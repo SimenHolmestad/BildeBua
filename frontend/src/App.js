@@ -1,5 +1,6 @@
 import React from 'react';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import UserPages from './components/UserPages'
 import LastImagePage from './components/LastImagePage'
 import QrCodePage from './components/QrCodePage'
@@ -9,26 +10,27 @@ import SlideshowPage from './components/SlideshowPage'
 
 import {
   BrowserRouter as Router,
+  Routes,
   Route,
-  Switch,
 } from 'react-router-dom';
 
 
 function App() {
+  const theme = React.useMemo(() => createTheme(), []);
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <Switch>
-          <Route exact path='/album/:albumName/last_image' component={ LastImagePage }/>
-          <Route exact path='/album/:albumName/last_image_qr' component={ QrCodeLastImagePage }/>
-          <Route exact path='/album/:albumName/slideshow' component={ SlideshowPage }/>
-          <Route exact path='/album/:albumName/slideshow_last_image' component={ SlideshowLastImagePage }/>
-          <Route exact path='/qr' component={ QrCodePage }/>
-          <Route path='/' component={ UserPages }/>
-        </Switch>
+        <Routes>
+          <Route path='/album/:albumName/last_image' element={<LastImagePage />} />
+          <Route path='/album/:albumName/last_image_qr' element={<QrCodeLastImagePage />} />
+          <Route path='/album/:albumName/slideshow' element={<SlideshowPage />} />
+          <Route path='/album/:albumName/slideshow_last_image' element={<SlideshowLastImagePage />} />
+          <Route path='/qr' element={<QrCodePage />} />
+          <Route path='/*' element={<UserPages />} />
+        </Routes>
       </Router>
-    </>
+    </ThemeProvider>
   );
 }
 

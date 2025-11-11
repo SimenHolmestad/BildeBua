@@ -1,15 +1,16 @@
 import React from 'react';
 import SlideshowPage from './SlideshowPage';
 import LastImage from './LastImage';
+import { useParams } from 'react-router-dom';
 
-function QrCodeLastImagePage(props) {
-  const albumName = props.match.params.albumName
+function SlideshowLastImagePage() {
+  const { albumName } = useParams();
   return (
     <>
-      <SlideshowPage {...props}/>
+      <SlideshowPage />
       <LastImage albumName={albumName} overlay={true} overlayTime={20000}/>
     </>
   );
 }
 
-export default QrCodeLastImagePage
+export default SlideshowLastImagePage

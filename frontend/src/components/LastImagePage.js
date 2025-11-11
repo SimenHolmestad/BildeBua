@@ -1,9 +1,11 @@
 import React from 'react';
 import LastImage from './LastImage'
+import { useParams } from 'react-router-dom';
 
-function LastImagePage(props) {
+function LastImagePage() {
+  const { albumName } = useParams();
   return (
-    <LastImage albumName={props.match.params.albumName}/>
+    <LastImage albumName={albumName}/>
   );
 }
 

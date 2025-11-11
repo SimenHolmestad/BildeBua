@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Card from '@material-ui/core/Card';
+import Card from '@mui/material/Card';
 import { get_available_album_data } from './../server'
 import NewAlbumDialog from './NewAlbumDialog';
-import { Link, Redirect } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import Typography from '@material-ui/core/Typography';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Grid from '@material-ui/core/Grid';
+import { Link, Navigate } from 'react-router-dom';
+import { makeStyles } from '@mui/styles';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+import Grid from '@mui/material/Grid';
 
 const useAlbumData = () => {
   const [albumData, setAlbumData] = useState(null);
@@ -31,7 +31,16 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     marginTop: '20px',
     paddingTop: '10px',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: theme.shape.borderRadius * 2 || 8,
+    border: `1px solid ${theme.palette.divider}`,
+    boxShadow: `0 8px 20px rgba(0,0,0,0.08)`,
+    backgroundImage: `linear-gradient(145deg, ${theme.palette.grey[50]}, ${theme.palette.grey[100]})`,
+    '&:hover': {
+      backgroundColor: theme.palette.grey[50],
+      boxShadow: `0 12px 28px rgba(0,0,0,0.12)`,
+    },
   },
   albumLink: {
     textDecoration:"inherit",
@@ -39,7 +48,8 @@ const useStyles = makeStyles((theme) => ({
     textTransform: "none"
   },
   albumLinkText: {
-    fontWeight: '200'
+    fontWeight: '200',
+    color: theme.palette.primary.main,
   },
   loadingGrid: {
     paddingTop: "30px",
@@ -55,12 +65,12 @@ function Menu() {
   let albumList = null
   if (!albumData) {
     return (
-      <Grid container className={classes.loadingGrid} spacing={2} justify="center">
+      <Grid container className={classes.loadingGrid} spacing={2} justifyContent="center">
         <CircularProgress/>
       </Grid>
     )
   } else if (albumData.forced_album) {
-    return <Redirect to={"/album/" + albumData.forced_album} />
+    return <Navigate to={"/album/" + albumData.forced_album} replace />
   } else {
     albumList = albumData.available_albums.map((albumName) => (
       <Link key={albumName} to={ "/album/" + albumName } className={classes.albumLink}>

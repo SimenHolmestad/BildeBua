@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { get_album_info } from './../server'
 import AlbumOverview from './AlbumOverview'
 import ImageDetail from './ImageDetail'
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import { Route, Switch } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
+import { makeStyles } from '@mui/styles';
+import Grid from '@mui/material/Grid';
+import { Route, Routes, useParams } from 'react-router-dom';
 
 const useStyles = makeStyles(() => ({
   loadingGrid: {
@@ -14,8 +14,8 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function AlbumPage(props) {
-  const albumName = props.match.params.albumName;
+function AlbumPage() {
+  const { albumName } = useParams();
   const [albumData, setAlbumData] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [imageIndex, setImageIndex] = React.useState(1);
@@ -45,13 +45,13 @@ function AlbumPage(props) {
 
   if (!albumData) {
     return (
-      <Grid container className={classes.loadingGrid} spacing={2} justify="center">
+      <Grid container className={classes.loadingGrid} spacing={2} justifyContent="center">
         <CircularProgress/>
       </Grid>
     )
   }
 
-  const imageDetail = () => (
+  const imageDetail = (
     <ImageDetail
       imageUrls={albumData.image_urls}
       imageIndex={imageIndex}
@@ -59,7 +59,7 @@ function AlbumPage(props) {
       albumName={albumName}/>
   )
 
-  const albumOverview = () => (
+  const albumOverview = (
     <AlbumOverview
       albumData={albumData}
       setAlbumData={setAlbumData}
@@ -67,10 +67,11 @@ function AlbumPage(props) {
   );
 
   return (
-    <Switch>
-      <Route exact path={`${props.match.url}/detail`} render={imageDetail} />
-      <Route path={`${props.match.url}`} render={albumOverview} />
-    </Switch>
+    <Routes>
+      <Route path="detail" element={imageDetail} />
+      <Route index element={albumOverview} />
+      <Route path="*" element={albumOverview} />
+    </Routes>
   )
 }
 

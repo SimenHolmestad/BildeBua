@@ -1,9 +1,10 @@
 import React from 'react';
 import QrCodePage from './QrCodePage';
 import LastImage from './LastImage';
+import { useParams } from 'react-router-dom';
 
-function QrCodeLastImagePage(props) {
-  const albumName = props.match.params.albumName
+function QrCodeLastImagePage() {
+  const { albumName } = useParams();
   return (
     <>
       <LastImage albumName={albumName} overlay={true} overlayTime={20000}/>

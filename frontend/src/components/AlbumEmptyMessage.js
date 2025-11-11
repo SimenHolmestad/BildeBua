@@ -1,7 +1,7 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
+import { makeStyles } from '@mui/styles';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
 
 const useStyles = makeStyles(() => ({
   noImagesDiv: {
@@ -17,7 +17,7 @@ function AlbumEmptyMessage() {
   const classes = useStyles();
   return (
     <div className={ classes.noImagesDiv }>
-      <Container justify="center" maxWidth="sm">
+      <Container maxWidth="sm">
         <Typography variant="h3" className={classes.emptyAlbumText} align="center" color="textSecondary" gutterBottom>
           There are no images
         </Typography>

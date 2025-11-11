@@ -1,6 +1,6 @@
 import React from 'react';
 import { get_last_image_url } from './../server'
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import FullscreenImage from './FullscreenImage';
 import AlbumEmptyMessage from './AlbumEmptyMessage';
 

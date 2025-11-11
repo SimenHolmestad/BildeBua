@@ -1,12 +1,12 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import ArrowBack from '@material-ui/icons/ArrowBack';
-import ArrowForward from '@material-ui/icons/ArrowForward';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { makeStyles } from '@mui/styles';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -90,7 +90,7 @@ function ImageDetail({imageUrls, imageIndex, setImageIndex, albumName}) {
              onLoad={doneLoading}
              src={imageUrls[imageUrls.length - imageIndex]}
              alt=""/>
-        <Grid container justify="space-between">
+        <Grid container justifyContent="space-between">
           {leftButton}
           {rightButton}
         </Grid>

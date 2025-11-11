@@ -1,13 +1,14 @@
 import React from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import AlbumEmptyMessage from './AlbumEmptyMessage';
 import Slideshow from './Slideshow';
 import { get_album_info } from './../server'
+import { useParams } from 'react-router-dom';
 
 
-function SlideshowPage(props) {
+function SlideshowPage() {
   const [imageUrls, setImageUrls] = React.useState(null);
-  const albumName = props.match.params.albumName;
+  const { albumName } = useParams();
 
   // Update the album data from server every 30 seconds
   React.useEffect(() => {

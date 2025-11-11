@@ -1,8 +1,8 @@
 import React from 'react';
 import { get_qr_codes } from './../server';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import { makeStyles } from '@mui/styles';
 import Header from './Header';
 
 const useStyles = makeStyles(() => ({
@@ -46,7 +46,7 @@ function QrCodePage() {
     <>
       <Header/>
       <div className={classes.verticallyCenteredDiv}>
-        <Grid container justify="space-around" className={classes.qrCodeGrid}>
+        <Grid container justifyContent="space-around" className={classes.qrCodeGrid}>
           {qrCodes}
         </Grid>
       </div>
