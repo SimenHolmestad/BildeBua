@@ -9,6 +9,8 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    host: true,
+    port: 5000,
     proxy: {
       "/albums": "http://localhost:5000",
       "/qr_codes": "http://localhost:5000",

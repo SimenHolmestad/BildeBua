@@ -38,7 +38,7 @@ def main() -> None:
     parser.add_argument(
         "config",
         nargs="?",
-        default=os.path.join("configs", "config.json"),
+        default=os.path.join("configs", "example_config.json"),
         help="Path to a config file."
     )
     args = parser.parse_args()

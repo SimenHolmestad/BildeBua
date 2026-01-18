@@ -1,6 +1,6 @@
-[Back to readme](../README.md)
+[Tilbake til lesmeg](../lesmeg.md)
 
-# Developing
+# Utvikling
 Under utvikling vil applikasjonen lage bilder som dette når det ikke er noe kamera koblet til:
 
 ![Dummy demo circle image](images/dummy_demo_image.png)
@@ -29,5 +29,5 @@ npm run dev
 
 # Kjøre tester
 ```
-python3 -m unittest
+export DYLD_LIBRARY_PATH=/opt/homebrew/lib:/usr/local/lib:$DYLD_LIBRARY_PATH && python3 -m pytest backend/tests
 ```

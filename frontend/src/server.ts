@@ -6,6 +6,7 @@ import {
   getQrCodesQrCodesGet,
   lastImageForAlbumAlbumsAlbumNameLastImageGet,
 } from "./api";
+import { client } from "./api/client.gen";
 import type {
   AlbumCaptureResponse,
   AlbumCreatedResponse,
@@ -17,6 +18,20 @@ import type {
 
 export type ApiError = { error: string };
 export type Result<T> = T | ApiError;
+
+const resolveApiBaseUrl = (): string => {
+  if (typeof window === "undefined") {
+    return "http://localhost:5000";
+  }
+
+  const { protocol, hostname, port } = window.location;
+  if (port === "5000") {
+    return `${protocol}//${hostname}:${port}`;
+  }
+  return `${protocol}//${hostname}:5000`;
+};
+
+client.setConfig({ baseUrl: resolveApiBaseUrl() });
 
 export const isApiError = (value: unknown): value is ApiError =>
   typeof value === "object" &&

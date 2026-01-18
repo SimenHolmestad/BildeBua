@@ -35,13 +35,14 @@ def run_application(settings: Settings) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run CameraHub application.")
     parser.add_argument(
-        "config",
-        nargs="?",
-        default=os.path.join("configs", "config.json"),
+        "--config",
+        dest="config_path",
+        default=None,
         help="Path to a config file."
     )
     args = parser.parse_args()
-    settings = load_settings(args.config)
+    config_path = args.config_path or os.path.join("configs", "example_config.json")
+    settings = load_settings(config_path)
     run_application(settings)
 
 

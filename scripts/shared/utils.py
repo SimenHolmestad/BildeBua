@@ -114,16 +114,25 @@ def find_ip_address_for_device() -> str:
 
 
 def _run_npm_build_commands() -> None:
-    with open(os.devnull, 'w') as fp:
-        print("Installing react dependencies...")
-        subprocess.run("npm install", shell=True, stdout=fp)
-        print("Building react application...")
-        subprocess.run("npm run build", shell=True, stdout=fp)
+    print("Installing react dependencies...")
+    subprocess.run(["npm", "install"], check=True)
+    print("Building react application...")
+    subprocess.run(["npm", "run", "build"], check=True)
 
 
 def _move_frontend_folder_to_backend(static_folder_name: str) -> None:
     print("moving build folder to backend...")
     target_path = os.path.join("./..", "backend", static_folder_name, "react")
+    build_dir = _get_frontend_build_dir()
     if os.path.exists(target_path):
         shutil.rmtree(target_path)
-    shutil.move("./build", target_path)
+    shutil.move(build_dir, target_path)
+
+
+def _get_frontend_build_dir() -> str:
+    for candidate in ("build", "dist"):
+        if os.path.exists(candidate):
+            return candidate
+    raise FileNotFoundError(
+        "Frontend build output not found. Expected ./build or ./dist after npm run build."
+    )

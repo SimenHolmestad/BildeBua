@@ -1,9 +1,10 @@
+import argparse
 import os
 import subprocess
 from scripts.shared.utils import build_frontend, frontend_is_built
 
 
-def run_deploy() -> None:
+def run_deploy(config_path: str) -> None:
     """Deploy the application to Systemd."""
     if os.geteuid() != 0:
         print("The deploy script must be run as root.")
@@ -13,7 +14,7 @@ def run_deploy() -> None:
     if not frontend_is_built():
         build_frontend()
 
-    systemd_file_content = create_systemd_config_file_content()
+    systemd_file_content = create_systemd_config_file_content(config_path)
     print("--------Systemd file is--------")
     print(systemd_file_content)
     print("-------------------------------")
@@ -23,6 +24,7 @@ def run_deploy() -> None:
     with open(systemd_file_path, "w") as f:
         f.write(systemd_file_content)
 
+    ensure_static_permissions()
     start_or_restart_systemd_process()
     print("System started")
     print("To get system status, run \"sudo systemctl status camerahub\"")
@@ -45,9 +47,10 @@ def start_or_restart_systemd_process() -> None:
     subprocess.run("sudo systemctl restart camerahub", shell=True)
 
 
-def create_systemd_config_file_content() -> str:
+def create_systemd_config_file_content(config_path: str) -> str:
     username = os.environ["SUDO_USER"]
     working_directory = os.getcwd()
+    resolved_config_path = _resolve_config_path(working_directory, config_path)
 
     content_lines = [
         "[Unit]",
@@ -57,7 +60,7 @@ def create_systemd_config_file_content() -> str:
         "[Service]",
         "User={}".format(username),
         "WorkingDirectory={}".format(working_directory),
-        "ExecStart=python3 scripts/run_application.py"
+        "ExecStart={}/.venv/bin/python -m scripts.run_application --config {}".format(working_directory, resolved_config_path),
         "Restart=always",
         "",
         "[Install]",
@@ -66,5 +69,28 @@ def create_systemd_config_file_content() -> str:
     return "\n".join(content_lines)
 
 
+def ensure_static_permissions() -> None:
+    username = os.environ["SUDO_USER"]
+    working_directory = os.getcwd()
+    static_dir = os.path.join(working_directory, "backend", "static")
+    os.makedirs(static_dir, exist_ok=True)
+    subprocess.run(
+        ["chown", "-R", f"{username}:{username}", static_dir],
+        check=True
+    )
+
+def _resolve_config_path(working_directory: str, config_path: str) -> str:
+    if os.path.isabs(config_path):
+        return config_path
+    return os.path.join(working_directory, config_path)
+
+
 if __name__ == "__main__":
-    run_deploy()
+    parser = argparse.ArgumentParser(description="Deploy CameraHub as a systemd service.")
+    parser.add_argument(
+        "--config",
+        default=os.path.join("configs", "example_config.json"),
+        help="Path to config file to use for the systemd service."
+    )
+    args = parser.parse_args()
+    run_deploy(args.config)
