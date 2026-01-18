@@ -1,8 +1,8 @@
+import argparse
 import os
 from backend.album_service import album_service
 from backend.core.config_loader import load_settings
 from backend.core.settings import Settings
-from scripts.shared.utils import get_camera_module_instance
 
 
 def run_try_camera_module(settings: Settings, album_dir_name: str = "test_albums") -> None:
@@ -25,8 +25,7 @@ def run_try_camera_module(settings: Settings, album_dir_name: str = "test_albums
         album_dir_name,
         album_name
     ))
-    camera_module = get_camera_module_instance(settings)
-    album_service.capture_image_to_album(base_path, album_dir_name, album_name, camera_module)
+    album_service.capture_image_to_album(base_path, album_dir_name, album_name, settings)
 
 
 def ensure_album_directory_exists(album_dir_name: str) -> None:
@@ -35,7 +34,15 @@ def ensure_album_directory_exists(album_dir_name: str) -> None:
 
 
 def main() -> None:
-    settings = load_settings()
+    parser = argparse.ArgumentParser(description="Try camera module capture.")
+    parser.add_argument(
+        "config",
+        nargs="?",
+        default=os.path.join("configs", "config.json"),
+        help="Path to a config file."
+    )
+    args = parser.parse_args()
+    settings = load_settings(args.config)
     run_try_camera_module(settings)
 
 

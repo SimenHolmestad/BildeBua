@@ -5,10 +5,10 @@ from pydantic import ValidationError
 from .settings import Settings
 
 
-def load_settings(config_path: str = os.path.join("config", "config.json")) -> Settings:
+def load_settings(config_path: str = os.path.join("configs", "config.json")) -> Settings:
     if not os.path.exists(config_path):
         raise FileNotFoundError(
-            "Config file not found at {}. Create it based on the example schema.".format(config_path)
+            "Config file not found at {}. Create it based on configs/example_config.json.".format(config_path)
         )
     with open(config_path, "r") as f:
         raw: Dict[str, Any] = json.loads(f.read())

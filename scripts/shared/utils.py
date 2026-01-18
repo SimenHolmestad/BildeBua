@@ -4,8 +4,8 @@ import socket
 import platform
 import subprocess
 from typing import Any, Optional
-from backend.api.qr_codes.handler import QrCodeHandler
-from backend.camera.options import get_instance_of_camera_module_by_name
+from typing import Mapping
+from scripts.shared import qr_code_utils
 from backend.album_service import album_service
 from backend.app import create_app
 from backend.core.settings import Settings
@@ -53,13 +53,13 @@ def open_webpage_in_device_browser(url: str) -> Optional[subprocess.Popen]:
     return None
 
 
-def create_qr_code_handler(
+def create_qr_codes(
     settings: Settings,
     host_ip: str,
     port: int,
     static_folder_name: str = STATIC_FOLDER_NAME
-) -> QrCodeHandler:
-    return QrCodeHandler.create_qr_code_handler_with_qr_codes(
+) -> list[Mapping[str, str]]:
+    context = qr_code_utils.create_qr_codes_with_settings(
         static_folder_path(static_folder_name),
         host_ip,
         port,
@@ -67,6 +67,7 @@ def create_qr_code_handler(
         forced_album_name=settings.albums.forced_album,
         wifi_settings=settings.qr_codes.wifi
     )
+    return qr_code_utils.get_qr_codes(context)
 
 
 def get_url_for_qr_code_page(host_ip: str, port: int, forced_album: Optional[str]) -> str:
@@ -77,10 +78,6 @@ def get_url_for_qr_code_page(host_ip: str, port: int, forced_album: Optional[str
             forced_album
         )
     return "http://{}:{}/qr".format(host_ip, str(port))
-
-
-def get_camera_module_instance(settings: Settings) -> Any:
-    return get_instance_of_camera_module_by_name(settings.camera.module)
 
 
 def ensure_forced_album_is_created(
@@ -98,16 +95,14 @@ def create_app_with_settings(
     port: int,
     static_folder_name: str = STATIC_FOLDER_NAME
 ) -> Any:
-    qr_code_handler = create_qr_code_handler(settings, host_ip, port, static_folder_name)
+    qr_codes = create_qr_codes(settings, host_ip, port, static_folder_name)
     base_path = static_folder_path(static_folder_name)
     ensure_forced_album_is_created(base_path, "albums", settings.albums.forced_album)
-    camera_module = get_camera_module_instance(settings)
 
     return create_app(
-        static_folder_name,
-        camera_module,
-        qr_code_handler,
-        forced_album_name=settings.albums.forced_album
+        static_folder_path(static_folder_name),
+        settings,
+        qr_codes
     )
 
 

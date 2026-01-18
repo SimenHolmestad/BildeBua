@@ -24,7 +24,7 @@ For å starte frontend, kjør dette i egen terminal.
 ```
 cd CameraHub/frontend
 npm install
-npm start
+npm run dev
 ```
 
 # Kjøre tester

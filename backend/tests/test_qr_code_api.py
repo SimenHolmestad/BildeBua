@@ -2,8 +2,8 @@ import unittest
 import tempfile
 from fastapi.testclient import TestClient
 from backend.app import create_app
-from backend.api.qr_codes.handler import QrCodeHandler
-from .camera_modules_for_testing import create_fast_dummy_module
+from scripts.shared import qr_code_utils
+from .camera_modules_for_testing import create_fast_dummy_settings
 from .test_utils import temp_dir_relpath
 
 
@@ -12,10 +12,14 @@ class QrCodeApiTestCase(unittest.TestCase):
         # Create a temporary static dir which is deleted after every test
         self.static_dir = tempfile.TemporaryDirectory(dir=".")
         self.static_dir_name = temp_dir_relpath(self.static_dir)
-        camera_module = create_fast_dummy_module()
+        settings = create_fast_dummy_settings()
 
-        self.qr_code_handler = QrCodeHandler(self.static_dir_name)
-        app = create_app(self.static_dir_name, camera_module, self.qr_code_handler)
+        self.qr_code_context = qr_code_utils.create_qr_code_context(self.static_dir_name)
+        app = create_app(
+            self.static_dir_name,
+            settings,
+            qr_code_utils.get_qr_codes(self.qr_code_context)
+        )
         self.test_client = TestClient(app)
 
     def tearDown(self) -> None:
@@ -27,7 +31,8 @@ class QrCodeApiTestCase(unittest.TestCase):
         self.assertEqual(response.json(), {"qr_codes": []})
 
     def test_response_after_adding_url_qr_code(self) -> None:
-        self.qr_code_handler.add_url_qr_code(
+        qr_code_utils.add_url_qr_code(
+            self.qr_code_context,
             "test_url_qr_code",
             "www.test.com",
             "Scan this qr code to go to www.test.com!"
@@ -38,18 +43,20 @@ class QrCodeApiTestCase(unittest.TestCase):
                 {
                     'name': 'test_url_qr_code',
                     'information': 'Scan this qr code to go to www.test.com!',
-                    'url': '/{}/qr_codes/test_url_qr_code.png'.format(self.static_dir_name)
+                    'url': '/static/qr_codes/test_url_qr_code.png'
                 }
             ]
         })
 
     def test_response_after_adding_url_and_wifi_qr_code(self) -> None:
-        self.qr_code_handler.add_url_qr_code(
+        qr_code_utils.add_url_qr_code(
+            self.qr_code_context,
             "test_url_qr_code",
             "www.test.com",
             "Scan this qr code to go to www.test.com!"
         )
-        self.qr_code_handler.add_wifi_qr_code(
+        qr_code_utils.add_wifi_qr_code(
+            self.qr_code_context,
             "wifi_qr_code",
             "my_netwok_ssid",
             "WPA/WPA2",
@@ -62,11 +69,11 @@ class QrCodeApiTestCase(unittest.TestCase):
                 {
                     'information': 'Scan this qr code to go to www.test.com!',
                     'name': 'test_url_qr_code',
-                    'url': '/{}/qr_codes/test_url_qr_code.png'.format(self.static_dir_name)
+                    'url': '/static/qr_codes/test_url_qr_code.png'
                 }, {
                     'information': 'Scan this qr code to connect to the wifi!',
                     'name': 'wifi_qr_code',
-                    'url': '/{}/qr_codes/wifi_qr_code.png'.format(self.static_dir_name)
+                    'url': '/static/qr_codes/wifi_qr_code.png'
                 }
             ]
         })

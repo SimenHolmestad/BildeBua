@@ -1,3 +1,5 @@
+import argparse
+import os
 import uvicorn
 from backend.core.config_loader import load_settings
 from backend.core.settings import Settings
@@ -31,7 +33,15 @@ def run_application(settings: Settings) -> None:
 
 
 def main() -> None:
-    settings = load_settings()
+    parser = argparse.ArgumentParser(description="Run CameraHub application.")
+    parser.add_argument(
+        "config",
+        nargs="?",
+        default=os.path.join("configs", "config.json"),
+        help="Path to a config file."
+    )
+    args = parser.parse_args()
+    settings = load_settings(args.config)
     run_application(settings)
 
 

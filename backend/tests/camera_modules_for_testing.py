@@ -1,46 +1,41 @@
-from shutil import copyfile
-from typing import Optional
-from backend.camera.modules.dummy_camera_module import DummyCameraModule
-from backend.camera.modules.base_camera_module import BaseCameraModule, ImageCaptureError
+from backend.core.settings import Settings
 
 
-def create_fast_dummy_module() -> DummyCameraModule:
-    """Creates a faster dummy module for quicker test runs"""
-    return DummyCameraModule(
-        width=120,
-        height=80,
-        number_of_circles=5,
-        min_circle_radius=5,
-        max_circle_radius=15
-    )
+def _base_settings() -> Settings:
+    return Settings.model_validate({
+        "qr_codes": {
+            "wifi": {
+                "enabled": False
+            }
+        }
+    })
 
 
-class FaultyCameraModule(BaseCameraModule):
-    """A camera module to test error handling functionality"""
-
-    def __init__(self, should_fail: bool = True) -> None:
-        super().__init__(".jpg", verbose_errors=False)
-        self.should_fail = should_fail
-        self.dummy_module = create_fast_dummy_module()
-
-    def capture_image(self, image_path: str, raw_file_path: Optional[str] = None) -> None:
-        if self.should_fail:
-            raise ImageCaptureError("This is a test error message")
-
-        self.dummy_module.try_capture_image(image_path)
+def create_fast_dummy_settings() -> Settings:
+    settings = _base_settings()
+    settings.camera.module = "dummy"
+    settings.camera.options = {
+        "width": 120,
+        "height": 80,
+        "number_of_circles": 5,
+        "min_circle_radius": 5,
+        "max_circle_radius": 15
+    }
+    return settings
 
 
-class DummyRawModule(BaseCameraModule):
-    """Dummy module which also creates dummy raw files.
+def create_faulty_dummy_settings() -> Settings:
+    settings = create_fast_dummy_settings()
+    settings.camera.options.update({
+        "should_fail": True,
+        "error_message": "This is a test error message",
+        "verbose_errors": False
+    })
+    return settings
 
-    The module uses another dummy module for creating the image file
-    before renaming and moving the file to the raw directory.
-    """
 
-    def __init__(self) -> None:
-        super().__init__(".png", needs_raw_file_transfer=True, raw_file_extension=".cr2")
-        self.dummy_module = create_fast_dummy_module()
-
-    def capture_image(self, image_path: str, raw_file_path: str) -> None:
-        self.dummy_module.try_capture_image(image_path)
-        copyfile(image_path, raw_file_path)
+def create_dummy_raw_settings() -> Settings:
+    settings = create_fast_dummy_settings()
+    settings.camera.modules["dummy"]["needs_raw_file_transfer"] = True
+    settings.camera.modules["dummy"]["raw_file_extension"] = ".cr2"
+    return settings

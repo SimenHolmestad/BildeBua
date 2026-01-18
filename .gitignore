@@ -22,3 +22,6 @@ test_albums/
 node_modules/
 
 .dir-locals.el
+
+configs/*
+!configs/example_config.json

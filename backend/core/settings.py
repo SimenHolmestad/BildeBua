@@ -1,4 +1,5 @@
 from typing import Optional, Dict, Any
+import copy
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -31,9 +32,41 @@ class QrCodeSettings(BaseModel):
     wifi: WifiSettings = Field(default_factory=WifiSettings)
 
 
+DEFAULT_CAMERA_MODULES: Dict[str, Dict[str, Any]] = {
+    "dummy": {
+        "file_extension": ".png",
+        "needs_raw_file_transfer": False,
+        "raw_file_extension": None
+    },
+    "rpicam": {
+        "file_extension": ".jpg",
+        "needs_raw_file_transfer": False,
+        "raw_file_extension": None
+    },
+    "dslr_jpg": {
+        "file_extension": ".jpg",
+        "needs_raw_file_transfer": False,
+        "raw_file_extension": None
+    },
+    "dslr_raw": {
+        "file_extension": ".jpg",
+        "needs_raw_file_transfer": False,
+        "raw_file_extension": None
+    },
+    "dslr_raw_transfer": {
+        "file_extension": ".jpg",
+        "needs_raw_file_transfer": True,
+        "raw_file_extension": ".cr2"
+    }
+}
+
+
 class CameraSettings(BaseModel):
     module: str = "dummy"
     options: Dict[str, Any] = Field(default_factory=dict)
+    modules: Dict[str, Dict[str, Any]] = Field(
+        default_factory=lambda: copy.deepcopy(DEFAULT_CAMERA_MODULES)
+    )
 
 
 class AlbumSettings(BaseModel):

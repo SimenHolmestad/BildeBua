@@ -1,41 +1,38 @@
 import os
-from typing import Any, Optional
+from typing import Any
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse, Response
-from backend.api.albums.router import construct_album_api_router
-from backend.api.qr_codes.router import construct_qr_code_api_router
+from backend.routers.albums import construct_album_api_router
+from backend.routers.qr_codes import construct_qr_code_api_router
 from backend.album_service.album_service import DEFAULT_ALBUMS_DIR
+from backend.core.settings import Settings
 
 
 def create_app(
-    static_folder_name: str,
-    camera_module: Any,
-    qr_code_handler: Any,
-    forced_album_name: Optional[str] = None
+    static_folder_path: str,
+    settings: Settings,
+    qr_codes: Any
 ) -> FastAPI:
     app = FastAPI(
         title="CameraHub API",
         version="1.0.0",
         description="API for managing albums, images, and QR codes."
     )
-    static_folder_path = static_folder_name
     if not os.path.exists(static_folder_path):
-        static_folder_path = os.path.join("backend", static_folder_name)
+        raise RuntimeError(f"Static folder path '{static_folder_path}' does not exist")
 
     app.include_router(construct_album_api_router(
         static_folder_path,
         DEFAULT_ALBUMS_DIR,
-        camera_module,
-        forced_album_name=forced_album_name
+        settings,
+        forced_album_name=settings.albums.forced_album
     ), prefix="/albums")
 
-    app.include_router(construct_qr_code_api_router(
-        qr_code_handler
-    ), prefix="/qr_codes")
+    app.include_router(construct_qr_code_api_router(qr_codes), prefix="/qr_codes")
 
     app.mount(
-        f"/{static_folder_name}",
+        "/static",
         StaticFiles(directory=static_folder_path),
         name="static"
     )

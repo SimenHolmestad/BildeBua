@@ -21,3 +21,4 @@ Andre nyttige lenker:
 - [Wifi-setup på hovedskjerm](docs/show_wifi_qr_code_on_main_screen.md)
 - [Oppsett med speilreflekskamera](docs/setup_dslr_camera.md)
 - [Nedlasting av bilder fra Raspberry PI](docs/downloading_images_from_the_rpi.md)
+- [Generere frontend API-typer](docs/generate_frontend_types.md)

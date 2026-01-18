@@ -1,6 +1,6 @@
 import os
 import shutil
-from typing import Any, List, Optional, Tuple
+from typing import List, Optional, Tuple
 from PIL import Image
 from .current_image_tracker import (
     get_name_of_last_image,
@@ -8,6 +8,8 @@ from .current_image_tracker import (
     increase_image_number
 )
 from .image_name_formatter import change_extension_of_filename
+from backend.camera_service import camera_service
+from backend.core.settings import Settings
 
 MAX_THUMBNAIL_SIZE = (600, 600)
 DEFAULT_ALBUMS_DIR = "albums"
@@ -126,7 +128,7 @@ def capture_image_to_album(
     base_path: str,
     albums_dir: str,
     album_name: str,
-    camera_module: Any,
+    settings: Settings,
     image_name_prefix: str = DEFAULT_IMAGE_NAME_PREFIX
 ) -> Tuple[str, str]:
     _ensure_album_folders(base_path, albums_dir, album_name)
@@ -134,26 +136,40 @@ def capture_image_to_album(
     images_path = _images_path(base_path, albums_dir, album_name)
     thumbnails_path = _thumbnails_path(base_path, albums_dir, album_name)
 
+    module_name = settings.camera.module
+    module_config = settings.camera.modules.get(module_name)
+    if not module_config:
+        raise camera_service.CameraModuleNotFoundError(
+            "Unknown camera module: {}".format(module_name)
+        )
+    file_extension = module_config.get("file_extension")
+    if not file_extension:
+        raise camera_service.ImageCaptureError(
+            "Missing file extension for camera module: {}".format(module_name)
+        )
+
     next_image_name = get_next_image_name(
         album_path,
         images_path,
         image_name_prefix,
-        camera_module.file_extension
+        file_extension
     )
 
-    if camera_module.needs_raw_file_transfer:
+    if module_config.get("needs_raw_file_transfer"):
         raw_images_path = _raw_images_path(base_path, albums_dir, album_name)
         os.makedirs(raw_images_path, exist_ok=True)
-        raw_image_name = change_extension_of_filename(
-            next_image_name,
-            camera_module.raw_file_extension
-        )
+        raw_extension = module_config.get("raw_file_extension")
+        if not raw_extension:
+            raise camera_service.ImageCaptureError(
+                "Missing raw file extension for camera module: {}".format(module_name)
+            )
+        raw_image_name = change_extension_of_filename(next_image_name, raw_extension)
         raw_image_path = os.path.join(raw_images_path, raw_image_name)
         image_path = os.path.join(images_path, next_image_name)
-        camera_module.try_capture_image(image_path, raw_image_path)
+        camera_service.try_capture_image(settings, image_path, raw_image_path)
     else:
         image_path = os.path.join(images_path, next_image_name)
-        camera_module.try_capture_image(image_path)
+        camera_service.try_capture_image(settings, image_path)
 
     _create_thumbnail_for_image(images_path, thumbnails_path, next_image_name)
     increase_image_number(album_path, images_path, image_name_prefix)

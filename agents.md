@@ -10,3 +10,10 @@ export DYLD_LIBRARY_PATH=/opt/homebrew/lib:/usr/local/lib:$DYLD_LIBRARY_PATH && 
 ```
 
 Make sure to run the tests after doing larger changes. Do not ask to run the tests, just do it.
+
+## Frontend Types
+When changes affect both the backend and frontend API surface, run the type generation script:
+
+```sh
+python3 -m scripts.generate_frontend_types
+```
