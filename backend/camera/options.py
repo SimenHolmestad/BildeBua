@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Type
-from .camera_modules.dummy_camera_module import DummyCameraModule
-from .camera_modules.rpicam_module import RPICameraModule
+from .modules.dummy_camera_module import DummyCameraModule
+from .modules.rpicam_module import RPICameraModule
 
 CAMERA_MODULE_OPTIONS: Dict[str, Type] = {
     "dummy": DummyCameraModule,
@@ -9,9 +9,9 @@ CAMERA_MODULE_OPTIONS: Dict[str, Type] = {
 
 # The dslr modules can only be imported when gphoto2 is installed.
 try:
-    from .camera_modules.dslr_jpg_module import DSLRJpgModule
-    from .camera_modules.dslr_raw_module import DSLRRawModule
-    from .camera_modules.dslr_raw_transfer_module import DSLRRawTransferModule
+    from .modules.dslr_jpg_module import DSLRJpgModule
+    from .modules.dslr_raw_module import DSLRRawModule
+    from .modules.dslr_raw_transfer_module import DSLRRawTransferModule
     CAMERA_MODULE_OPTIONS["dslr_jpg"] = DSLRJpgModule
     CAMERA_MODULE_OPTIONS["dslr_raw"] = DSLRRawModule
     CAMERA_MODULE_OPTIONS["dslr_raw_transfer"] = DSLRRawTransferModule

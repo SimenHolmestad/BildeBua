@@ -35,7 +35,7 @@ const UserPages = () => {
           Hope you like CameraHub!
         </Typography>
         <Typography variant="subtitle1" align="center" color="inherit" component="p">
-          CameraHub is made using Python, Flask, React and Material UI. The source code is openly available on <a className={classes.footerLink} href="https://github.com/SimenHolmestad/CameraHub" target="_blank" rel="noreferrer">GitHub</a>.
+          CameraHub is made using Python, FastAPI, React and Material UI. The source code is openly available on <a className={classes.footerLink} href="https://github.com/SimenHolmestad/CameraHub" target="_blank" rel="noreferrer">GitHub</a>.
         </Typography>
       </footer>
     </>

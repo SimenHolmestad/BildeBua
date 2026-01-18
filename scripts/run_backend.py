@@ -1,5 +1,6 @@
-from backend.config_loader import load_settings
-from backend.settings import Settings
+import uvicorn
+from backend.core.config_loader import load_settings
+from backend.core.settings import Settings
 from scripts.shared.utils import (
     DEBUG_PORT,
     create_app_with_settings,
@@ -17,7 +18,7 @@ def run_backend(settings: Settings) -> None:
     print("Url for qr codes (when frontend is running):", qr_code_url)
 
     app = create_app_with_settings(settings, host_ip, DEBUG_PORT)
-    app.run(debug=True, host="localhost")
+    uvicorn.run(app, host="localhost", port=DEBUG_PORT, log_level="debug")
 
 
 def main() -> None:

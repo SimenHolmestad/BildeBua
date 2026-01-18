@@ -1,5 +1,6 @@
-from backend.config_loader import load_settings
-from backend.settings import Settings
+import uvicorn
+from backend.core.config_loader import load_settings
+from backend.core.settings import Settings
 from scripts.shared.utils import (
     PRODUCTION_PORT,
     build_frontend,
@@ -22,7 +23,7 @@ def run_application(settings: Settings) -> None:
     app = create_app_with_settings(settings, host_ip, PRODUCTION_PORT)
 
     browser_process = open_webpage_in_device_browser(qr_code_url)
-    app.run(host=host_ip)
+    uvicorn.run(app, host=host_ip, port=PRODUCTION_PORT)
 
     # Delete browser process if it was created
     if browser_process:

@@ -1,8 +1,8 @@
 import unittest
 import tempfile
+from fastapi.testclient import TestClient
 from backend.app import create_app
-from backend.album_storage.folder_album_handler import FolderAlbumHandler
-from backend.qr_code_api.qr_code_handler import QrCodeHandler
+from backend.api.qr_codes.handler import QrCodeHandler
 from .camera_modules_for_testing import create_fast_dummy_module
 from .test_utils import temp_dir_relpath
 
@@ -13,19 +13,18 @@ class QrCodeApiTestCase(unittest.TestCase):
         self.static_dir = tempfile.TemporaryDirectory(dir=".")
         self.static_dir_name = temp_dir_relpath(self.static_dir)
         camera_module = create_fast_dummy_module()
-        album_handler = FolderAlbumHandler(self.static_dir_name, "albums")
 
         self.qr_code_handler = QrCodeHandler(self.static_dir_name)
-        app = create_app(album_handler, self.static_dir_name, camera_module, self.qr_code_handler)
-        self.test_client = app.test_client()
+        app = create_app(self.static_dir_name, camera_module, self.qr_code_handler)
+        self.test_client = TestClient(app)
 
     def tearDown(self) -> None:
         self.static_dir.cleanup()
 
     def test_response_when_no_qr_codes_added(self) -> None:
-        response = self.test_client.get('/qr_codes/', content_type='application/json')
+        response = self.test_client.get("/qr_codes/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {'qr_codes': []})
+        self.assertEqual(response.json(), {"qr_codes": []})
 
     def test_response_after_adding_url_qr_code(self) -> None:
         self.qr_code_handler.add_url_qr_code(
@@ -33,7 +32,7 @@ class QrCodeApiTestCase(unittest.TestCase):
             "www.test.com",
             "Scan this qr code to go to www.test.com!"
         )
-        json_response = self.test_client.get('/qr_codes/', content_type='application/json').json
+        json_response = self.test_client.get("/qr_codes/").json()
         self.assertEqual(json_response, {
             'qr_codes': [
                 {
@@ -57,7 +56,7 @@ class QrCodeApiTestCase(unittest.TestCase):
             "my_super_secret_password",
             "Scan this qr code to connect to the wifi!"
         )
-        json_response = self.test_client.get('/qr_codes/', content_type='application/json').json
+        json_response = self.test_client.get("/qr_codes/").json()
         self.assertEqual(json_response, {
             'qr_codes': [
                 {

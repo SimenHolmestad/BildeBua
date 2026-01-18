@@ -1,7 +1,6 @@
 import os
 from typing import List, Optional
-from backend.album_storage.folder import Folder
-from backend.settings import WifiSettings
+from backend.core.settings import WifiSettings
 from .qr_code import QrCode
 
 
@@ -11,7 +10,9 @@ class QrCodeHandler:
     """
 
     def __init__(self, static_dir_path: str, use_center_images: bool = False) -> None:
-        self.qr_code_folder = Folder(static_dir_path, "qr_codes")
+        self.qr_codes_dir_name = "qr_codes"
+        self.qr_code_folder_path = os.path.join(static_dir_path, self.qr_codes_dir_name)
+        os.makedirs(self.qr_code_folder_path, exist_ok=True)
         self.qr_codes = []
         self.logo_image_path = None
         self.wifi_image_path = None
@@ -24,7 +25,8 @@ class QrCodeHandler:
         """Add a qr_code containing and url to the qr code handler"""
         self.qr_codes.append(
             QrCode(
-                self.qr_code_folder,
+                self.qr_code_folder_path,
+                self.qr_codes_dir_name,
                 name,
                 url,
                 information_text,
@@ -44,7 +46,8 @@ class QrCodeHandler:
         wifi_qr_code_content = F"WIFI:S:{wifi_name};T:{wifi_protocol};P:{wifi_password};;"
         self.qr_codes.append(
             QrCode(
-                self.qr_code_folder,
+                self.qr_code_folder_path,
+                self.qr_codes_dir_name,
                 name,
                 wifi_qr_code_content,
                 information_text,

@@ -6,12 +6,12 @@ Camerahub is in general not trying to be more complicated than it needs to be. T
 - There is no session management
 - All images is stored in folders and there is no database
 
-This is some of the reason that the backend is developed in Flask. Developing CameraHub in Django probably would have been overkill when much of the Django functionality is not needed.
+This is some of the reason that the backend is developed in FastAPI. Developing CameraHub in Django probably would have been overkill when much of the Django functionality is not needed.
 
 # Technologies used
 The frameworks and libraries used for CameraHub are:
 
-- [Flask](https://flask.palletsprojects.com/en/2.0.x/) (for the backend)
+- [FastAPI](https://fastapi.tiangolo.com/) (for the backend)
 - [React](https://reactjs.org/) (for the frontend)
 - [Gphoto2](https://github.com/gphoto/gphoto2) (for communication with DSLR camera)
 
@@ -104,11 +104,11 @@ Doing this will create a folder named `test_albums` (in the root of the project)
 
 Some of the camera modules available are described below:
 ## The dummy camera module
-The dummy camera module (`backend/camera_modules/dummy_camera_module.py`) is created for testing purposes, so that it is not necessary to have a camera connected when developing. It is also used when running unit tests.
+The dummy camera module (`backend/camera/modules/dummy_camera_module.py`) is created for testing purposes, so that it is not necessary to have a camera connected when developing. It is also used when running unit tests.
 
 The module creates white images with randomly colored and positioned circles. How this circle generation is done can be changed by altering the class parameters.
 ## The "Raspberry PI camera module" camera module
-The "Raspberry PI camera module" camera module (`backend/camera_modules/rpicam_module.py`) makes it possible to use CameraHub together with the [Raspberry PI camera module](https://www.raspberrypi.org/documentation/hardware/camera/).
+The "Raspberry PI camera module" camera module (`backend/camera/modules/rpicam_module.py`) makes it possible to use CameraHub together with the [Raspberry PI camera module](https://www.raspberrypi.org/documentation/hardware/camera/).
 
 Currently, the module uses the `raspistill` command. For more information about getting started with the RPI camera module, see [the official tutorial](https://projects.raspberrypi.org/en/projects/getting-started-with-picamera).
 ## The DSLR camera modules
@@ -117,9 +117,9 @@ The DSLR camera modules are based on gphoto2 and makes CameraHub compatible with
 For more information on the DSLR camera modules, see [Setup DSLR camera on Raspberry PI](setup_dslr_camera.md).
 
 ## Creating a new camera module
-Most of the basic camera module functionality is implemented in the base class `backend/camera_modules/base_camera_module.py`, so creating a new one should not be that difficult – just create a class which inherits from `BaseCameraModule` and implements the `capture_image`-method. Take a look at [backend/camera_modules/rpicam_module.py](../backend/camera_modules/rpicam_module.py) to see how simple a camera module can be.
+Most of the basic camera module functionality is implemented in the base class `backend/camera/modules/base_camera_module.py`, so creating a new one should not be that difficult – just create a class which inherits from `BaseCameraModule` and implements the `capture_image`-method. Take a look at [backend/camera/modules/rpicam_module.py](../backend/camera/modules/rpicam_module.py) to see how simple a camera module can be.
 
-Also, when creating a new camera module, remember to update the dictionary `CAMERA_MODULE_OPTIONS` in `backend/camera_module_options.py` with information about the new module.
+Also, when creating a new camera module, remember to update the dictionary `CAMERA_MODULE_OPTIONS` in `backend/camera/options.py` with information about the new module.
 
 # Possible improvements to CameraHub
 For possible improvements to CameraHub, see [possible improvements](possible_improvements.md).

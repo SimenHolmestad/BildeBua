@@ -4,11 +4,11 @@ import socket
 import platform
 import subprocess
 from typing import Any, Optional
-from backend.qr_code_api.qr_code_handler import QrCodeHandler
-from backend.camera_module_options import get_instance_of_camera_module_by_name
-from backend.album_storage.folder_album_handler import FolderAlbumHandler
+from backend.api.qr_codes.handler import QrCodeHandler
+from backend.camera.options import get_instance_of_camera_module_by_name
+from backend.album_service import album_service
 from backend.app import create_app
-from backend.settings import Settings
+from backend.core.settings import Settings
 
 STATIC_FOLDER_NAME = "static"
 DEBUG_PORT = 3000
@@ -22,7 +22,7 @@ def static_folder_path(static_folder_name: str = STATIC_FOLDER_NAME) -> str:
 def build_frontend(static_folder_name: str = STATIC_FOLDER_NAME) -> None:
     os.chdir("frontend")
     _run_npm_build_commands()
-    _move_frontend_folder_to_flask(static_folder_name)
+    _move_frontend_folder_to_backend(static_folder_name)
     os.chdir("./..")
 
 
@@ -83,16 +83,13 @@ def get_camera_module_instance(settings: Settings) -> Any:
     return get_instance_of_camera_module_by_name(settings.camera.module)
 
 
-def get_album_handler_instance(static_folder_name: str = STATIC_FOLDER_NAME) -> FolderAlbumHandler:
-    return FolderAlbumHandler(static_folder_path(static_folder_name), "albums")
-
-
 def ensure_forced_album_is_created(
-    album_handler: FolderAlbumHandler,
+    base_path: str,
+    albums_dir: str,
     forced_album: Optional[str]
 ) -> None:
     if forced_album:
-        album_handler.get_or_create_album(forced_album)
+        album_service.get_or_create_album(base_path, albums_dir, forced_album)
 
 
 def create_app_with_settings(
@@ -102,12 +99,11 @@ def create_app_with_settings(
     static_folder_name: str = STATIC_FOLDER_NAME
 ) -> Any:
     qr_code_handler = create_qr_code_handler(settings, host_ip, port, static_folder_name)
-    album_handler = get_album_handler_instance(static_folder_name)
-    ensure_forced_album_is_created(album_handler, settings.albums.forced_album)
+    base_path = static_folder_path(static_folder_name)
+    ensure_forced_album_is_created(base_path, "albums", settings.albums.forced_album)
     camera_module = get_camera_module_instance(settings)
 
     return create_app(
-        album_handler,
         static_folder_name,
         camera_module,
         qr_code_handler,
@@ -130,8 +126,8 @@ def _run_npm_build_commands() -> None:
         subprocess.run("npm run build", shell=True, stdout=fp)
 
 
-def _move_frontend_folder_to_flask(static_folder_name: str) -> None:
-    print("moving build folder to flask...")
+def _move_frontend_folder_to_backend(static_folder_name: str) -> None:
+    print("moving build folder to backend...")
     target_path = os.path.join("./..", "backend", static_folder_name, "react")
     if os.path.exists(target_path):
         shutil.rmtree(target_path)

@@ -1,7 +1,7 @@
 from shutil import copyfile
 from typing import Optional
-from backend.camera_modules.dummy_camera_module import DummyCameraModule
-from backend.camera_modules.base_camera_module import BaseCameraModule, ImageCaptureError
+from backend.camera.modules.dummy_camera_module import DummyCameraModule
+from backend.camera.modules.base_camera_module import BaseCameraModule, ImageCaptureError
 
 
 def create_fast_dummy_module() -> DummyCameraModule:

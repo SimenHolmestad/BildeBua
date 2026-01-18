@@ -3,8 +3,8 @@ import unittest
 import tempfile
 from pyzbar.pyzbar import decode
 from PIL import Image
-from backend.qr_code_api.qr_code_handler import QrCodeHandler
-from backend.settings import WifiSettings
+from backend.api.qr_codes.handler import QrCodeHandler
+from backend.core.settings import WifiSettings
 from .test_utils import temp_dir_relpath
 
 

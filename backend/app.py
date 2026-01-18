@@ -1,31 +1,51 @@
+import os
 from typing import Any, Optional
-from flask import Flask
-from backend.album_api.api_blueprint import construct_album_api_blueprint
-from backend.qr_code_api.qr_code_blueprint import construct_qr_code_api_blueprint
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse, Response
+from backend.api.albums.router import construct_album_api_router
+from backend.api.qr_codes.router import construct_qr_code_api_router
+from backend.album_service.album_service import DEFAULT_ALBUMS_DIR
 
 
 def create_app(
-    album_handler: Any,
     static_folder_name: str,
     camera_module: Any,
     qr_code_handler: Any,
     forced_album_name: Optional[str] = None
-) -> Flask:
-    app = Flask(__name__, static_folder=static_folder_name)
+) -> FastAPI:
+    app = FastAPI(
+        title="CameraHub API",
+        version="1.0.0",
+        description="API for managing albums, images, and QR codes."
+    )
+    static_folder_path = static_folder_name
+    if not os.path.exists(static_folder_path):
+        static_folder_path = os.path.join("backend", static_folder_name)
 
-    app.register_blueprint(construct_album_api_blueprint(
-        album_handler,
+    app.include_router(construct_album_api_router(
+        static_folder_path,
+        DEFAULT_ALBUMS_DIR,
         camera_module,
         forced_album_name=forced_album_name
-    ), url_prefix="/albums")
+    ), prefix="/albums")
 
-    app.register_blueprint(construct_qr_code_api_blueprint(
+    app.include_router(construct_qr_code_api_router(
         qr_code_handler
-    ), url_prefix="/qr_codes")
+    ), prefix="/qr_codes")
 
-    @app.route('/', defaults={'path': ''})
-    @app.route('/<path:path>')  # Make sure subpaths are routed to react
+    app.mount(
+        f"/{static_folder_name}",
+        StaticFiles(directory=static_folder_path),
+        name="static"
+    )
+
+    @app.get("/", include_in_schema=False)
+    @app.get("/{path:path}", include_in_schema=False)
     def index(path: str) -> Any:
-        return app.send_static_file('react/index.html')
+        react_index = os.path.join(static_folder_path, "react", "index.html")
+        if os.path.exists(react_index):
+            return FileResponse(react_index)
+        return Response(status_code=404)
 
     return app

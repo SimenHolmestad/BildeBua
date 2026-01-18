@@ -1,7 +1,9 @@
 matplotlib
 numpy
-Flask
+fastapi
 qrcode
 pyzbar
 pytest
 pydantic
+httpx
+uvicorn

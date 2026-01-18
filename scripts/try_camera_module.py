@@ -1,7 +1,7 @@
 import os
-from backend.album_storage.folder_album_handler import FolderAlbumHandler
-from backend.config_loader import load_settings
-from backend.settings import Settings
+from backend.album_service import album_service
+from backend.core.config_loader import load_settings
+from backend.core.settings import Settings
 from scripts.shared.utils import get_camera_module_instance
 
 
@@ -14,11 +14,11 @@ def run_try_camera_module(settings: Settings, album_dir_name: str = "test_albums
 
     """
     ensure_album_directory_exists(album_dir_name)
-    album_handler = FolderAlbumHandler(".", album_dir_name)
+    base_path = "."
 
     camera_module_name = settings.camera.module
     album_name = camera_module_name + "_album"
-    album = album_handler.get_or_create_album(album_name)
+    album_service.get_or_create_album(base_path, album_dir_name, album_name)
 
     print("Capturing image with {} module to {}/{}".format(
         camera_module_name,
@@ -26,7 +26,7 @@ def run_try_camera_module(settings: Settings, album_dir_name: str = "test_albums
         album_name
     ))
     camera_module = get_camera_module_instance(settings)
-    album.try_capture_image_to_album(camera_module)
+    album_service.capture_image_to_album(base_path, album_dir_name, album_name, camera_module)
 
 
 def ensure_album_directory_exists(album_dir_name: str) -> None:

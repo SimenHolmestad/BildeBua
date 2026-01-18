@@ -1,7 +1,7 @@
+import os
 from typing import Optional
 import qrcode
 from PIL import Image
-from backend.album_storage.folder import Folder
 
 
 class QrCode:
@@ -12,26 +12,30 @@ class QrCode:
 
     """
 
-    def __init__(self,
-                 qr_code_folder: Folder,
-                 name: str,
-                 content: str,
-                 information_text: str,
-                 center_image_path: Optional[str] = None,
-                 qr_image_size: int = 1024,
-                 center_image_size: int = 256) -> None:
-        self.folder: Folder = qr_code_folder
+    def __init__(
+        self,
+        qr_code_folder_path: str,
+        qr_code_folder_name: str,
+        name: str,
+        content: str,
+        information_text: str,
+        center_image_path: Optional[str] = None,
+        qr_image_size: int = 1024,
+        center_image_size: int = 256
+    ) -> None:
+        self.folder_path = qr_code_folder_path
+        self.folder_name = qr_code_folder_name
         self.name: str = name
         self.filename: str = self.name + ".png"
         self.information_text: str = information_text
         self.center_image_path: Optional[str] = center_image_path
         self.qr_image_size: int = qr_image_size
         self.center_image_size: int = center_image_size
-        self.__generate_qr_code(self.folder.get_path_to_file(self.filename), content)
+        self.__generate_qr_code(os.path.join(self.folder_path, self.filename), content)
 
     def get_relative_url(self) -> str:
         return "{}/{}".format(
-            self.folder.get_name(),
+            self.folder_name,
             self.filename
         )
 
