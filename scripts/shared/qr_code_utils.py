@@ -48,7 +48,7 @@ def add_wifi_qr_code(
     information_text: str
 ) -> None:
     """Add a qr code containing wifi information to the context."""
-    wifi_qr_code_content = "WIFI:S:{};T:{};P:{};;".format(wifi_name, wifi_protocol, wifi_password)
+    wifi_qr_code_content = f"WIFI:S:{wifi_name};T:{wifi_protocol};P:{wifi_password};;"
     _add_qr_code(
         context,
         name=name,
@@ -64,7 +64,7 @@ def get_qr_codes(context: QrCodeContext) -> List[QrCodeEntry]:
 
 def get_qr_code_urls_as_strings(context: QrCodeContext, host_ip: str) -> List[str]:
     return [
-        "For accessing {} : {}".format(qr_code["name"], _get_absolute_url_for_qr_code(qr_code, host_ip))
+        f"For accessing {qr_code['name']} : {_get_absolute_url_for_qr_code(qr_code, host_ip)}"
         for qr_code in get_qr_codes(context)
     ]
 
@@ -92,8 +92,8 @@ def create_qr_codes_with_settings(
 
 def get_start_page_url(host_ip: str, port: int, forced_album_name: Optional[str] = None) -> str:
     if forced_album_name:
-        return "http://{}:{}/album/{}".format(host_ip, port, forced_album_name)
-    return "http://{}:{}/".format(host_ip, port)
+        return f"http://{host_ip}:{port}/album/{forced_album_name}"
+    return f"http://{host_ip}:{port}/"
 
 
 def _add_qr_code(
@@ -109,7 +109,7 @@ def _add_qr_code(
     context["qr_codes"].append({
         "name": name,
         "information": information_text,
-        "relative_url": "{}/{}".format(context["qr_codes_dir_name"], filename)
+        "relative_url": f"{context['qr_codes_dir_name']}/{filename}"
     })
 
 

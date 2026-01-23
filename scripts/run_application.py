@@ -15,8 +15,8 @@ from scripts.shared.utils import (
 
 
 def run_application(settings: Settings) -> None:
-    if not frontend_is_built():
-        build_frontend()
+    if not frontend_is_built(settings.static_folder_name):
+        build_frontend(settings.static_folder_name)
 
     host_ip = find_ip_address_for_device()
     qr_code_url = get_url_for_qr_code_page(host_ip, PRODUCTION_PORT, settings.albums.forced_album)

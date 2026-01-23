@@ -33,7 +33,7 @@ def try_capture_image(
     if _BUSY:
         raise ImageCaptureError("Camera is already in use")
     if module_config.get("needs_raw_file_transfer") and not raw_file_path:
-        raise ImageCaptureError("Missing raw file path for camera module: {}".format(module_name))
+        raise ImageCaptureError(f"Missing raw file path for camera module: {module_name}")
     _BUSY = True
 
     try:
@@ -57,7 +57,7 @@ def _handle_exception(exc: Exception, verbose_errors: bool) -> None:
 def _get_module_config(settings: Settings, module_name: str) -> Dict[str, Any]:
     modules = settings.camera.modules
     if module_name not in modules:
-        raise CameraModuleNotFoundError("Unknown camera module: {}".format(module_name))
+        raise CameraModuleNotFoundError(f"Unknown camera module: {module_name}")
     return modules[module_name]
 
 
@@ -70,7 +70,7 @@ def _get_capture_handler(module_name: str) -> Any:
         "dslr_raw_transfer": _capture_dslr_raw_transfer_image,
     }
     if module_name not in handlers:
-        raise CameraModuleNotFoundError("Unknown camera module: {}".format(module_name))
+        raise CameraModuleNotFoundError(f"Unknown camera module: {module_name}")
     return handlers[module_name]
 
 
@@ -265,7 +265,7 @@ def _kill_gphoto2_process() -> None:
 
 def _set_capture_target(target_number: int) -> None:
     subprocess.run(
-        "gphoto2 --set-config capturetarget={}".format(target_number),
+        f"gphoto2 --set-config capturetarget={target_number}",
         shell=True,
         check=False
     )

@@ -20,11 +20,7 @@ def run_try_camera_module(settings: Settings, album_dir_name: str = "test_albums
     album_name = camera_module_name + "_album"
     album_service.get_or_create_album(base_path, album_dir_name, album_name)
 
-    print("Capturing image with {} module to {}/{}".format(
-        camera_module_name,
-        album_dir_name,
-        album_name
-    ))
+    print(f"Capturing image with {camera_module_name} module to {album_dir_name}/{album_name}")
     album_service.capture_image_to_album(base_path, album_dir_name, album_name, settings)
 
 

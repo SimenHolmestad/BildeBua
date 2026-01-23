@@ -109,8 +109,8 @@ class FolderAlbumTestCase(unittest.TestCase):
             settings
         )
 
-        expected_relative_image_url = "{}/test_album/images/image0001.png".format(self.test_dir_name)
-        expected_relative_thumbnail_url = "{}/test_album/thumbnails/image0001.jpg".format(self.test_dir_name)
+        expected_relative_image_url = f"{self.test_dir_name}/test_album/images/image0001.png"
+        expected_relative_thumbnail_url = f"{self.test_dir_name}/test_album/thumbnails/image0001.jpg"
 
         last_image_url = album_service.get_relative_url_of_last_image(
             self.base_path,

@@ -8,7 +8,7 @@ from .settings import Settings
 def load_settings(config_path: str = os.path.join("configs", "config.json")) -> Settings:
     if not os.path.exists(config_path):
         raise FileNotFoundError(
-            "Config file not found at {}. Create it based on configs/example_config.json.".format(config_path)
+            f"Config file not found at {config_path}. Create it based on configs/example_config.json."
         )
     with open(config_path, "r") as f:
         raw: Dict[str, Any] = json.loads(f.read())
@@ -16,4 +16,4 @@ def load_settings(config_path: str = os.path.join("configs", "config.json")) -> 
     try:
         return Settings.model_validate(raw)
     except ValidationError as exc:
-        raise ValueError("Invalid config: {}".format(exc)) from exc
+        raise ValueError(f"Invalid config: {exc}") from exc

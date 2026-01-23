@@ -23,7 +23,7 @@ class WifiSettings(BaseModel):
                 if not value
             ]
             if missing:
-                raise ValueError("Missing wifi config fields: {}".format(", ".join(missing)))
+                raise ValueError(f"Missing wifi config fields: {', '.join(missing)}")
         return self
 
 
@@ -74,6 +74,7 @@ class AlbumSettings(BaseModel):
 
 
 class Settings(BaseModel):
+    static_folder_name: str = "static"
     albums: AlbumSettings = Field(default_factory=AlbumSettings)
     camera: CameraSettings = Field(default_factory=CameraSettings)
     qr_codes: QrCodeSettings = Field(default_factory=QrCodeSettings)

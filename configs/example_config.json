@@ -1,4 +1,5 @@
 {
+  "static_folder_name": "static",
   "albums": {
     "forced_album": null
   },

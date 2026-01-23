@@ -1,6 +1,7 @@
 import argparse
 import os
 import subprocess
+from backend.core.config_loader import load_settings
 from scripts.deploy import (
     create_systemd_config_file_content,
     ensure_static_permissions,
@@ -18,7 +19,9 @@ def run_update_and_redeploy(config_path: str) -> None:
 
     subprocess.run("git reset --hard HEAD", shell=True)
     subprocess.run("git pull", shell=True)
-    build_frontend()
+    settings = load_settings(config_path)
+    static_folder_name = settings.static_folder_name
+    build_frontend(static_folder_name)
 
     systemd_file_path = get_systemd_file_path()
     systemd_file_content = create_systemd_config_file_content(config_path)
@@ -29,7 +32,7 @@ def run_update_and_redeploy(config_path: str) -> None:
     print(systemd_file_content)
     print("-------------------------------")
 
-    ensure_static_permissions()
+    ensure_static_permissions(static_folder_name)
     start_or_restart_systemd_process()
     print("System started")
     print("To get system status, run \"sudo systemctl status camerahub\"")

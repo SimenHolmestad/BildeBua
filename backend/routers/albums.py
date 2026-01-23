@@ -91,7 +91,7 @@ def construct_album_api_router(
         if not album_service.album_exists(albums_base_path, albums_dir, album_name):
             return error_response(
                 status.HTTP_404_NOT_FOUND,
-                "No album with the name \"{}\" exists".format(album_name)
+                f"No album with the name \"{album_name}\" exists"
             )
 
         return get_album_information(request, album_name)
@@ -108,7 +108,7 @@ def construct_album_api_router(
         if not album_service.album_exists(albums_base_path, albums_dir, album_name):
             return error_response(
                 status.HTTP_404_NOT_FOUND,
-                "No album with the name \"{}\" exists".format(album_name)
+                f"No album with the name \"{album_name}\" exists"
             )
 
         return try_capture_image_to_album(request, album_name)
@@ -124,7 +124,7 @@ def construct_album_api_router(
         if not album_service.album_exists(albums_base_path, albums_dir, album_name):
             return error_response(
                 status.HTTP_404_NOT_FOUND,
-                "No album with the name \"{}\" exists".format(album_name)
+                f"No album with the name \"{album_name}\" exists"
             )
 
         relative_url = album_service.get_relative_url_of_last_image(
@@ -214,7 +214,7 @@ def construct_album_api_router(
     def unaccessible_album_error_message() -> Any:
         return error_response(
             status.HTTP_403_FORBIDDEN,
-            "Illegal operation. The only accessible album is {}.".format(forced_album_name)
+            f"Illegal operation. The only accessible album is {forced_album_name}."
         )
 
     def error_response(status_code: int, message: str) -> JSONResponse:

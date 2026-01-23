@@ -140,12 +140,12 @@ def capture_image_to_album(
     module_config = settings.camera.modules.get(module_name)
     if not module_config:
         raise camera_service.CameraModuleNotFoundError(
-            "Unknown camera module: {}".format(module_name)
+            f"Unknown camera module: {module_name}"
         )
     file_extension = module_config.get("file_extension")
     if not file_extension:
         raise camera_service.ImageCaptureError(
-            "Missing file extension for camera module: {}".format(module_name)
+            f"Missing file extension for camera module: {module_name}"
         )
 
     next_image_name = get_next_image_name(
@@ -161,7 +161,7 @@ def capture_image_to_album(
         raw_extension = module_config.get("raw_file_extension")
         if not raw_extension:
             raise camera_service.ImageCaptureError(
-                "Missing raw file extension for camera module: {}".format(module_name)
+                f"Missing raw file extension for camera module: {module_name}"
             )
         raw_image_name = change_extension_of_filename(next_image_name, raw_extension)
         raw_image_path = os.path.join(raw_images_path, raw_image_name)
@@ -222,7 +222,7 @@ def _ensure_album_folders(base_path: str, albums_dir: str, album_name: str) -> N
 
 
 def _relative_url(albums_dir: str, album_name: str, folder_name: str, filename: str) -> str:
-    return "{}/{}/{}/{}".format(albums_dir, album_name, folder_name, filename)
+    return f"{albums_dir}/{album_name}/{folder_name}/{filename}"
 
 
 def _create_thumbnail(input_path: str, output_path: str) -> None:

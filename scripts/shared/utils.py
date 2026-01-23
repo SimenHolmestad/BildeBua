@@ -9,24 +9,22 @@ from scripts.shared import qr_code_utils
 from backend.album_service import album_service
 from backend.app import create_app
 from backend.core.settings import Settings
-
-STATIC_FOLDER_NAME = "static"
 DEBUG_PORT = 3000
 PRODUCTION_PORT = 5000
 
 
-def static_folder_path(static_folder_name: str = STATIC_FOLDER_NAME) -> str:
+def static_folder_path(static_folder_name: str) -> str:
     return os.path.join("backend", static_folder_name)
 
 
-def build_frontend(static_folder_name: str = STATIC_FOLDER_NAME) -> None:
+def build_frontend(static_folder_name: str) -> None:
     os.chdir("frontend")
     _run_npm_build_commands()
     _move_frontend_folder_to_backend(static_folder_name)
     os.chdir("./..")
 
 
-def frontend_is_built(static_folder_name: str = STATIC_FOLDER_NAME) -> bool:
+def frontend_is_built(static_folder_name: str) -> bool:
     node_modules_path = os.path.join(
         "frontend",
         "node_modules"
@@ -56,11 +54,10 @@ def open_webpage_in_device_browser(url: str) -> Optional[subprocess.Popen]:
 def create_qr_codes(
     settings: Settings,
     host_ip: str,
-    port: int,
-    static_folder_name: str = STATIC_FOLDER_NAME
+    port: int
 ) -> list[Mapping[str, str]]:
     context = qr_code_utils.create_qr_codes_with_settings(
-        static_folder_path(static_folder_name),
+        static_folder_path(settings.static_folder_name),
         host_ip,
         port,
         use_center_images=settings.qr_codes.use_center_images,
@@ -72,12 +69,8 @@ def create_qr_codes(
 
 def get_url_for_qr_code_page(host_ip: str, port: int, forced_album: Optional[str]) -> str:
     if forced_album:
-        return "http://{}:{}/album/{}/last_image_qr".format(
-            host_ip,
-            str(port),
-            forced_album
-        )
-    return "http://{}:{}/qr".format(host_ip, str(port))
+        return f"http://{host_ip}:{port}/album/{forced_album}/last_image_qr"
+    return f"http://{host_ip}:{port}/qr"
 
 
 def ensure_forced_album_is_created(
@@ -92,15 +85,14 @@ def ensure_forced_album_is_created(
 def create_app_with_settings(
     settings: Settings,
     host_ip: str,
-    port: int,
-    static_folder_name: str = STATIC_FOLDER_NAME
+    port: int
 ) -> Any:
-    qr_codes = create_qr_codes(settings, host_ip, port, static_folder_name)
-    base_path = static_folder_path(static_folder_name)
+    qr_codes = create_qr_codes(settings, host_ip, port)
+    base_path = static_folder_path(settings.static_folder_name)
     ensure_forced_album_is_created(base_path, "albums", settings.albums.forced_album)
 
     return create_app(
-        static_folder_path(static_folder_name),
+        static_folder_path(settings.static_folder_name),
         settings,
         qr_codes
     )
