@@ -1,17 +1,10 @@
 import os
-from types import SimpleNamespace
-from typing import List, Optional, Tuple
-from .current_image_tracker import (
-    get_name_of_last_image,
-    get_next_image_name,
-    increase_image_number
-)
+from typing import List, Optional
+from .current_image_tracker import CurrentImageTracker
 from .image_name_formatter import change_extension_of_filename
 from .thumbnail_utils import create_thumbnail_for_image, recreate_all_thumbnails
-from backend.camera_service import camera_service
-from backend.core.config import AlbumConfig, CameraConfig
-
-DEFAULT_IMAGE_NAME_PREFIX = "image"
+from backend.camera_service import CameraService
+from backend.core.config import AlbumConfig
 
 
 class AlbumNotFoundError(RuntimeError):
@@ -19,9 +12,9 @@ class AlbumNotFoundError(RuntimeError):
 
 
 class AlbumService:
-    def __init__(self, config: AlbumConfig, camera_config: CameraConfig) -> None:
+    def __init__(self, config: AlbumConfig, camera_service: CameraService) -> None:
         self.config = config
-        self.camera_config = camera_config
+        self.camera_service = camera_service
         os.makedirs(self.config.albums_dir, exist_ok=True)
 
     def get_available_album_names(self) -> List[str]:
@@ -58,24 +51,19 @@ class AlbumService:
     def get_last_image_name(
         self,
         album_name: str,
-        image_name_prefix: str = DEFAULT_IMAGE_NAME_PREFIX
     ) -> Optional[str]:
         self._ensure_album_folders(album_name)
-        return get_name_of_last_image(
-            self._album_path(album_name),
-            self._images_path(album_name),
-            image_name_prefix
-        )
+        image_tracker = self._image_tracker_for_album(album_name)
+        return image_tracker.get_name_of_last_image()
 
     def get_last_thumbnail_name(
         self,
         album_name: str,
-        image_name_prefix: str = DEFAULT_IMAGE_NAME_PREFIX
     ) -> Optional[str]:
-        last_image_name = self.get_last_image_name(album_name, image_name_prefix)
+        last_image_name = self.get_last_image_name(album_name)
         if not last_image_name:
             return None
-        return change_extension_of_filename(last_image_name, ".jpg")
+        return self._thumbnail_name_for_image(last_image_name)
 
     def get_image_names(self, album_name: str) -> List[str]:
         self._ensure_album_folders(album_name)
@@ -94,63 +82,21 @@ class AlbumService:
     def capture_image_to_album(
         self,
         album_name: str,
-        image_name_prefix: str = DEFAULT_IMAGE_NAME_PREFIX
-    ) -> Tuple[str, str]:
+    ) -> None:
         self._ensure_album_folders(album_name)
-        album_path = self._album_path(album_name)
+        image_tracker = self._image_tracker_for_album(album_name)
         images_path = self._images_path(album_name)
+        next_image_base_name = self._capture_next_image(images_path, image_tracker)
+
         thumbnails_path = self._thumbnails_path(album_name)
+        self._create_thumbnail_for_captured_image(images_path, thumbnails_path, next_image_base_name)
 
-        module_name = self.camera_config.module
-        module_config = self.camera_config.modules.get(module_name)
-        if not module_config:
-            raise camera_service.CameraModuleNotFoundError(
-                f"Unknown camera module: {module_name}"
-            )
-        file_extension = module_config.get("file_extension")
-        if not file_extension:
-            raise camera_service.ImageCaptureError(
-                f"Missing file extension for camera module: {module_name}"
-            )
-
-        next_image_name = get_next_image_name(
-            album_path,
-            images_path,
-            image_name_prefix,
-            file_extension
-        )
-
-        if module_config.get("needs_raw_file_transfer"):
-            raw_images_path = self._raw_images_path(album_name)
-            os.makedirs(raw_images_path, exist_ok=True)
-            raw_extension = module_config.get("raw_file_extension")
-            if not raw_extension:
-                raise camera_service.ImageCaptureError(
-                    f"Missing raw file extension for camera module: {module_name}"
-                )
-            raw_image_name = change_extension_of_filename(next_image_name, raw_extension)
-            raw_image_path = os.path.join(raw_images_path, raw_image_name)
-            image_path = os.path.join(images_path, next_image_name)
-            camera_service.try_capture_image(
-                SimpleNamespace(camera=self.camera_config),
-                image_path,
-                raw_image_path
-            )
-        else:
-            image_path = os.path.join(images_path, next_image_name)
-            camera_service.try_capture_image(SimpleNamespace(camera=self.camera_config), image_path)
-
-        create_thumbnail_for_image(images_path, thumbnails_path, next_image_name)
-        increase_image_number(album_path, images_path, image_name_prefix)
-
-        thumbnail_name = change_extension_of_filename(next_image_name, ".jpg")
-        return next_image_name, thumbnail_name
+        image_tracker.increase_image_number()
 
     def ensure_album_thumbnails_correct(self, album_name: str) -> None:
         self._ensure_album_folders(album_name)
         thumbnails_path = self._thumbnails_path(album_name)
         images_path = self._images_path(album_name)
-        os.makedirs(thumbnails_path, exist_ok=True)
         if len(os.listdir(images_path)) != len(os.listdir(thumbnails_path)):
             recreate_all_thumbnails(images_path, thumbnails_path)
 
@@ -167,11 +113,35 @@ class AlbumService:
     def _thumbnails_path(self, album_name: str) -> str:
         return os.path.join(self._album_path(album_name), "thumbnails")
 
-    def _raw_images_path(self, album_name: str) -> str:
-        return os.path.join(self._album_path(album_name), "raw_images")
-
     def _ensure_album_folders(self, album_name: str) -> None:
         os.makedirs(self.config.albums_dir, exist_ok=True)
         os.makedirs(self._album_path(album_name), exist_ok=True)
         os.makedirs(self._images_path(album_name), exist_ok=True)
         os.makedirs(self._thumbnails_path(album_name), exist_ok=True)
+
+    def _image_tracker_for_album(self, album_name: str) -> CurrentImageTracker:
+        return CurrentImageTracker(
+            album_folder_path=self._album_path(album_name),
+            images_folder_path=self._images_path(album_name)
+        )
+
+    def _capture_next_image(
+        self,
+        images_path: str,
+        image_tracker: CurrentImageTracker
+    ) -> str:
+        next_image_base_name = image_tracker.get_next_image_base_name()
+        next_image_base_path = os.path.join(images_path, next_image_base_name)
+        self.camera_service.capture_image(next_image_base_path)
+        return next_image_base_name
+
+    def _create_thumbnail_for_captured_image(
+        self,
+        images_path: str,
+        thumbnails_path: str,
+        image_base_name: str
+    ) -> None:
+        create_thumbnail_for_image(images_path, thumbnails_path, image_base_name)
+
+    def _thumbnail_name_for_image(self, image_name: str) -> str:
+        return change_extension_of_filename(image_name, ".jpg")

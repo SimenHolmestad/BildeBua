@@ -14,22 +14,18 @@ def _base_config(albums_dir: str) -> Config:
 
 def create_fast_dummy_config(albums_dir: str) -> Config:
     config = _base_config(albums_dir)
-    config.camera.module = "dummy"
-    config.camera.options = {
-        "width": 120,
-        "height": 80,
-        "number_of_circles": 5,
-        "min_circle_radius": 5,
-        "max_circle_radius": 15
-    }
+    config.camera.camera_type = "dummy"
+    config.camera.dummy_config.width = 120
+    config.camera.dummy_config.height = 80
+    config.camera.dummy_config.number_of_circles = 5
+    config.camera.dummy_config.min_circle_radius = 5
+    config.camera.dummy_config.max_circle_radius = 15
     return config
 
 
 def create_faulty_dummy_config(albums_dir: str) -> Config:
     config = create_fast_dummy_config(albums_dir)
-    config.camera.options.update({
-        "should_fail": True,
-        "error_message": "This is a test error message",
-        "verbose_errors": False
-    })
+    config.camera.dummy_config.should_fail = True
+    config.camera.dummy_config.error_message = "This is a test error message"
+    config.camera.verbose_errors = False
     return config

@@ -1,5 +1,4 @@
-from typing import Optional, Dict, Any
-import copy
+from typing import Optional, Literal
 from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -32,41 +31,20 @@ class QrCodeConfig(BaseModel):
     use_center_images: bool = True
 
 
-DEFAULT_CAMERA_MODULES: Dict[str, Dict[str, Any]] = {
-    "dummy": {
-        "file_extension": ".png",
-        "needs_raw_file_transfer": False,
-        "raw_file_extension": None
-    },
-    "rpicam": {
-        "file_extension": ".jpg",
-        "needs_raw_file_transfer": False,
-        "raw_file_extension": None
-    },
-    "dslr_jpg": {
-        "file_extension": ".jpg",
-        "needs_raw_file_transfer": False,
-        "raw_file_extension": None
-    },
-    "dslr_raw": {
-        "file_extension": ".jpg",
-        "needs_raw_file_transfer": False,
-        "raw_file_extension": None
-    },
-    "dslr_raw_transfer": {
-        "file_extension": ".jpg",
-        "needs_raw_file_transfer": True,
-        "raw_file_extension": ".cr2"
-    }
-}
+class DummyCameraConfig(BaseModel):
+    width: int = 1200
+    height: int = 800
+    number_of_circles: int = 80
+    min_circle_radius: int = 30
+    max_circle_radius: int = 80
+    should_fail: bool = False
+    error_message: str = "This is a test error message"
 
 
 class CameraConfig(BaseModel):
-    module: str = "dummy"
-    options: Dict[str, Any] = Field(default_factory=dict)
-    modules: Dict[str, Dict[str, Any]] = Field(
-        default_factory=lambda: copy.deepcopy(DEFAULT_CAMERA_MODULES)
-    )
+    camera_type: Literal["dslr", "rpicam", "dummy"] = "dummy"
+    verbose_errors: bool = True
+    dummy_config: DummyCameraConfig = Field(default_factory=DummyCameraConfig)
 
 
 class AlbumConfig(BaseModel):

@@ -5,6 +5,15 @@ Under utvikling vil applikasjonen lage bilder som dette når det ikke er noe kam
 
 ![Dummy demo circle image](images/dummy_demo_image.png)
 
+# Installering av avhengigheter
+Du trenger `gphoto2` for a kunne bruke applikasjonen med speilreflekskamera. Appen laster ned bildet den skal bruke, mens raw-filen blir liggende igjen pa kameraet. Du trenger ogsa `zbar` for a kunne kjore deler av testene:
+```
+brew install zbar
+brew install gphoto2
+```
+
+# Kjøre applikasjon lokalt
+
 Kjør følgende for å starte backend:
 ```
 git clone https://github.com/SimenHolmestad/CameraHub.git

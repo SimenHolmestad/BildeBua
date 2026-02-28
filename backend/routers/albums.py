@@ -2,7 +2,7 @@ from typing import Any, Iterable, List, Optional
 from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from backend.camera_service import ImageCaptureError
+from backend.camera_service import CameraService, ImageCaptureError
 from backend.album_service.album_service import AlbumService
 from backend.core.config import Config
 
@@ -41,10 +41,10 @@ class LastImageResponse(BaseModel):
 
 def construct_album_api_router(config: Config) -> APIRouter:
     """Constructs route related to accessing the albums and adding new
-    images to them using the camera module
+    images to them using the configured camera
     """
     album_api_router = APIRouter()
-    album_service = AlbumService(config.albums, config.camera)
+    album_service = AlbumService(config.albums, CameraService(config.camera))
     forced_album_name = config.albums.forced_album
     albums_dir = config.albums.albums_dir
     albums_url_prefix = _albums_url_prefix_from_dir(albums_dir)
@@ -79,7 +79,7 @@ def construct_album_api_router(config: Config) -> APIRouter:
         On GET: Returns a list of the image links for all images in
         <album_name>.
 
-        On POST: Try to capture an image with the camera module and
+        On POST: Try to capture an image with the configured camera and
         add the image to <album_name>.
 
         If the album does not exist, an error message is returned.
@@ -166,7 +166,10 @@ def construct_album_api_router(config: Config) -> APIRouter:
             return error_response(status.HTTP_500_INTERNAL_SERVER_ERROR, str(e))
 
     def capture_image_to_album(request: Request, album_name: str) -> Any:
-        image_name, thumbnail_name = album_service.capture_image_to_album(album_name)
+        album_service.capture_image_to_album(album_name)
+        image_name = album_service.get_last_image_name(album_name) or ""
+        thumbnail_name = album_service.get_last_thumbnail_name(album_name) or ""
+
         return {
             "success": "Image successfully captured",
             "image_url": create_static_url(

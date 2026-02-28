@@ -8,3 +8,4 @@ pydantic
 pydantic-settings
 httpx
 uvicorn
+gphoto2

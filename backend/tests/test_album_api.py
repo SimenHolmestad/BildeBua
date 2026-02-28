@@ -4,6 +4,7 @@ import os
 from fastapi.testclient import TestClient
 from backend.app import create_app
 from backend.album_service.album_service import AlbumService
+from backend.camera_service import CameraService
 from scripts.shared import qr_code_utils
 from .camera_modules_for_testing import create_fast_dummy_config, create_faulty_dummy_config
 from .test_utils import temp_dir_relpath
@@ -21,7 +22,7 @@ class AlbumApiTestCase(unittest.TestCase):
 
     def create_app_and_client_with_config(self, config) -> None:
         self.config = config
-        self.album_service = AlbumService(config.albums, config.camera)
+        self.album_service = AlbumService(config.albums, CameraService(config.camera))
         qr_code_context = qr_code_utils.create_qr_code_context(self.static_dir_name)
         app = create_app(self.static_dir_name, config, qr_code_utils.get_qr_codes(qr_code_context))
         self.test_client = TestClient(app)
@@ -30,7 +31,7 @@ class AlbumApiTestCase(unittest.TestCase):
         config = create_fast_dummy_config(self.albums_dir_path)
         config.albums.forced_album = forced_album_name
         self.config = config
-        self.album_service = AlbumService(config.albums, config.camera)
+        self.album_service = AlbumService(config.albums, CameraService(config.camera))
         qr_code_context = qr_code_utils.create_qr_code_context(self.static_dir_name)
         app = create_app(self.static_dir_name, config, qr_code_utils.get_qr_codes(qr_code_context))
         self.test_client = TestClient(app)
@@ -224,6 +225,15 @@ class AlbumApiTestCase(unittest.TestCase):
             'thumbnail_url': "/static/albums/album1/thumbnails/image0001.jpg"
         })
 
+    def test_capture_only_creates_expected_album_files(self) -> None:
+        self.create_temp_album("album1")
+
+        response = self.test_client.post("/albums/album1")
+        album_path = os.path.join(self.albums_dir_path, "album1")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(sorted(os.listdir(album_path)), [".image_number.txt", "images", "thumbnails"])
+
     def test_unsuccessful_image_capture_response(self) -> None:
         faulty_config = create_faulty_dummy_config(self.albums_dir_path)
         self.create_app_and_client_with_config(faulty_config)
@@ -241,7 +251,7 @@ class AlbumApiTestCase(unittest.TestCase):
         self.test_client.post(
             "/albums/album1"
         ).json()  # This request should fail
-        faulty_config.camera.options["should_fail"] = False
+        faulty_config.camera.dummy_config.should_fail = False
 
         json_response = self.test_client.post("/albums/album1").json()
         self.assertNotIn("error", json_response)

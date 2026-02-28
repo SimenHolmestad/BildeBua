@@ -3,6 +3,7 @@ import shutil
 import unittest
 import tempfile
 from backend.album_service.album_service import AlbumNotFoundError, AlbumService
+from backend.camera_service import CameraService
 from backend.core.config import AlbumConfig, CameraConfig
 from .camera_modules_for_testing import create_fast_dummy_config
 from .test_utils import temp_dir_relpath
@@ -13,7 +14,10 @@ class FolderAlbumHandlerTestCase(unittest.TestCase):
         self.test_dir = tempfile.TemporaryDirectory(dir="backend/static")
         self.test_dir_name = temp_dir_relpath(self.test_dir)
         self.albums_dir = self.test_dir_name
-        self.album_service = AlbumService(AlbumConfig(albums_dir=self.albums_dir), CameraConfig())
+        self.album_service = AlbumService(
+            AlbumConfig(albums_dir=self.albums_dir),
+            CameraService(CameraConfig())
+        )
 
     def tearDown(self) -> None:
         self.test_dir.cleanup()  # Remove test_dir from file system
@@ -24,6 +28,12 @@ class FolderAlbumHandlerTestCase(unittest.TestCase):
             name
         )
         os.mkdir(path_to_folder)
+
+    def configure_camera(self, camera_config: CameraConfig) -> None:
+        self.album_service = AlbumService(
+            AlbumConfig(albums_dir=self.albums_dir),
+            CameraService(camera_config)
+        )
 
     def test_empty_folder_returns_empty_list(self) -> None:
         self.assertEqual(
@@ -76,7 +86,7 @@ class FolderAlbumHandlerTestCase(unittest.TestCase):
     def test_ensure_all_thumbnails_correct(self) -> None:
         self.album_service.get_or_create_album("test_album")
         config = create_fast_dummy_config(self.albums_dir)
-        self.album_service.camera_config = config.camera
+        self.configure_camera(config.camera)
         self.album_service.capture_image_to_album("test_album")
         self.album_service.capture_image_to_album("test_album")
 
