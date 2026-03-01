@@ -24,9 +24,9 @@ class CameraService:
             elif self.camera_config.camera_type == "rpicam":
                 capture_rpicam_image(base_image_path)
             elif self.camera_config.camera_type == "dslr":
-                capture_dslr_image(base_image_path)
+                capture_dslr_image(self.camera_config, base_image_path)
             elif self.camera_config.camera_type == "webcam":
-                capture_webcam_image(base_image_path)
+                capture_webcam_image(self.camera_config, base_image_path)
             else:
                 raise ImageCaptureError(f"Unsupported camera type: {self.camera_config.camera_type}")
         except Exception as exc:

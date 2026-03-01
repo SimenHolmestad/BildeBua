@@ -43,6 +43,10 @@ class DummyCameraConfig(BaseModel):
 
 class CameraConfig(BaseModel):
     camera_type: Literal["dslr", "rpicam", "webcam", "dummy"] = "dummy"
+    preview_seconds: int = Field(default=3, ge=0)
+    overlay_image: Literal["smil", "smil_for_faen"] = "smil"
+    dslr_preview_iso: int = Field(default=4000, gt=0)
+    dslr_capture_iso: int = Field(default=200, gt=0)
     verbose_errors: bool = True
     dummy_config: DummyCameraConfig = Field(default_factory=DummyCameraConfig)
 

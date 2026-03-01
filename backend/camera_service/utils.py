@@ -42,8 +42,8 @@ def get_common_ffplay_parameters() -> list[str]:
     ]
 
 
-def show_overlay() -> subprocess.Popen[str]:
-    overlay_path = Path(__file__).resolve().parent / "media" / "smil_for_faen.png"
+def show_overlay(overlay_image: str) -> subprocess.Popen[str]:
+    overlay_path = Path(__file__).resolve().parent / "media" / f"{overlay_image}.png"
     width, height = get_display_size()
     centered_overlay_filter = (
         f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
@@ -66,7 +66,7 @@ def show_overlay() -> subprocess.Popen[str]:
     )
 
 
-def stop_process(process: subprocess.Popen[str] | None) -> None:
+def stop_process(process: subprocess.Popen[str] | subprocess.Popen[bytes] | None) -> None:
     if process is None:
         return
 
