@@ -4,6 +4,7 @@ from backend.core.config import CameraConfig
 from .dummy_image_generator import create_dummy_image
 from .dslr_capture import capture_dslr_image
 from .rpicam_capture import capture_rpicam_image
+from .webcam_capture import capture_webcam_image
 from .errors import ImageCaptureError
 
 
@@ -24,6 +25,8 @@ class CameraService:
                 capture_rpicam_image(base_image_path)
             elif self.camera_config.camera_type == "dslr":
                 capture_dslr_image(base_image_path)
+            elif self.camera_config.camera_type == "webcam":
+                capture_webcam_image(base_image_path)
             else:
                 raise ImageCaptureError(f"Unsupported camera type: {self.camera_config.camera_type}")
         except Exception as exc:

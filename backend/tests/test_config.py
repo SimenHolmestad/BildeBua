@@ -29,11 +29,12 @@ class ConfigTestCase(unittest.TestCase):
         self.assertEqual(config.albums.albums_dir, "backend/static/windows_albums")
 
     def test_camera_type_accepts_supported_values(self) -> None:
-        config = Config.model_validate({
-            "albums": {"albums_dir": "backend/static/custom_albums"},
-            "camera": {"camera_type": "rpicam"}
-        })
-        self.assertEqual(config.camera.camera_type, "rpicam")
+        for camera_type in ("rpicam", "webcam", "dslr", "dummy"):
+            config = Config.model_validate({
+                "albums": {"albums_dir": "backend/static/custom_albums"},
+                "camera": {"camera_type": camera_type}
+            })
+            self.assertEqual(config.camera.camera_type, camera_type)
 
     def test_camera_type_rejects_invalid_value(self) -> None:
         with self.assertRaises(ValidationError):

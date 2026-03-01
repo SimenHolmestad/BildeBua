@@ -42,7 +42,7 @@ class DummyCameraConfig(BaseModel):
 
 
 class CameraConfig(BaseModel):
-    camera_type: Literal["dslr", "rpicam", "dummy"] = "dummy"
+    camera_type: Literal["dslr", "rpicam", "webcam", "dummy"] = "dummy"
     verbose_errors: bool = True
     dummy_config: DummyCameraConfig = Field(default_factory=DummyCameraConfig)
 

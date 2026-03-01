@@ -23,3 +23,8 @@ Andre nyttige lenker:
 - [Wifi-setup på hovedskjerm](docs/vis_wifi_qr_kode_pa_hovedskjerm.md)
 - [Nedlasting av bilder fra Raspberry PI](docs/nedlasting_av_bilder_fra_rpi.md)
 - [Generere frontend API-typer](docs/generer_frontend_api_typer.md)
+
+# Kameraoppsett
+`CAMERAHUB_CAMERA__CAMERA_TYPE` stotter `dummy`, `rpicam`, `dslr` og `webcam`.
+
+`webcam` bruker `ffplay` for a vise forhåndsvisning i fullskjerm i 3 sekunder og `imagesnap` fra PATH for å ta bildet fra standardkameraet.
