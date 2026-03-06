@@ -15,7 +15,7 @@ Når PI-en er på nettverket, se [denne guiden](https://www.raspberrypi.org/docu
 1. Kjør `ping raspberrypi.local` og notér IP-adressen
 2. Kjør `ssh <rpi_brukernavn>@<ip_adresse>` og sjekk at du kommer inn.
 
-**Merk:** Raspberry PI-en må være på samme nettverk som enhetene som skal bruke CameraHub.
+**Merk:** Raspberry PI-en må være på samme nettverk som enhetene som skal bruke BildeBua.
 ## 3. Sett opp .ssh-nøkkel mot RPI-en
 Kjør følgende:
 ```
@@ -31,8 +31,8 @@ sudo apt-get install nodejs npm
 ```
 Deretter, last ned prosjektet og installer Python-avhengigheter:
 ```
-git clone https://github.com/SimenHolmestad/CameraHub.git
-cd CameraHub
+git clone https://github.com/SimenHolmestad/BildeBua.git
+cd BildeBua
 python3.13 -m venv .venv
 source .venv/bin/activate
 pip3 install -r python-requirements.txt

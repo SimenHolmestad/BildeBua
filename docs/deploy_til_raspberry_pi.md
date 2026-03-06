@@ -7,13 +7,13 @@ Formatet på innstillinger kan finnes [her](../backend/core/config.py).
 
 Det kan være fint å redigere .env-filen lokalt på maskinen og gjøre følgende for å kopiere til RPI:
 ```
-scp ./.env <brukernavn>@<ip-adresse>:~/CameraHub/.env
+scp ./.env <brukernavn>@<ip-adresse>:~/BildeBua/.env
 ```
 
 Deretter kan man kjøre med:
 ```
 ssh <brukernavn>@<ip-adresse>
-cd ~/CameraHub
+cd ~/BildeBua
 source .venv/bin/activate
 sudo .venv/bin/python -m scripts.deploy --env-file ./.env
 ```

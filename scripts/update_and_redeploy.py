@@ -36,13 +36,13 @@ def run_update_and_redeploy(env_file: str, skip_frontend_build: bool) -> None:
     ensure_static_permissions(static_folder_name)
     start_or_restart_systemd_process()
     print("System started")
-    print("To get system status, run \"sudo systemctl status camerahub\"")
-    print("To get last log lines, run \"journalctl --unit=camerahub -n 100 --no-pager\"")
-    print("To stop the deployment, run \"sudo systemctl stop camerahub\"")
+    print("To get system status, run \"sudo systemctl status bildebua\"")
+    print("To get last log lines, run \"journalctl --unit=bildebua -n 100 --no-pager\"")
+    print("To stop the deployment, run \"sudo systemctl stop bildebua\"")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Update repo and redeploy CameraHub.")
+    parser = argparse.ArgumentParser(description="Update repo and redeploy BildeBua.")
     parser.add_argument(
         "--env-file",
         default=os.path.join(".env"),

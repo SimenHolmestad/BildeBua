@@ -33,7 +33,7 @@ def run_application(config: Config) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run CameraHub application.")
+    parser = argparse.ArgumentParser(description="Run BildeBua application.")
     parser.add_argument(
         "--env-file",
         dest="env_file",

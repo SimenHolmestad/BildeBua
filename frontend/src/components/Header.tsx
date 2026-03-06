@@ -27,7 +27,7 @@ const Header = () => {
         <Button component={Link} to={"/"} className={classes.logo} color="inherit">
           <CameraIcon className={classes.icon} />
           <Typography variant="h6" color="inherit" noWrap>
-            CameraHub
+            BildeBua
           </Typography>
         </Button>
       </Toolbar>

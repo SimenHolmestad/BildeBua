@@ -3,6 +3,6 @@ import App from './App';
 
 test('renders application header', () => {
   render(<App />);
-  const headings = screen.getAllByRole('heading', { name: /CameraHub/i });
+  const headings = screen.getAllByRole('heading', { name: /BildeBua/i });
   expect(headings.length).toBeGreaterThan(0);
 });

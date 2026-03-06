@@ -23,7 +23,7 @@ def get_common_ffplay_parameters() -> list[str]:
 
     return [
         "-window_title",
-        "CameraHub",
+        "BildeBua",
         "-noborder",
         "-left",
         "0",

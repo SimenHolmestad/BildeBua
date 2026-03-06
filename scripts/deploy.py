@@ -30,9 +30,9 @@ def run_deploy(env_file: str) -> None:
     ensure_static_permissions(static_folder_name)
     start_or_restart_systemd_process()
     print("System started")
-    print("To get system status, run \"sudo systemctl status camerahub\"")
-    print("To get last log lines, run \"journalctl --unit=camerahub -n 100 --no-pager\"")
-    print("To stop the deployment, run \"sudo systemctl stop camerahub\"")
+    print("To get system status, run \"sudo systemctl status bildebua\"")
+    print("To get last log lines, run \"journalctl --unit=bildebua -n 100 --no-pager\"")
+    print("To stop the deployment, run \"sudo systemctl stop bildebua\"")
 
 
 def get_systemd_file_path() -> str:
@@ -41,14 +41,14 @@ def get_systemd_file_path() -> str:
         "etc",
         "systemd",
         "system",
-        "camerahub.service"
+        "bildebua.service"
     )
 
 
 def start_or_restart_systemd_process() -> None:
     subprocess.run("sudo systemctl daemon-reload", shell=True)
     # Restart in this case should start the system if it is not already started
-    subprocess.run("sudo systemctl restart camerahub", shell=True)
+    subprocess.run("sudo systemctl restart bildebua", shell=True)
 
 
 def create_systemd_config_file_content(env_file: str) -> str:
@@ -58,7 +58,7 @@ def create_systemd_config_file_content(env_file: str) -> str:
 
     content_lines = [
         "[Unit]",
-        "Description=Camerahub",
+        "Description=BildeBua",
         "After=network.target",
         "",
         "[Service]",
@@ -90,7 +90,7 @@ def _resolve_env_file_path(working_directory: str, env_file: str) -> str:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Deploy CameraHub as a systemd service.")
+    parser = argparse.ArgumentParser(description="Deploy BildeBua as a systemd service.")
     parser.add_argument(
         "--env-file",
         default=os.path.join(".env"),

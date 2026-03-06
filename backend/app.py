@@ -14,7 +14,7 @@ def create_app(
     qr_codes: Any
 ) -> FastAPI:
     app = FastAPI(
-        title="CameraHub API",
+        title="BildeBua API",
         version="1.0.0",
         description="API for managing albums, images, and QR codes."
     )

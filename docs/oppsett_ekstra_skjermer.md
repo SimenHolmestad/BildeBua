@@ -1,9 +1,9 @@
 [Tilbake til readme](../readme.md)
 
 # Oppsett av ekstra skjermer/monitorer
-CameraHub tilbyr noen "skjulte sider" som ikke er tilgjengelige fra brukergrensesnittet. Disse sidene er ment å vises på en skjerm eller prosjektor nær kameraet. Du som photobooth-operator kan velge hvilke sider som skal vises til brukerne.
+BildeBua tilbyr noen "skjulte sider" som ikke er tilgjengelige fra brukergrensesnittet. Disse sidene er ment å vises på en skjerm eller prosjektor nær kameraet. Du som photobooth-operator kan velge hvilke sider som skal vises til brukerne.
 
-**Merk:** URL-ene i dette dokumentet skal legges bak base-URL-en som CameraHub kjører på. For eksempel, hvis CameraHub kjører på `10.0.0.13:5000`, finner du QR-kodesiden på:
+**Merk:** URL-ene i dette dokumentet skal legges bak base-URL-en som BildeBua kjører på. For eksempel, hvis BildeBua kjører på `10.0.0.13:5000`, finner du QR-kodesiden på:
 ```
 http://10.0.0.13:5000/qr
 ```

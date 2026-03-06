@@ -12,7 +12,7 @@ from scripts.shared.utils import (
 
 
 def get_backend_port() -> int:
-    port_override = os.getenv("CAMERAHUB_BACKEND_PORT")
+    port_override = os.getenv("BILDEBUA_BACKEND_PORT")
     if not port_override:
         return DEBUG_PORT
 
@@ -36,7 +36,7 @@ def run_backend(config: Config) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run CameraHub backend.")
+    parser = argparse.ArgumentParser(description="Run BildeBua backend.")
     parser.add_argument(
         "--env-file",
         dest="env_file",

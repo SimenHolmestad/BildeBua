@@ -16,8 +16,8 @@ brew install gphoto2
 
 Kjør følgende for å starte backend:
 ```
-git clone https://github.com/SimenHolmestad/CameraHub.git
-cd CameraHub
+git clone https://github.com/SimenHolmestad/BildeBua.git
+cd BildeBua
 python3.13 -m venv .venv
 source .venv/bin/activate
 pip3 install -r python-requirements.txt
@@ -27,7 +27,7 @@ python3 -m scripts.run_backend
 
 For å starte frontend, kjør dette i egen terminal.
 ```
-cd CameraHub/frontend
+cd BildeBua/frontend
 npm install
 npm run dev
 ```

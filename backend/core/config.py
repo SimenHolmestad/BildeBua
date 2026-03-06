@@ -66,7 +66,7 @@ class AlbumConfig(BaseModel):
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
-        env_prefix="CAMERAHUB_",
+        env_prefix="BILDEBUA_",
         env_nested_delimiter="__",
         extra="ignore",
     )

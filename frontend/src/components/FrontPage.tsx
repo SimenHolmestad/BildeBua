@@ -125,10 +125,10 @@ const FrontPage = () => {
       <div className={classes.heroContent}>
         <Container maxWidth="sm">
           <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-            Welcome to CameraHub!
+            Welcome to BildeBua!
           </Typography>
           <Typography variant="h5" align="center" color="textSecondary" paragraph>
-            You can use CameraHub to capture images or view already captured images. Choose one of the albums below or create a new album to start!
+            You can use BildeBua to capture images or view already captured images. Choose one of the albums below or create a new album to start!
           </Typography>
         </Container>
       </div>

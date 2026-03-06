@@ -46,7 +46,7 @@ const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
         <DialogTitle>Create new album</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Every image stored in CameraHub must be connected to an album. Please enter a name and description for your new album below.
+            Every image stored in BildeBua must be connected to an album. Please enter a name and description for your new album below.
           </DialogContentText>
           <TextField
             value={albumName}

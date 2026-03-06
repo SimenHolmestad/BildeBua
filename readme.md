@@ -1,9 +1,9 @@
-# Kamerabua
-Kamerabua er en hjemmelaget "Photobooth" til bruk med Raspberry PI.
+# BildeBua
+BildeBua er en hjemmelaget "Photobooth" til bruk med Raspberry PI.
 
-![CameraHub demo gif](docs/images/demo.gif)
+![BildeBua demo gif](docs/images/demo.gif)
 
-For å sette opp Kamerabua trenger du følgende:
+For å sette opp BildeBua trenger du følgende:
 
 - Raspberry PI
 - Et kamera (Raspberry PI Camera Module eller speilrefleks)
@@ -25,6 +25,6 @@ Andre nyttige lenker:
 - [Generere frontend API-typer](docs/generer_frontend_api_typer.md)
 
 # Kameraoppsett
-`CAMERAHUB_CAMERA__CAMERA_TYPE` stotter `dummy`, `rpicam`, `dslr` og `webcam`.
+`BILDEBUA_CAMERA__CAMERA_TYPE` stotter `dummy`, `rpicam`, `dslr` og `webcam`.
 
 `webcam` bruker `ffplay` for a vise forhåndsvisning i fullskjerm i 3 sekunder og `imagesnap` fra PATH for å ta bildet fra standardkameraet.

@@ -85,7 +85,7 @@ def create_qr_codes_with_config(
         context,
         "start_page_url",
         start_page_url,
-        "Scan this qr code to go to CameraHub!"
+        "Scan this qr code to go to BildeBua!"
     )
     return context
 

@@ -7,7 +7,7 @@ Først, logg inn med SSH i et terminalvindu og sett opp ting riktig:
 
 ```
 ssh <brukernavn>@<ip-adresse>
-cd ~/CameraHub
+cd ~/BildeBua
 source .venv/bin/activate
 ```
 bytt til branchen du jobber på med

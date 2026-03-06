@@ -21,13 +21,13 @@ const Footer = () => {
   return (
     <footer className={classes.footer}>
       <Typography variant="h6" align="center" gutterBottom color="inherit">
-        Hope you like CameraHub!
+        Hope you like BildeBua!
       </Typography>
       <Typography variant="subtitle1" align="center" color="inherit" component="p">
-        CameraHub is made using Python, FastAPI, React and Material UI. The source code is openly available on{' '}
+        BildeBua is made using Python, FastAPI, React and Material UI. The source code is openly available on{' '}
         <a
           className={classes.footerLink}
-          href="https://github.com/SimenHolmestad/CameraHub"
+          href="https://github.com/SimenHolmestad/BildeBua"
           target="_blank"
           rel="noreferrer"
         >

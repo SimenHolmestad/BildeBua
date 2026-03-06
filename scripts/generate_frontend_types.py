@@ -7,7 +7,7 @@ from urllib import request, error
 
 
 OPENAPI_URL = "http://localhost:5000/openapi.json"
-BACKEND_LOG_PATH = "/tmp/camerahub-backend.log"
+BACKEND_LOG_PATH = "/tmp/bildebua-backend.log"
 WAIT_SECONDS = 30
 
 
@@ -19,7 +19,7 @@ def _start_backend() -> subprocess.Popen:
     print("Starting backend for OpenAPI generation...")
     log_handle = open(BACKEND_LOG_PATH, "w")
     env = os.environ.copy()
-    env["CAMERAHUB_BACKEND_PORT"] = "5000"
+    env["BILDEBUA_BACKEND_PORT"] = "5000"
     return subprocess.Popen(
         ["python3", "-m", "scripts.run_backend"],
         stdout=log_handle,
