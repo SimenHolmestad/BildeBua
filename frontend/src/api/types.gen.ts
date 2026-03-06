@@ -6,14 +6,17 @@
 export type AlbumCaptureResponse = {
     /**
      * Success
+     * Status message for a successful capture.
      */
     success: string;
     /**
      * Image Url
+     * URL of the captured image.
      */
     image_url: string;
     /**
      * Thumbnail Url
+     * URL of the generated image thumbnail.
      */
     thumbnail_url: string;
 };
@@ -24,10 +27,12 @@ export type AlbumCaptureResponse = {
 export type AlbumCreateRequest = {
     /**
      * Album Name
+     * Name of the album to create or update.
      */
     album_name: string;
     /**
      * Description
+     * Optional album description.
      */
     description?: string | null;
 };
@@ -38,10 +43,12 @@ export type AlbumCreateRequest = {
 export type AlbumCreatedResponse = {
     /**
      * Album Name
+     * Created or updated album name.
      */
     album_name: string;
     /**
      * Album Url
+     * Relative URL to the album resource.
      */
     album_url: string;
 };
@@ -52,18 +59,22 @@ export type AlbumCreatedResponse = {
 export type AlbumInfoResponse = {
     /**
      * Album Name
+     * Album name.
      */
     album_name: string;
     /**
      * Description
+     * Album description.
      */
     description: string;
     /**
      * Image Urls
+     * Image URLs in newest-first order.
      */
     image_urls: Array<string>;
     /**
      * Thumbnail Urls
+     * Thumbnail URLs in newest-first order.
      */
     thumbnail_urls: Array<string>;
 };
@@ -74,12 +85,25 @@ export type AlbumInfoResponse = {
 export type AvailableAlbumsResponse = {
     /**
      * Available Albums
+     * All available album names.
      */
     available_albums: Array<string>;
     /**
      * Forced Album
+     * If set, this is the only album allowed for write/read operations.
      */
     forced_album?: string | null;
+};
+
+/**
+ * ErrorResponse
+ */
+export type ErrorResponse = {
+    /**
+     * Error
+     * Human-readable error message.
+     */
+    error: string;
 };
 
 /**
@@ -98,8 +122,41 @@ export type HttpValidationError = {
 export type LastImageResponse = {
     /**
      * Last Image Url
+     * URL of the latest image in the album.
      */
     last_image_url: string;
+};
+
+/**
+ * QrCodeResponse
+ */
+export type QrCodeResponse = {
+    /**
+     * Name
+     * QR code identifier.
+     */
+    name: string;
+    /**
+     * Information
+     * Text displayed alongside the QR code.
+     */
+    information: string;
+    /**
+     * Url
+     * URL to the QR code image.
+     */
+    url: string;
+};
+
+/**
+ * QrCodesResponse
+ */
+export type QrCodesResponse = {
+    /**
+     * Qr Codes
+     * All available QR codes.
+     */
+    qr_codes: Array<QrCodeResponse>;
 };
 
 /**
@@ -118,54 +175,69 @@ export type ValidationError = {
      * Error Type
      */
     type: string;
+    /**
+     * Input
+     */
+    input?: unknown;
+    /**
+     * Context
+     */
+    ctx?: {
+        [key: string]: unknown;
+    };
 };
 
-export type AvailableAlbumsAlbumsGetData = {
+export type ListAlbumsData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/albums/';
 };
 
-export type AvailableAlbumsAlbumsGetResponses = {
+export type ListAlbumsResponses = {
     /**
      * Successful Response
      */
     200: AvailableAlbumsResponse;
 };
 
-export type AvailableAlbumsAlbumsGetResponse = AvailableAlbumsAlbumsGetResponses[keyof AvailableAlbumsAlbumsGetResponses];
+export type ListAlbumsResponse = ListAlbumsResponses[keyof ListAlbumsResponses];
 
-export type CreateAlbumAlbumsPostData = {
+export type CreateAlbumData = {
     body: AlbumCreateRequest;
     path?: never;
     query?: never;
     url: '/albums/';
 };
 
-export type CreateAlbumAlbumsPostErrors = {
+export type CreateAlbumErrors = {
+    /**
+     * Write access is blocked because a forced album is configured.
+     */
+    403: ErrorResponse;
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type CreateAlbumAlbumsPostError = CreateAlbumAlbumsPostErrors[keyof CreateAlbumAlbumsPostErrors];
+export type CreateAlbumError = CreateAlbumErrors[keyof CreateAlbumErrors];
 
-export type CreateAlbumAlbumsPostResponses = {
+export type CreateAlbumResponses = {
     /**
      * Successful Response
      */
     200: AlbumCreatedResponse;
 };
 
-export type CreateAlbumAlbumsPostResponse = CreateAlbumAlbumsPostResponses[keyof CreateAlbumAlbumsPostResponses];
+export type CreateAlbumResponse = CreateAlbumResponses[keyof CreateAlbumResponses];
 
 export type GetAlbumInfoData = {
     body?: never;
     path: {
         /**
          * Album Name
+         * Album name.
          */
         album_name: string;
     };
@@ -174,6 +246,14 @@ export type GetAlbumInfoData = {
 };
 
 export type GetAlbumInfoErrors = {
+    /**
+     * Requested album is not accessible due to forced album configuration.
+     */
+    403: ErrorResponse;
+    /**
+     * Album does not exist.
+     */
+    404: ErrorResponse;
     /**
      * Validation Error
      */
@@ -196,6 +276,7 @@ export type CaptureImageToAlbumData = {
     path: {
         /**
          * Album Name
+         * Album name.
          */
         album_name: string;
     };
@@ -205,9 +286,21 @@ export type CaptureImageToAlbumData = {
 
 export type CaptureImageToAlbumErrors = {
     /**
+     * Requested album is not accessible due to forced album configuration.
+     */
+    403: ErrorResponse;
+    /**
+     * Album does not exist.
+     */
+    404: ErrorResponse;
+    /**
      * Validation Error
      */
     422: HttpValidationError;
+    /**
+     * Image capture failed.
+     */
+    500: ErrorResponse;
 };
 
 export type CaptureImageToAlbumError = CaptureImageToAlbumErrors[keyof CaptureImageToAlbumErrors];
@@ -221,11 +314,12 @@ export type CaptureImageToAlbumResponses = {
 
 export type CaptureImageToAlbumResponse = CaptureImageToAlbumResponses[keyof CaptureImageToAlbumResponses];
 
-export type LastImageForAlbumAlbumsAlbumNameLastImageGetData = {
+export type GetAlbumLastImageData = {
     body?: never;
     path: {
         /**
          * Album Name
+         * Album name.
          */
         album_name: string;
     };
@@ -233,38 +327,47 @@ export type LastImageForAlbumAlbumsAlbumNameLastImageGetData = {
     url: '/albums/{album_name}/last_image';
 };
 
-export type LastImageForAlbumAlbumsAlbumNameLastImageGetErrors = {
+export type GetAlbumLastImageErrors = {
+    /**
+     * Requested album is not accessible due to forced album configuration.
+     */
+    403: ErrorResponse;
+    /**
+     * Album does not exist or has no images yet.
+     */
+    404: ErrorResponse;
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type LastImageForAlbumAlbumsAlbumNameLastImageGetError = LastImageForAlbumAlbumsAlbumNameLastImageGetErrors[keyof LastImageForAlbumAlbumsAlbumNameLastImageGetErrors];
+export type GetAlbumLastImageError = GetAlbumLastImageErrors[keyof GetAlbumLastImageErrors];
 
-export type LastImageForAlbumAlbumsAlbumNameLastImageGetResponses = {
+export type GetAlbumLastImageResponses = {
     /**
      * Successful Response
      */
     200: LastImageResponse;
 };
 
-export type LastImageForAlbumAlbumsAlbumNameLastImageGetResponse = LastImageForAlbumAlbumsAlbumNameLastImageGetResponses[keyof LastImageForAlbumAlbumsAlbumNameLastImageGetResponses];
+export type GetAlbumLastImageResponse = GetAlbumLastImageResponses[keyof GetAlbumLastImageResponses];
 
-export type GetQrCodesQrCodesGetData = {
+export type GetQrCodesData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/qr_codes/';
 };
 
-export type GetQrCodesQrCodesGetResponses = {
+export type GetQrCodesResponses = {
     /**
-     * Response Get Qr Codes Qr Codes  Get
      * Successful Response
      */
-    200: unknown;
+    200: QrCodesResponse;
 };
+
+export type GetQrCodesResponse = GetQrCodesResponses[keyof GetQrCodesResponses];
 
 export type ClientOptions = {
     baseUrl: 'http://localhost:5000' | (string & {});

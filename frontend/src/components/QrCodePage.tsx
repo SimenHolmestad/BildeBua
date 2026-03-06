@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 import { makeStyles } from '@mui/styles';
 import Header from './Header';
 import type { Theme } from '@mui/material/styles';
-import type { GetQrCodesQrCodesGetResponses } from '../api';
+import type { GetQrCodesResponses } from '../api';
 
 const useStyles = makeStyles((theme: Theme) => ({
   qrCodeGridItem: {
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-type QrCodeResponse = GetQrCodesQrCodesGetResponses[200];
+type QrCodeResponse = GetQrCodesResponses[200];
 
 const QrCodePage = () => {
   const classes = useStyles();

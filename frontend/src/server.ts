@@ -1,10 +1,10 @@
 import {
-  availableAlbumsAlbumsGet,
+  listAlbums,
   captureImageToAlbum,
-  createAlbumAlbumsPost,
+  createAlbum,
+  getAlbumLastImage,
   getAlbumInfo,
-  getQrCodesQrCodesGet,
-  lastImageForAlbumAlbumsAlbumNameLastImageGet,
+  getQrCodes,
 } from "./api";
 import { client } from "./api/client.gen";
 import type {
@@ -12,7 +12,7 @@ import type {
   AlbumCreatedResponse,
   AlbumInfoResponse,
   AvailableAlbumsResponse,
-  GetQrCodesQrCodesGetResponses,
+  GetQrCodesResponses,
   LastImageResponse,
 } from "./api";
 
@@ -49,13 +49,13 @@ const unwrap = async <T>(promise: Promise<unknown>): Promise<Result<T>> => {
 };
 
 export const get_available_album_data = async (): Promise<Result<AvailableAlbumsResponse>> =>
-  unwrap<AvailableAlbumsResponse>(availableAlbumsAlbumsGet());
+  unwrap<AvailableAlbumsResponse>(listAlbums());
 
 export const get_album_info = async (album_name: string): Promise<Result<AlbumInfoResponse>> =>
   unwrap<AlbumInfoResponse>(getAlbumInfo({ path: { album_name } }));
 
 export const get_last_image_url = async (album_name: string): Promise<Result<LastImageResponse>> =>
-  unwrap<LastImageResponse>(lastImageForAlbumAlbumsAlbumNameLastImageGet({ path: { album_name } }));
+  unwrap<LastImageResponse>(getAlbumLastImage({ path: { album_name } }));
 
 export const capture_image_to_album = async (album_name: string): Promise<Result<AlbumCaptureResponse>> =>
   unwrap<AlbumCaptureResponse>(captureImageToAlbum({ path: { album_name } }));
@@ -64,7 +64,7 @@ export const create_or_update_album = async (
   album_name: string,
   description?: string
 ): Promise<Result<AlbumCreatedResponse>> =>
-  unwrap<AlbumCreatedResponse>(createAlbumAlbumsPost({ body: { album_name, description } }));
+  unwrap<AlbumCreatedResponse>(createAlbum({ body: { album_name, description } }));
 
-export const get_qr_codes = async (): Promise<Result<GetQrCodesQrCodesGetResponses[200]>> =>
-  unwrap<GetQrCodesQrCodesGetResponses[200]>(getQrCodesQrCodesGet());
+export const get_qr_codes = async (): Promise<Result<GetQrCodesResponses[200]>> =>
+  unwrap<GetQrCodesResponses[200]>(getQrCodes());

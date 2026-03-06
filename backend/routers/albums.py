@@ -1,89 +1,130 @@
-from typing import Any, Iterable, List, Optional
-from fastapi import APIRouter, Request, status
+from typing import Iterable, List, Optional
+from fastapi import APIRouter, Path, Request, status
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from backend.camera_service import CameraService, ImageCaptureError
 from backend.album_service.album_service import AlbumService
 from backend.core.config import Config
 
 
 class AlbumCreateRequest(BaseModel):
-    album_name: str
-    description: Optional[str] = None
+    album_name: str = Field(
+        description="Name of the album to create or update.",
+        examples=["album1"]
+    )
+    description: Optional[str] = Field(
+        default=None,
+        description="Optional album description.",
+        examples=["A very nice album indeed"]
+    )
 
 
 class AlbumCreatedResponse(BaseModel):
-    album_name: str
-    album_url: str
+    album_name: str = Field(description="Created or updated album name.", examples=["album1"])
+    album_url: str = Field(description="Relative URL to the album resource.", examples=["/albums/album1"])
 
 
 class AvailableAlbumsResponse(BaseModel):
-    available_albums: List[str]
-    forced_album: Optional[str] = None
+    available_albums: List[str] = Field(
+        description="All available album names.",
+        examples=[["album1", "album2"]]
+    )
+    forced_album: Optional[str] = Field(
+        default=None,
+        description="If set, this is the only album allowed for write/read operations.",
+        examples=["album1"]
+    )
 
 
 class AlbumInfoResponse(BaseModel):
-    album_name: str
-    description: str
-    image_urls: List[str]
-    thumbnail_urls: List[str]
+    album_name: str = Field(description="Album name.", examples=["album1"])
+    description: str = Field(description="Album description.", examples=["A very nice album indeed"])
+    image_urls: List[str] = Field(
+        description="Image URLs in newest-first order.",
+        examples=[["/static/albums/album1/images/image0002.png"]]
+    )
+    thumbnail_urls: List[str] = Field(
+        description="Thumbnail URLs in newest-first order.",
+        examples=[["/static/albums/album1/thumbnails/image0002.jpg"]]
+    )
 
 
 class AlbumCaptureResponse(BaseModel):
-    success: str
-    image_url: str
-    thumbnail_url: str
+    success: str = Field(description="Status message for a successful capture.")
+    image_url: str = Field(description="URL of the captured image.")
+    thumbnail_url: str = Field(description="URL of the generated image thumbnail.")
 
 
 class LastImageResponse(BaseModel):
-    last_image_url: str
+    last_image_url: str = Field(
+        description="URL of the latest image in the album.",
+        examples=["/static/albums/album1/images/image0001.png"]
+    )
+
+
+class ErrorResponse(BaseModel):
+    error: str = Field(description="Human-readable error message.")
 
 
 def construct_album_api_router(config: Config) -> APIRouter:
-    """Constructs route related to accessing the albums and adding new
-    images to them using the configured camera
-    """
-    album_api_router = APIRouter()
+    """Construct album-related API routes."""
+    album_api_router = APIRouter(tags=["albums"])
     album_service = AlbumService(config.albums, CameraService(config.camera))
     forced_album_name = config.albums.forced_album
     albums_dir = config.albums.albums_dir
     albums_url_prefix = _albums_url_prefix_from_dir(albums_dir)
 
-    @album_api_router.get("/", response_model=AvailableAlbumsResponse)
-    def available_albums() -> Any:
-        """An endpoint for listing albums and create new albums.
-
-        On GET: Return list of all available albums.
-
-        On POST: Create a new album with the given album name if it
-        does not already exists. If a description is given, set the
-        description of the album.
-        """
-
+    @album_api_router.get(
+        "/",
+        response_model=AvailableAlbumsResponse,
+        operation_id="list_albums",
+        summary="List available albums",
+        description="Return all available albums and the active forced album restriction."
+    )
+    def available_albums() -> AvailableAlbumsResponse:
         return get_available_albums()
 
-    @album_api_router.post("/", response_model=AlbumCreatedResponse)
-    def create_album(request_body: AlbumCreateRequest, request: Request) -> Any:
+    @album_api_router.post(
+        "/",
+        response_model=AlbumCreatedResponse,
+        operation_id="create_album",
+        summary="Create or update album",
+        description=(
+            "Create the album if it does not exist. "
+            "If `description` is provided, update the album description."
+        ),
+        responses={
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorResponse,
+                "description": "Write access is blocked because a forced album is configured."
+            }
+        }
+    )
+    def create_album(request_body: AlbumCreateRequest, request: Request) -> AlbumCreatedResponse | JSONResponse:
         return create_or_update_album(request_body, request)
 
     @album_api_router.get(
         "/{album_name}",
         name="album_info",
         response_model=AlbumInfoResponse,
-        operation_id="get_album_info"
+        operation_id="get_album_info",
+        summary="Get album details",
+        description="Return album metadata and image/thumbnail URLs.",
+        responses={
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorResponse,
+                "description": "Requested album is not accessible due to forced album configuration."
+            },
+            status.HTTP_404_NOT_FOUND: {
+                "model": ErrorResponse,
+                "description": "Album does not exist."
+            }
+        }
     )
-    def album_info(album_name: str, request: Request) -> Any:
-        """An endpoint for listing images in an album or capture a new image
-        to the album
-
-        On GET: Returns a list of the image links for all images in
-        <album_name>.
-
-        On POST: Try to capture an image with the configured camera and
-        add the image to <album_name>.
-
-        If the album does not exist, an error message is returned.
-        """
+    def album_info(
+        request: Request,
+        album_name: str = Path(..., description="Album name.", examples=["album1"])
+    ) -> AlbumInfoResponse | JSONResponse:
         if forced_album_name and album_name != forced_album_name:
             return unaccessible_album_error_message()
 
@@ -98,9 +139,28 @@ def construct_album_api_router(config: Config) -> APIRouter:
     @album_api_router.post(
         "/{album_name}",
         response_model=AlbumCaptureResponse,
-        operation_id="capture_image_to_album"
+        operation_id="capture_image_to_album",
+        summary="Capture image to album",
+        description="Capture one image with the configured camera and add it to the album.",
+        responses={
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorResponse,
+                "description": "Requested album is not accessible due to forced album configuration."
+            },
+            status.HTTP_404_NOT_FOUND: {
+                "model": ErrorResponse,
+                "description": "Album does not exist."
+            },
+            status.HTTP_500_INTERNAL_SERVER_ERROR: {
+                "model": ErrorResponse,
+                "description": "Image capture failed."
+            }
+        }
     )
-    def capture_album_image(album_name: str, request: Request) -> Any:
+    def capture_album_image(
+        request: Request,
+        album_name: str = Path(..., description="Album name.", examples=["album1"])
+    ) -> AlbumCaptureResponse | JSONResponse:
         if forced_album_name and album_name != forced_album_name:
             return unaccessible_album_error_message()
 
@@ -112,11 +172,27 @@ def construct_album_api_router(config: Config) -> APIRouter:
 
         return try_capture_image_to_album(request, album_name)
 
-    @album_api_router.get("/{album_name}/last_image", response_model=LastImageResponse)
-    def last_image_for_album(album_name: str, request: Request) -> Any:
-        """Returns the url of the last image captured to the specified
-        album
-        """
+    @album_api_router.get(
+        "/{album_name}/last_image",
+        response_model=LastImageResponse,
+        operation_id="get_album_last_image",
+        summary="Get latest album image",
+        description="Return the URL for the latest captured image in an album.",
+        responses={
+            status.HTTP_403_FORBIDDEN: {
+                "model": ErrorResponse,
+                "description": "Requested album is not accessible due to forced album configuration."
+            },
+            status.HTTP_404_NOT_FOUND: {
+                "model": ErrorResponse,
+                "description": "Album does not exist or has no images yet."
+            }
+        }
+    )
+    def last_image_for_album(
+        request: Request,
+        album_name: str = Path(..., description="Album name.", examples=["album1"])
+    ) -> LastImageResponse | JSONResponse:
         if forced_album_name and album_name != forced_album_name:
             return unaccessible_album_error_message()
 
@@ -130,14 +206,17 @@ def construct_album_api_router(config: Config) -> APIRouter:
         if not image_name:
             return error_response(status.HTTP_404_NOT_FOUND, "album is empty")
 
-        return {
-            "last_image_url": create_static_url(
+        return LastImageResponse(
+            last_image_url=create_static_url(
                 request,
                 _relative_url(albums_url_prefix, album_name, "images", image_name)
             )
-        }
+        )
 
-    def create_or_update_album(request_body: AlbumCreateRequest, request: Request) -> Any:
+    def create_or_update_album(
+        request_body: AlbumCreateRequest,
+        request: Request
+    ) -> AlbumCreatedResponse | JSONResponse:
         if forced_album_name:
             return unaccessible_album_error_message()
 
@@ -147,64 +226,64 @@ def construct_album_api_router(config: Config) -> APIRouter:
         if request_body.description is not None:
             album_service.set_album_description(album_name, request_body.description)
 
-        return {
-            "album_name": album_name,
-            "album_url": request.url_for("album_info", album_name=album_name).path
-        }
+        return AlbumCreatedResponse(
+            album_name=album_name,
+            album_url=request.url_for("album_info", album_name=album_name).path
+        )
 
-    def get_available_albums() -> Any:
+    def get_available_albums() -> AvailableAlbumsResponse:
         album_names = album_service.get_available_album_names()
-        return {
-            "available_albums": album_names,
-            "forced_album": forced_album_name
-        }
+        return AvailableAlbumsResponse(available_albums=album_names, forced_album=forced_album_name)
 
-    def try_capture_image_to_album(request: Request, album_name: str) -> Any:
+    def try_capture_image_to_album(
+        request: Request,
+        album_name: str
+    ) -> AlbumCaptureResponse | JSONResponse:
         try:
             return capture_image_to_album(request, album_name)
         except ImageCaptureError as e:
             return error_response(status.HTTP_500_INTERNAL_SERVER_ERROR, str(e))
 
-    def capture_image_to_album(request: Request, album_name: str) -> Any:
+    def capture_image_to_album(request: Request, album_name: str) -> AlbumCaptureResponse:
         album_service.capture_image_to_album(album_name)
         image_name = album_service.get_last_image_name(album_name) or ""
         thumbnail_name = album_service.get_last_thumbnail_name(album_name) or ""
 
-        return {
-            "success": "Image successfully captured",
-            "image_url": create_static_url(
+        return AlbumCaptureResponse(
+            success="Image successfully captured",
+            image_url=create_static_url(
                 request,
                 _relative_url(albums_url_prefix, album_name, "images", image_name)
             ),
-            "thumbnail_url": create_static_url(
+            thumbnail_url=create_static_url(
                 request,
                 _relative_url(albums_url_prefix, album_name, "thumbnails", thumbnail_name)
             )
-        }
+        )
 
-    def get_album_information(request: Request, album_name: str) -> Any:
+    def get_album_information(request: Request, album_name: str) -> AlbumInfoResponse:
         description = album_service.get_album_description(album_name)
         image_names = album_service.get_image_names(album_name)
         thumbnail_names = album_service.get_thumbnail_names(album_name)
 
-        return {
-            "album_name": album_name,
-            "image_urls": create_static_url_list(
+        return AlbumInfoResponse(
+            album_name=album_name,
+            image_urls=create_static_url_list(
                 request,
                 [
                     _relative_url(albums_url_prefix, album_name, "images", image_name)
                     for image_name in image_names
                 ]
             ),
-            "thumbnail_urls": create_static_url_list(
+            thumbnail_urls=create_static_url_list(
                 request,
                 [
                     _relative_url(albums_url_prefix, album_name, "thumbnails", thumbnail_name)
                     for thumbnail_name in thumbnail_names
                 ]
             ),
-            "description": description,
-        }
+            description=description,
+        )
 
     def create_static_url(request: Request, relative_url: str) -> str:
         return request.url_for("static", path=relative_url).path
@@ -212,7 +291,7 @@ def construct_album_api_router(config: Config) -> APIRouter:
     def create_static_url_list(request: Request, relative_url_list: Iterable[str]) -> List[str]:
         return list(map(lambda url: create_static_url(request, url), relative_url_list))
 
-    def unaccessible_album_error_message() -> Any:
+    def unaccessible_album_error_message() -> JSONResponse:
         return error_response(
             status.HTTP_403_FORBIDDEN,
             f"Illegal operation. The only accessible album is {forced_album_name}."
