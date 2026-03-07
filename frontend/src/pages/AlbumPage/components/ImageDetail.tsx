@@ -95,7 +95,7 @@ const ImageDetail = ({ imageUrls, imageIndex, setImageIndex, albumName }: ImageD
   return (
     <>
       <Container className={classes.imageContainer}>
-        <Button component={Link} to={routes.albumOverview(albumName)} className={classes.backToAlbumButton}>
+        <Button component={Link} to={routes.albumPage(albumName)} className={classes.backToAlbumButton}>
           <KeyboardArrowLeft />
           Back to album
         </Button>

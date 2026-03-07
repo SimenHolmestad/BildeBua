@@ -19,15 +19,15 @@ const App: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Routes>
-        <Route path={routes.home} element={<FrontPage />} />
-        <Route path={routes.qr} element={<QrCodePage />} />
-        <Route path={routes.albumOverview(':albumName')} element={<AlbumPage view="overview" />} />
-        <Route path={routes.albumDetail(':albumName')} element={<AlbumPage view="detail" />} />
-        <Route path={routes.albumLastImage(':albumName')} element={<LastImagePage />} />
-        <Route path={routes.albumLastImageQr(':albumName')} element={<QrCodeLastImagePage />} />
-        <Route path={routes.albumSlideshow(':albumName')} element={<SlideshowPage />} />
-        <Route path={routes.albumSlideshowLastImage(':albumName')} element={<SlideshowLastImagePage />} />
-        <Route path={routes.notFound} element={<FrontPage />} />
+        <Route path={routes.frontPage} element={<FrontPage />} />
+        <Route path={routes.qrCodePage} element={<QrCodePage />} />
+        <Route path={routes.albumPage(':albumName')} element={<AlbumPage view="overview" />} />
+        <Route path={routes.albumPageDetail(':albumName')} element={<AlbumPage view="detail" />} />
+        <Route path={routes.lastImagePage(':albumName')} element={<LastImagePage />} />
+        <Route path={routes.qrCodeLastImagePage(':albumName')} element={<QrCodeLastImagePage />} />
+        <Route path={routes.slideshowPage(':albumName')} element={<SlideshowPage />} />
+        <Route path={routes.slideshowLastImagePage(':albumName')} element={<SlideshowLastImagePage />} />
+        <Route path={routes.notFoundPage} element={<FrontPage />} />
         <Route path="*" element={<FrontPage />} />
       </Routes>
     </ThemeProvider>

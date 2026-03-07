@@ -41,7 +41,7 @@ const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
   };
 
   if (redirectAlbum) {
-    return <Navigate to={routes.albumOverview(redirectAlbum)} replace />;
+    return <Navigate to={routes.albumPage(redirectAlbum)} replace />;
   }
 
   return (

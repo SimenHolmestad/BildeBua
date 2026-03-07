@@ -114,7 +114,7 @@ const AlbumOverview = ({ albumData, setImageIndex }: AlbumOverviewProps) => {
             <CardActions>
               <Button
                 component={Link}
-                to={routes.albumDetail(albumName)}
+                to={routes.albumPageDetail(albumName)}
                 onClick={() => setImageIndex(thumbnailUrls.length - index)}
                 size="small"
                 color="primary"

@@ -86,7 +86,7 @@ const FrontPage = () => {
     return (
       <>
         <Header />
-        <Navigate to={routes.albumOverview(albumInfo.forced_album)} replace />
+        <Navigate to={routes.albumPage(albumInfo.forced_album)} replace />
         <Footer />
       </>
     );
@@ -95,7 +95,7 @@ const FrontPage = () => {
   const availableAlbums = albumInfo.available_albums ?? [];
 
   const albumList = availableAlbums.map((albumName) => (
-    <Link key={albumName} to={routes.albumOverview(albumName)} className={classes.albumLink}>
+    <Link key={albumName} to={routes.albumPage(albumName)} className={classes.albumLink}>
       <Card className={classes.card}>
         <Typography variant="h3" align="center" color="textPrimary" className={classes.albumLinkText} paragraph>
           {albumName}
