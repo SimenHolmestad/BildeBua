@@ -76,9 +76,11 @@ const FullscreenImage = ({ imageUrl, time, startHided }: FullscreenImageProps) =
     return null;
   }
 
+  const imageSrc = imageUrl ?? undefined;
+
   return (
     <div className={ classes.background }>
-      <img src={imageUrl} className={ classes.image } alt=""/>
+      <img src={imageSrc} className={ classes.image } alt=""/>
     </div>
   );
 };

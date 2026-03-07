@@ -1,14 +1,14 @@
-import { getAuthToken } from '../core/auth';
+import { getAuthToken } from 'api/core/auth';
 import type {
   QuerySerializer,
   QuerySerializerOptions,
-} from '../core/bodySerializer';
-import { jsonBodySerializer } from '../core/bodySerializer';
+} from 'api/core/bodySerializer';
+import { jsonBodySerializer } from 'api/core/bodySerializer';
 import {
   serializeArrayParam,
   serializeObjectParam,
   serializePrimitiveParam,
-} from '../core/pathSerializer';
+} from 'api/core/pathSerializer';
 import type { Client, ClientOptions, Config, RequestOptions } from './types';
 
 interface PathSerializer {

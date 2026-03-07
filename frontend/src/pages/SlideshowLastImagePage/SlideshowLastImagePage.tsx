@@ -1,6 +1,6 @@
 import React from 'react';
-import SlideshowPage from './SlideshowPage';
-import LastImage from './LastImage';
+import SlideshowPage from 'pages/SlideshowPage/SlideshowPage';
+import LastImage from 'components/LastImage';
 import { useParams } from 'react-router-dom';
 
 const SlideshowLastImagePage = () => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import FullscreenImage from './FullscreenImage';
+import FullscreenImage from 'components/FullscreenImage';
 
 
 type SlideshowProps = {

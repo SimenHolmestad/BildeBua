@@ -6,10 +6,12 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { create_or_update_album, isApiError } from './../server'
-import { Navigate } from "react-router-dom";
+import { Navigate } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import { createAlbumAndRefresh } from 'hooks/swr';
+import routes from 'routes';
+import { getApiErrorMessage } from 'utils/apiError';
 
 type NewAlbumDialogProps = {
   open: boolean;
@@ -17,10 +19,11 @@ type NewAlbumDialogProps = {
 };
 
 const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
-  const [albumName, setAlbumName] = React.useState("");
-  const [description, setDescription] = React.useState("");
+  const [albumName, setAlbumName] = React.useState('');
+  const [description, setDescription] = React.useState('');
   const [redirectAlbum, setRedirectAlbum] = React.useState<string | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
   const handleDialogClose = () => {
     setErrorMessage(null);
     handleClose();
@@ -28,16 +31,17 @@ const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const response = await create_or_update_album(albumName, description)
-    if (isApiError(response)) {
-      setErrorMessage(response.error);
-      return;
+
+    try {
+      const response = await createAlbumAndRefresh(albumName, description);
+      setRedirectAlbum(response.album_name);
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error));
     }
-    setRedirectAlbum(response.album_name)
   };
 
   if (redirectAlbum) {
-    return <Navigate to={"/album/" + redirectAlbum} replace />
+    return <Navigate to={routes.albumOverview(redirectAlbum)} replace />;
   }
 
   return (
@@ -50,7 +54,7 @@ const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
           </DialogContentText>
           <TextField
             value={albumName}
-            onChange={e => setAlbumName(e.target.value)}
+            onChange={(event) => setAlbumName(event.target.value)}
             autoFocus
             margin="dense"
             label="Album name"
@@ -58,7 +62,7 @@ const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
           />
           <TextField
             value={description}
-            onChange={e => setDescription(e.target.value)}
+            onChange={(event) => setDescription(event.target.value)}
             label="Description"
             multiline
             rows={4}
@@ -87,4 +91,4 @@ const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
   );
 };
 
-export default NewAlbumDialog
+export default NewAlbumDialog;

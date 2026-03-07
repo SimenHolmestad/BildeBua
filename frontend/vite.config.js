@@ -1,9 +1,20 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import path from "node:path";
 
 export default defineConfig(({ command }) => ({
   base: command === "serve" ? "/" : "/static/react/",
   plugins: [react()],
+  resolve: {
+    alias: {
+      api: path.resolve(__dirname, "src/api"),
+      components: path.resolve(__dirname, "src/components"),
+      hooks: path.resolve(__dirname, "src/hooks"),
+      pages: path.resolve(__dirname, "src/pages"),
+      routes: path.resolve(__dirname, "src/routes.ts"),
+      utils: path.resolve(__dirname, "src/utils"),
+    },
+  },
   build: {
     outDir: "build",
     emptyOutDir: true,

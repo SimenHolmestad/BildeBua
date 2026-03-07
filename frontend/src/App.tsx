@@ -1,38 +1,35 @@
 import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import AlbumPage from './components/AlbumPage'
-import FrontPage from './components/FrontPage'
-import LastImagePage from './components/LastImagePage'
-import QrCodePage from './components/QrCodePage'
-import QrCodeLastImagePage from './components/QrCodeLastImagePage'
-import SlideshowLastImagePage from './components/SlideshowLastImagePage'
-import SlideshowPage from './components/SlideshowPage'
+import AlbumPage from './pages/AlbumPage/AlbumPage';
+import FrontPage from './pages/FrontPage/FrontPage';
+import LastImagePage from './pages/LastImagePage/LastImagePage';
+import QrCodePage from './pages/QrCodePage/QrCodePage';
+import QrCodeLastImagePage from './pages/QrCodeLastImagePage/QrCodeLastImagePage';
+import SlideshowLastImagePage from './pages/SlideshowLastImagePage/SlideshowLastImagePage';
+import SlideshowPage from './pages/SlideshowPage/SlideshowPage';
+import routes from './routes';
 
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
-const App = () => {
+const App: React.FC = () => {
   const theme = React.useMemo(() => createTheme(), []);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path='/album/:albumName/last_image' element={<LastImagePage />} />
-          <Route path='/album/:albumName/last_image_qr' element={<QrCodeLastImagePage />} />
-          <Route path='/album/:albumName/slideshow' element={<SlideshowPage />} />
-          <Route path='/album/:albumName/slideshow_last_image' element={<SlideshowLastImagePage />} />
-          <Route path='/album/:albumName/detail' element={<AlbumPage view="detail" />} />
-          <Route path='/album/:albumName' element={<AlbumPage view="overview" />} />
-          <Route path='/qr' element={<QrCodePage />} />
-          <Route path='/' element={<FrontPage />} />
-          <Route path='*' element={<FrontPage />} />
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path={routes.home} element={<FrontPage />} />
+        <Route path={routes.qr} element={<QrCodePage />} />
+        <Route path={routes.albumOverview(':albumName')} element={<AlbumPage view="overview" />} />
+        <Route path={routes.albumDetail(':albumName')} element={<AlbumPage view="detail" />} />
+        <Route path={routes.albumLastImage(':albumName')} element={<LastImagePage />} />
+        <Route path={routes.albumLastImageQr(':albumName')} element={<QrCodeLastImagePage />} />
+        <Route path={routes.albumSlideshow(':albumName')} element={<SlideshowPage />} />
+        <Route path={routes.albumSlideshowLastImage(':albumName')} element={<SlideshowLastImagePage />} />
+        <Route path={routes.notFound} element={<FrontPage />} />
+        <Route path="*" element={<FrontPage />} />
+      </Routes>
     </ThemeProvider>
   );
 };

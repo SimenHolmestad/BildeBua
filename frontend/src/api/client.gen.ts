@@ -14,5 +14,6 @@ import { type Config, type ClientOptions as DefaultClientOptions, createClient, 
 export type CreateClientConfig<T extends DefaultClientOptions = ClientOptions> = (override?: Config<DefaultClientOptions & T>) => Config<Required<DefaultClientOptions> & T>;
 
 export const client = createClient(createConfig<ClientOptions>({
-    baseUrl: 'http://localhost:5000'
+    baseUrl: 'http://localhost:5000',
+    throwOnError: true
 }));

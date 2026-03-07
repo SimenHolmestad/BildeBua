@@ -1,5 +1,5 @@
 import React from 'react';
-import LastImage from './LastImage'
+import LastImage from 'components/LastImage';
 import { useParams } from 'react-router-dom';
 
 const LastImagePage = () => {

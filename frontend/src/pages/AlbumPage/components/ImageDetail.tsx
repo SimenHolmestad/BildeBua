@@ -9,6 +9,7 @@ import Container from '@mui/material/Container';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
 import type { Theme } from '@mui/material/styles';
+import routes from 'routes';
 
 const useStyles = makeStyles((theme: Theme) => ({
   leftIcon: {
@@ -94,7 +95,7 @@ const ImageDetail = ({ imageUrls, imageIndex, setImageIndex, albumName }: ImageD
   return (
     <>
       <Container className={classes.imageContainer}>
-        <Button component={Link} to={"/album/" + albumName} className={classes.backToAlbumButton}>
+        <Button component={Link} to={routes.albumOverview(albumName)} className={classes.backToAlbumButton}>
           <KeyboardArrowLeft />
           Back to album
         </Button>

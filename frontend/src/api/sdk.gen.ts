@@ -22,8 +22,9 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  * List available albums
  * Return all available albums and the active forced album restriction.
  */
-export const listAlbums = <ThrowOnError extends boolean = false>(options?: Options<ListAlbumsData, ThrowOnError>) => {
-    return (options?.client ?? _heyApiClient).get<ListAlbumsResponses, unknown, ThrowOnError>({
+export const listAlbums = <ThrowOnError extends boolean = true>(options?: Options<ListAlbumsData, ThrowOnError>) => {
+    return (options?.client ?? _heyApiClient).get<ListAlbumsResponses, unknown, ThrowOnError, 'data'>({
+        responseStyle: 'data',
         url: '/albums/',
         ...options
     });
@@ -33,8 +34,9 @@ export const listAlbums = <ThrowOnError extends boolean = false>(options?: Optio
  * Create or update album
  * Create the album if it does not exist. If `description` is provided, update the album description.
  */
-export const createAlbum = <ThrowOnError extends boolean = false>(options: Options<CreateAlbumData, ThrowOnError>) => {
-    return (options.client ?? _heyApiClient).post<CreateAlbumResponses, CreateAlbumErrors, ThrowOnError>({
+export const createAlbum = <ThrowOnError extends boolean = true>(options: Options<CreateAlbumData, ThrowOnError>) => {
+    return (options.client ?? _heyApiClient).post<CreateAlbumResponses, CreateAlbumErrors, ThrowOnError, 'data'>({
+        responseStyle: 'data',
         url: '/albums/',
         ...options,
         headers: {
@@ -48,8 +50,9 @@ export const createAlbum = <ThrowOnError extends boolean = false>(options: Optio
  * Get album details
  * Return album metadata and image/thumbnail URLs.
  */
-export const getAlbumInfo = <ThrowOnError extends boolean = false>(options: Options<GetAlbumInfoData, ThrowOnError>) => {
-    return (options.client ?? _heyApiClient).get<GetAlbumInfoResponses, GetAlbumInfoErrors, ThrowOnError>({
+export const getAlbumInfo = <ThrowOnError extends boolean = true>(options: Options<GetAlbumInfoData, ThrowOnError>) => {
+    return (options.client ?? _heyApiClient).get<GetAlbumInfoResponses, GetAlbumInfoErrors, ThrowOnError, 'data'>({
+        responseStyle: 'data',
         url: '/albums/{album_name}',
         ...options
     });
@@ -59,8 +62,9 @@ export const getAlbumInfo = <ThrowOnError extends boolean = false>(options: Opti
  * Capture image to album
  * Capture one image with the configured camera and add it to the album.
  */
-export const captureImageToAlbum = <ThrowOnError extends boolean = false>(options: Options<CaptureImageToAlbumData, ThrowOnError>) => {
-    return (options.client ?? _heyApiClient).post<CaptureImageToAlbumResponses, CaptureImageToAlbumErrors, ThrowOnError>({
+export const captureImageToAlbum = <ThrowOnError extends boolean = true>(options: Options<CaptureImageToAlbumData, ThrowOnError>) => {
+    return (options.client ?? _heyApiClient).post<CaptureImageToAlbumResponses, CaptureImageToAlbumErrors, ThrowOnError, 'data'>({
+        responseStyle: 'data',
         url: '/albums/{album_name}',
         ...options
     });
@@ -70,8 +74,9 @@ export const captureImageToAlbum = <ThrowOnError extends boolean = false>(option
  * Get latest album image
  * Return the URL for the latest captured image in an album.
  */
-export const getAlbumLastImage = <ThrowOnError extends boolean = false>(options: Options<GetAlbumLastImageData, ThrowOnError>) => {
-    return (options.client ?? _heyApiClient).get<GetAlbumLastImageResponses, GetAlbumLastImageErrors, ThrowOnError>({
+export const getAlbumLastImage = <ThrowOnError extends boolean = true>(options: Options<GetAlbumLastImageData, ThrowOnError>) => {
+    return (options.client ?? _heyApiClient).get<GetAlbumLastImageResponses, GetAlbumLastImageErrors, ThrowOnError, 'data'>({
+        responseStyle: 'data',
         url: '/albums/{album_name}/last_image',
         ...options
     });
@@ -81,8 +86,9 @@ export const getAlbumLastImage = <ThrowOnError extends boolean = false>(options:
  * List QR codes
  * Return all generated QR codes with display text and static image URLs.
  */
-export const getQrCodes = <ThrowOnError extends boolean = false>(options?: Options<GetQrCodesData, ThrowOnError>) => {
-    return (options?.client ?? _heyApiClient).get<GetQrCodesResponses, unknown, ThrowOnError>({
+export const getQrCodes = <ThrowOnError extends boolean = true>(options?: Options<GetQrCodesData, ThrowOnError>) => {
+    return (options?.client ?? _heyApiClient).get<GetQrCodesResponses, unknown, ThrowOnError, 'data'>({
+        responseStyle: 'data',
         url: '/qr_codes/',
         ...options
     });
