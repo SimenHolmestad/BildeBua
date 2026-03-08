@@ -154,8 +154,7 @@ class AlbumApiTestCase(unittest.TestCase):
         self.assertEqual(json_response, {
             'album_name': 'album1',
             'description': '',
-            'image_urls': [],
-            'thumbnail_urls': []
+            'images': []
         })
 
     def test_get_info_for_album_other_than_forced_album(self) -> None:
@@ -173,8 +172,7 @@ class AlbumApiTestCase(unittest.TestCase):
         self.assertEqual(json_response, {
             'album_name': 'album1',
             'description': '',
-            'image_urls': [],
-            'thumbnail_urls': []
+            'images': []
         })
 
     def test_get_info_for_album_with_description(self) -> None:
@@ -183,8 +181,7 @@ class AlbumApiTestCase(unittest.TestCase):
         self.assertEqual(json_response, {
             'album_name': 'album1',
             'description': 'This is a very nice album',
-            'image_urls': [],
-            'thumbnail_urls': []
+            'images': []
         })
 
     def test_get_info_for_album_with_images(self) -> None:
@@ -196,13 +193,17 @@ class AlbumApiTestCase(unittest.TestCase):
         self.assertEqual(json_response, {
             'album_name': 'album1',
             'description': '',
-            'image_urls': [
-                '/static/albums/album1/images/image0002.png',
-                '/static/albums/album1/images/image0001.png'
-            ],
-            'thumbnail_urls': [
-                '/static/albums/album1/thumbnails/image0002.jpg',
-                '/static/albums/album1/thumbnails/image0001.jpg'
+            'images': [
+                {
+                    'image_number': 1,
+                    'image_url': '/static/albums/album1/images/image0001.png',
+                    'thumbnail_url': '/static/albums/album1/thumbnails/image0001.jpg'
+                },
+                {
+                    'image_number': 2,
+                    'image_url': '/static/albums/album1/images/image0002.png',
+                    'thumbnail_url': '/static/albums/album1/thumbnails/image0002.jpg'
+                }
             ]
         })
 

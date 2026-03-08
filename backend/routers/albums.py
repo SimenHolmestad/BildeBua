@@ -1,4 +1,5 @@
-from typing import Iterable, List, Optional
+import re
+from typing import List, Optional
 from fastapi import APIRouter, Path, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -36,16 +37,26 @@ class AvailableAlbumsResponse(BaseModel):
     )
 
 
+class AlbumImageResponse(BaseModel):
+    image_number: int = Field(description="Image number extracted from filename.")
+    image_url: str = Field(description="URL of the image.")
+    thumbnail_url: str = Field(description="URL of the image thumbnail.")
+
+
 class AlbumInfoResponse(BaseModel):
     album_name: str = Field(description="Album name.", examples=["album1"])
     description: str = Field(description="Album description.", examples=["A very nice album indeed"])
-    image_urls: List[str] = Field(
-        description="Image URLs in newest-first order.",
-        examples=[["/static/albums/album1/images/image0002.png"]]
-    )
-    thumbnail_urls: List[str] = Field(
-        description="Thumbnail URLs in newest-first order.",
-        examples=[["/static/albums/album1/thumbnails/image0002.jpg"]]
+    images: List[AlbumImageResponse] = Field(
+        description="Image and thumbnail URLs grouped in a list with image numbers.",
+        examples=[[{
+            "image_number": 1,
+            "image_url": "/static/albums/album1/images/image0001.png",
+            "thumbnail_url": "/static/albums/album1/thumbnails/image0001.jpg"
+        }, {
+            "image_number": 2,
+            "image_url": "/static/albums/album1/images/image0002.png",
+            "thumbnail_url": "/static/albums/album1/thumbnails/image0002.jpg"
+        }]]
     )
 
 
@@ -109,7 +120,7 @@ def construct_album_api_router(config: Config) -> APIRouter:
         response_model=AlbumInfoResponse,
         operation_id="get_album_info",
         summary="Get album details",
-        description="Return album metadata and image/thumbnail URLs.",
+        description="Return album metadata and image/thumbnail URLs as numbered image entries.",
         responses={
             status.HTTP_403_FORBIDDEN: {
                 "model": ErrorResponse,
@@ -265,31 +276,51 @@ def construct_album_api_router(config: Config) -> APIRouter:
         description = album_service.get_album_description(album_name)
         image_names = album_service.get_image_names(album_name)
         thumbnail_names = album_service.get_thumbnail_names(album_name)
+        image_names_by_number = {
+            image_number: image_name
+            for image_name in image_names
+            for image_number in [_image_number_from_filename(image_name)]
+            if image_number is not None
+        }
+        thumbnail_names_by_number = {
+            image_number: thumbnail_name
+            for thumbnail_name in thumbnail_names
+            for image_number in [_image_number_from_filename(thumbnail_name)]
+            if image_number is not None
+        }
+        available_numbers = sorted(set(image_names_by_number).intersection(thumbnail_names_by_number))
 
         return AlbumInfoResponse(
             album_name=album_name,
-            image_urls=create_static_url_list(
-                request,
-                [
-                    _relative_url(albums_url_prefix, album_name, "images", image_name)
-                    for image_name in image_names
-                ]
-            ),
-            thumbnail_urls=create_static_url_list(
-                request,
-                [
-                    _relative_url(albums_url_prefix, album_name, "thumbnails", thumbnail_name)
-                    for thumbnail_name in thumbnail_names
-                ]
-            ),
+            images=[
+                AlbumImageResponse(
+                    image_number=image_number,
+                    image_url=create_static_url(
+                        request,
+                        _relative_url(
+                            albums_url_prefix,
+                            album_name,
+                            "images",
+                            image_names_by_number[image_number]
+                        )
+                    ),
+                    thumbnail_url=create_static_url(
+                        request,
+                        _relative_url(
+                            albums_url_prefix,
+                            album_name,
+                            "thumbnails",
+                            thumbnail_names_by_number[image_number]
+                        )
+                    )
+                )
+                for image_number in available_numbers
+            ],
             description=description,
         )
 
     def create_static_url(request: Request, relative_url: str) -> str:
         return request.url_for("static", path=relative_url).path
-
-    def create_static_url_list(request: Request, relative_url_list: Iterable[str]) -> List[str]:
-        return list(map(lambda url: create_static_url(request, url), relative_url_list))
 
     def unaccessible_album_error_message() -> JSONResponse:
         return error_response(
@@ -312,3 +343,13 @@ def _albums_url_prefix_from_dir(albums_dir: str) -> str:
 
 def _relative_url(prefix: str, album_name: str, folder_name: str, filename: str) -> str:
     return "/".join(filter(None, [prefix, album_name, folder_name, filename]))
+
+
+IMAGE_FILENAME_PATTERN = re.compile(r"^image(\d+)\.[^.]+$")
+
+
+def _image_number_from_filename(filename: str) -> Optional[int]:
+    match = IMAGE_FILENAME_PATTERN.match(filename)
+    if not match:
+        return None
+    return int(match.group(1))

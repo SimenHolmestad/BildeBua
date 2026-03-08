@@ -2,6 +2,7 @@ import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import AlbumPage from './pages/AlbumPage/AlbumPage';
+import AlbumImageDetailPage from './pages/AlbumImageDetailPage/AlbumImageDetailPage';
 import FrontPage from './pages/FrontPage/FrontPage';
 import LastImagePage from './pages/LastImagePage/LastImagePage';
 import QrCodePage from './pages/QrCodePage/QrCodePage';
@@ -21,8 +22,8 @@ const App: React.FC = () => {
       <Routes>
         <Route path={routes.frontPage} element={<FrontPage />} />
         <Route path={routes.qrCodePage} element={<QrCodePage />} />
-        <Route path={routes.albumPage(':albumName')} element={<AlbumPage view="overview" />} />
-        <Route path={routes.albumPageDetail(':albumName')} element={<AlbumPage view="detail" />} />
+        <Route path={routes.albumPage(':albumName')} element={<AlbumPage />} />
+        <Route path={routes.albumImageDetailPage(':albumName', ':imageNumber')} element={<AlbumImageDetailPage />} />
         <Route path={routes.lastImagePage(':albumName')} element={<LastImagePage />} />
         <Route path={routes.qrCodeLastImagePage(':albumName')} element={<QrCodeLastImagePage />} />
         <Route path={routes.slideshowPage(':albumName')} element={<SlideshowPage />} />

@@ -8,13 +8,6 @@ import Footer from 'components/Footer';
 import type { Theme } from '@mui/material/styles';
 import { useAlbumInfo } from 'hooks/swr';
 import AlbumOverview from './components/AlbumOverview';
-import ImageDetail from './components/ImageDetail';
-
-type AlbumPageView = 'detail' | 'overview';
-
-type AlbumPageProps = {
-  view?: AlbumPageView;
-};
 
 const useStyles = makeStyles((_theme: Theme) => ({
   loadingGrid: {
@@ -23,10 +16,9 @@ const useStyles = makeStyles((_theme: Theme) => ({
   },
 }));
 
-const AlbumPage = ({ view = 'overview' }: AlbumPageProps) => {
+const AlbumPage = () => {
   const { albumName } = useParams<{ albumName: string }>();
   const { albumInfo, isLoading } = useAlbumInfo(5000);
-  const [imageIndex, setImageIndex] = React.useState(1);
   const classes = useStyles();
 
   if (!albumName) {
@@ -63,28 +55,10 @@ const AlbumPage = ({ view = 'overview' }: AlbumPageProps) => {
     );
   }
 
-  const imageDetail = (
-    <ImageDetail
-      imageUrls={albumInfo.image_urls}
-      imageIndex={imageIndex}
-      setImageIndex={setImageIndex}
-      albumName={albumName}
-    />
-  );
-
-  const albumOverview = (
-    <AlbumOverview
-      albumData={albumInfo}
-      setImageIndex={setImageIndex}
-    />
-  );
-
-  const pageContent = view === 'detail' ? imageDetail : albumOverview;
-
   return (
     <>
       <Header />
-      {pageContent}
+      <AlbumOverview albumData={albumInfo} />
       <Footer />
     </>
   );

@@ -48,7 +48,7 @@ export const createAlbum = <ThrowOnError extends boolean = true>(options: Option
 
 /**
  * Get album details
- * Return album metadata and image/thumbnail URLs.
+ * Return album metadata and image/thumbnail URLs as numbered image entries.
  */
 export const getAlbumInfo = <ThrowOnError extends boolean = true>(options: Options<GetAlbumInfoData, ThrowOnError>) => {
     return (options.client ?? _heyApiClient).get<GetAlbumInfoResponses, GetAlbumInfoErrors, ThrowOnError, 'data'>({

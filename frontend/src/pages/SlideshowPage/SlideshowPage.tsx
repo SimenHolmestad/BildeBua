@@ -17,7 +17,10 @@ const SlideshowPage = () => {
     return <CircularProgress />;
   }
 
-  const imageUrls = albumInfo?.image_urls ?? [];
+  const images = albumInfo?.images ?? [];
+  const imageUrls = [...images]
+    .reverse()
+    .map((image) => image.image_url);
 
   if (imageUrls.length === 0) {
     return <AlbumEmptyMessage />;

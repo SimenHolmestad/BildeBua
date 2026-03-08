@@ -1,8 +1,8 @@
-import type { Auth } from 'api/core/auth';
+import type { Auth } from '../core/auth';
 import type {
   Client as CoreClient,
   Config as CoreConfig,
-} from 'api/core/types';
+} from '../core/types';
 import type { Middleware } from './utils';
 
 export type ResponseStyle = 'data' | 'fields';

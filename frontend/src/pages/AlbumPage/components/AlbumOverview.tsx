@@ -49,17 +49,17 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 type AlbumOverviewProps = {
   albumData: AlbumInfoResponse;
-  setImageIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
-const AlbumOverview = ({ albumData, setImageIndex }: AlbumOverviewProps) => {
+const AlbumOverview = ({ albumData }: AlbumOverviewProps) => {
   const [isCapturingImage, setIsCapturingImage] = React.useState(false);
   const classes = useStyles();
-  const thumbnailUrls = albumData.thumbnail_urls;
+  const images = albumData.images;
   const albumName = albumData.album_name;
   const albumDescription = albumData.description ?? '';
   const [errorSnackbarOpen, setErrorSnackbarOpen] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const newestFirstImages = [...images].reverse();
 
   const handleErrorSnackbarClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -92,7 +92,7 @@ const AlbumOverview = ({ albumData, setImageIndex }: AlbumOverviewProps) => {
     </Button>
   );
 
-  const cardGrid = thumbnailUrls.length === 0 ? (
+  const cardGrid = newestFirstImages.length === 0 ? (
     <Container maxWidth="sm">
       <Typography variant="h3" className={classes.emptyAlbumText} align="center" color="textSecondary" gutterBottom>
         No images :(
@@ -103,28 +103,29 @@ const AlbumOverview = ({ albumData, setImageIndex }: AlbumOverviewProps) => {
     </Container>
   ) : (
     <Grid container spacing={4}>
-      {thumbnailUrls.map((url, index) => (
-        <Grid item key={url} xs={12} sm={6} md={4}>
-          <Card className={classes.card}>
-            <CardMedia
-              className={classes.cardMedia}
-              image={url}
-              title="No description provided"
-            />
-            <CardActions>
-              <Button
-                component={Link}
-                to={routes.albumPageDetail(albumName)}
-                onClick={() => setImageIndex(thumbnailUrls.length - index)}
-                size="small"
-                color="primary"
-              >
-                View in full size
-              </Button>
-            </CardActions>
-          </Card>
-        </Grid>
-      ))}
+      {newestFirstImages.map((imageData) => {
+        return (
+          <Grid item key={`${imageData.thumbnail_url}-${imageData.image_number}`} xs={12} sm={6} md={4}>
+            <Card className={classes.card}>
+              <CardMedia
+                className={classes.cardMedia}
+                image={imageData.thumbnail_url}
+                title="No description provided"
+              />
+              <CardActions>
+                <Button
+                  component={Link}
+                  to={routes.albumImageDetailPage(albumName, imageData.image_number)}
+                  size="small"
+                  color="primary"
+                >
+                  View in full size
+                </Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        );
+      })}
     </Grid>
   );
 

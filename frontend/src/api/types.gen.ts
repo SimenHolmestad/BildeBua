@@ -54,6 +54,27 @@ export type AlbumCreatedResponse = {
 };
 
 /**
+ * AlbumImageResponse
+ */
+export type AlbumImageResponse = {
+    /**
+     * Image Number
+     * Image number extracted from filename.
+     */
+    image_number: number;
+    /**
+     * Image Url
+     * URL of the image.
+     */
+    image_url: string;
+    /**
+     * Thumbnail Url
+     * URL of the image thumbnail.
+     */
+    thumbnail_url: string;
+};
+
+/**
  * AlbumInfoResponse
  */
 export type AlbumInfoResponse = {
@@ -68,15 +89,10 @@ export type AlbumInfoResponse = {
      */
     description: string;
     /**
-     * Image Urls
-     * Image URLs in newest-first order.
+     * Images
+     * Image and thumbnail URLs grouped in a list with image numbers.
      */
-    image_urls: Array<string>;
-    /**
-     * Thumbnail Urls
-     * Thumbnail URLs in newest-first order.
-     */
-    thumbnail_urls: Array<string>;
+    images: Array<AlbumImageResponse>;
 };
 
 /**

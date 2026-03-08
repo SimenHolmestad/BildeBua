@@ -3,7 +3,7 @@ const routes = {
   notFoundPage: '/notfound',
   qrCodePage: '/qr',
   albumPage: (albumName: string): string => `/album/${albumName}`,
-  albumPageDetail: (albumName: string): string => `/album/${albumName}/detail`,
+  albumImageDetailPage: (albumName: string, imageNumber: string | number): string => `/album/${albumName}/image/${imageNumber}`,
   lastImagePage: (albumName: string): string => `/album/${albumName}/last_image`,
   qrCodeLastImagePage: (albumName: string): string => `/album/${albumName}/last_image_qr`,
   slideshowPage: (albumName: string): string => `/album/${albumName}/slideshow`,
