@@ -58,7 +58,12 @@ class AlbumApiTestCase(unittest.TestCase):
         response = self.test_client.get("/albums/")
         self.assertEqual(response.status_code, 200)
 
-        expected_response = {"available_albums": ["album1", "album2"]}
+        expected_response = {
+            "available_albums": [
+                {"name": "album1", "last_images_thumbnails": []},
+                {"name": "album2", "last_images_thumbnails": []}
+            ]
+        }
         self.assertEqual(response.json(), {**expected_response, "forced_album": None})
 
     def test_get_available_albums_when_forced_album_is_set(self) -> None:
@@ -69,8 +74,36 @@ class AlbumApiTestCase(unittest.TestCase):
 
         json_response = self.test_client.get("/albums/").json()
 
-        expected_response = {"available_albums": ["album1", "album2"], "forced_album": "album2"}
+        expected_response = {
+            "available_albums": [
+                {"name": "album1", "last_images_thumbnails": []},
+                {"name": "album2", "last_images_thumbnails": []}
+            ],
+            "forced_album": "album2"
+        }
         self.assertEqual(json_response, expected_response)
+
+    def test_get_available_albums_includes_latest_thumbnail_urls(self) -> None:
+        self.create_temp_album("album1")
+        for _ in range(5):
+            self.add_dummy_image_file_to_album("album1")
+
+        json_response = self.test_client.get("/albums/").json()
+
+        self.assertEqual(json_response, {
+            "available_albums": [
+                {
+                    "name": "album1",
+                    "last_images_thumbnails": [
+                        "/static/albums/album1/thumbnails/image0005.jpg",
+                        "/static/albums/album1/thumbnails/image0004.jpg",
+                        "/static/albums/album1/thumbnails/image0003.jpg",
+                        "/static/albums/album1/thumbnails/image0002.jpg"
+                    ]
+                }
+            ],
+            "forced_album": None
+        })
 
     def test_create_album_when_forced_album_is_set(self) -> None:
         self.create_temp_album("album2")

@@ -1,40 +1,23 @@
 import React from 'react';
-import Typography from '@mui/material/Typography';
-import { makeStyles } from '@mui/styles';
-import type { Theme } from '@mui/material/styles';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  footer: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-    padding: theme.spacing(6),
-  },
-  footerLink: {
-    color: theme.palette.primary.contrastText,
-    textDecoration: 'none',
-    fontWeight: 600,
-  },
-}));
 
 const Footer = () => {
-  const classes = useStyles();
   return (
-    <footer className={classes.footer}>
-      <Typography variant="h6" align="center" gutterBottom color="inherit">
-        Hope you like BildeBua!
-      </Typography>
-      <Typography variant="subtitle1" align="center" color="inherit" component="p">
-        BildeBua is made using Python, FastAPI, React and Material UI. The source code is openly available on{' '}
-        <a
-          className={classes.footerLink}
-          href="https://github.com/SimenHolmestad/BildeBua"
-          target="_blank"
-          rel="noreferrer"
-        >
-          GitHub
-        </a>
-        .
-      </Typography>
+    <footer className="mt-16 border-t border-base-200 bg-base-100/70">
+      <div className="mx-auto w-full max-w-6xl px-4 py-10 text-center sm:px-6 lg:px-8">
+        <p className="font-display text-xl text-base-900">Håper du liker BildeBua!</p>
+        <p className="mt-2 text-sm text-base-700">
+          BildeBua er laget med Python, FastAPI, React og Tailwind. Kildekoden er tilgjengelig på{' '}
+          <a
+            className="font-semibold underline decoration-base-400 decoration-2 underline-offset-4 hover:decoration-base-700"
+            href="https://github.com/SimenHolmestad/BildeBua"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
+          .
+        </p>
+      </div>
     </footer>
   );
 };

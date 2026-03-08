@@ -96,14 +96,30 @@ export type AlbumInfoResponse = {
 };
 
 /**
+ * AvailableAlbumResponse
+ */
+export type AvailableAlbumResponse = {
+    /**
+     * Name
+     * Album name.
+     */
+    name: string;
+    /**
+     * Last Images Thumbnails
+     * Up to 4 latest thumbnail URLs in the album, newest first.
+     */
+    last_images_thumbnails: Array<string>;
+};
+
+/**
  * AvailableAlbumsResponse
  */
 export type AvailableAlbumsResponse = {
     /**
      * Available Albums
-     * All available album names.
+     * All available albums with card thumbnail previews.
      */
-    available_albums: Array<string>;
+    available_albums: Array<AvailableAlbumResponse>;
     /**
      * Forced Album
      * If set, this is the only album allowed for write/read operations.

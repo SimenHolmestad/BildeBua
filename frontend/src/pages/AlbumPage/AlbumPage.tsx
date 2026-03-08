@@ -1,32 +1,20 @@
 import React from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
-import { makeStyles } from '@mui/styles';
-import Grid from '@mui/material/Grid';
+import Footer from 'components/Footer';
 import Header from 'components/Header';
 import NotFound from 'components/NotFound';
-import { useParams } from 'react-router-dom';
-import Footer from 'components/Footer';
-import type { Theme } from '@mui/material/styles';
 import { useAlbumInfo } from 'hooks/swr';
+import { useParams } from 'react-router-dom';
 import AlbumOverview from './components/AlbumOverview';
-
-const useStyles = makeStyles((_theme: Theme) => ({
-  loadingGrid: {
-    height: '80vh',
-    paddingTop: '250px',
-  },
-}));
 
 const AlbumPage = () => {
   const { albumName } = useParams<{ albumName: string }>();
   const { albumInfo, isLoading } = useAlbumInfo(5000);
-  const classes = useStyles();
 
   if (!albumName) {
     return (
       <>
         <Header />
-        <h1>ERROR: Album name is missing.</h1>
+        <h1 className="mx-auto my-20 max-w-3xl px-4 text-2xl font-semibold text-red-700">FEIL: Albumnavn mangler.</h1>
         <Footer />
       </>
     );
@@ -36,9 +24,9 @@ const AlbumPage = () => {
     return (
       <>
         <Header />
-        <Grid container className={classes.loadingGrid} spacing={2} justifyContent="center">
-          <CircularProgress />
-        </Grid>
+        <div className="flex min-h-[80vh] items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-base-300 border-t-base-700" />
+        </div>
         <Footer />
       </>
     );

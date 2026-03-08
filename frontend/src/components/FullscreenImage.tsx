@@ -1,38 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
-import type { Theme } from '@mui/material/styles';
-
-type StyleProps = {
-  opacity: number;
-};
-
-const useStyles = makeStyles<Theme, StyleProps>(({
-  image: {
-    maxWidth: "100%",
-    maxHeight: "100%",
-    bottom: "0",
-    left: "0",
-    margin: "auto",
-    position: "fixed",
-    right: "0",
-    top: "0",
-    objectFit: "contain",
-    zoom: 10,
-    transition: "opacity 1s ease-in-out",
-    opacity: (props) => props.opacity
-  },
-  background: {
-    position: "fixed",
-    zIndex: 1200,
-    top: 0,
-    left: 0,
-    width: "100%",
-    height:" 100%",
-    backgroundColor: "black",
-    transition: "opacity 1s ease-in-out",
-    opacity: (props) => props.opacity
-  }
-}))
 
 type FullscreenImageProps = {
   imageUrl?: string | null;
@@ -41,48 +7,63 @@ type FullscreenImageProps = {
 };
 
 const FullscreenImage = ({ imageUrl, time, startHided }: FullscreenImageProps) => {
-  const [extraStyles, setExtraStyles] = React.useState<StyleProps>({ opacity: 0 });
-  let firstImageShowing = React.useRef(true);
   const [isShowing, setIsShowing] = React.useState(false);
-  const classes = useStyles(extraStyles);
-  let timeout = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [isFadingIn, setIsFadingIn] = React.useState(false);
+  const firstImageShowing = React.useRef(true);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   React.useEffect(() => {
     if (!imageUrl) {
-      return
+      return;
     }
+
     if (startHided && firstImageShowing.current) {
-      firstImageShowing.current = false
-      return
+      firstImageShowing.current = false;
+      return;
     }
 
-    setExtraStyles({opacity: 1})
-    setIsShowing(true)
+    setIsShowing(true);
+    setIsFadingIn(true);
 
-    if (timeout.current) {
-      clearTimeout(timeout.current)
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
+
     if (time) {
-      timeout.current = setTimeout(startFadeOut, time)
+      timeoutRef.current = setTimeout(() => {
+        setIsFadingIn(false);
+        timeoutRef.current = setTimeout(() => setIsShowing(false), 1000);
+      }, time);
     }
   }, [imageUrl, startHided, time]);
-
-  const startFadeOut = () => {
-    setExtraStyles({opacity: 0})
-    timeout.current = setTimeout(() => setIsShowing(false), 1000);
-  }
 
   if (!isShowing) {
     return null;
   }
 
-  const imageSrc = imageUrl ?? undefined;
-
   return (
-    <div className={ classes.background }>
-      <img src={imageSrc} className={ classes.image } alt=""/>
+    <div
+      className={`fixed inset-0 z-[1200] bg-black transition-opacity duration-1000 ${
+        isFadingIn ? 'opacity-100' : 'opacity-0'
+      }`}
+    >
+      <img
+        src={imageUrl ?? undefined}
+        alt=""
+        className={`fixed inset-0 m-auto max-h-full max-w-full object-contain transition-opacity duration-1000 ${
+          isFadingIn ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
     </div>
   );
 };
 
-export default FullscreenImage
+export default FullscreenImage;

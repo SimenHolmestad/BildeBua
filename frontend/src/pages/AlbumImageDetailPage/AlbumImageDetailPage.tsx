@@ -1,54 +1,12 @@
 import React from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import ArrowBack from '@mui/icons-material/ArrowBack';
-import ArrowForward from '@mui/icons-material/ArrowForward';
-import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
-import { makeStyles } from '@mui/styles';
-import { Link, useParams } from 'react-router-dom';
-import type { Theme } from '@mui/material/styles';
-import Header from 'components/Header';
 import Footer from 'components/Footer';
+import Header from 'components/Header';
 import NotFound from 'components/NotFound';
 import { useAlbumInfo } from 'hooks/swr';
+import { Link, useParams } from 'react-router-dom';
 import routes from 'routes';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  loadingGrid: {
-    height: '80vh',
-    paddingTop: '250px',
-  },
-  image: {
-    width: '100%',
-  },
-  imageContainer: {
-    maxWidth: '1100px',
-    padding: theme.spacing(0, 0, 0),
-  },
-  backToAlbumButton: {
-    marginTop: '4px',
-  },
-  leftIcon: {
-    marginRight: theme.spacing(1),
-  },
-  rightIcon: {
-    marginLeft: theme.spacing(1),
-  },
-  notFoundContainer: {
-    minHeight: '70vh',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: theme.spacing(2),
-  },
-}));
-
 const AlbumImageDetailPage = () => {
-  const classes = useStyles();
   const { albumName, imageNumber } = useParams<{ albumName: string; imageNumber: string }>();
   const { albumInfo, isLoading } = useAlbumInfo(5000);
 
@@ -56,7 +14,7 @@ const AlbumImageDetailPage = () => {
     return (
       <>
         <Header />
-        <h1>ERROR: Album name is missing.</h1>
+        <h1 className="mx-auto my-20 max-w-3xl px-4 text-2xl font-semibold text-red-700">FEIL: Albumnavn mangler.</h1>
         <Footer />
       </>
     );
@@ -66,9 +24,9 @@ const AlbumImageDetailPage = () => {
     return (
       <>
         <Header />
-        <Grid container className={classes.loadingGrid} spacing={2} justifyContent="center">
-          <CircularProgress />
-        </Grid>
+        <div className="flex min-h-[80vh] items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-base-300 border-t-base-700" />
+        </div>
         <Footer />
       </>
     );
@@ -84,9 +42,7 @@ const AlbumImageDetailPage = () => {
     );
   }
 
-  const selectedImageNumber = imageNumber && /^\d+$/.test(imageNumber)
-    ? Number.parseInt(imageNumber, 10)
-    : Number.NaN;
+  const selectedImageNumber = imageNumber && /^\d+$/.test(imageNumber) ? Number.parseInt(imageNumber, 10) : Number.NaN;
   const images = albumInfo.images;
   const selectedIndex = images.findIndex((image) => image.image_number === selectedImageNumber);
   const selectedImage = Number.isNaN(selectedImageNumber) ? null : images[selectedIndex] ?? null;
@@ -95,17 +51,16 @@ const AlbumImageDetailPage = () => {
     return (
       <>
         <Header />
-        <Container className={classes.notFoundContainer}>
-          <Typography variant="h4" align="center">
-            Image not found
-          </Typography>
-          <Typography variant="h6" color="textSecondary" align="center">
-            Could not find image {imageNumber} in this album.
-          </Typography>
-          <Button component={Link} to={routes.albumPage(albumName)} variant="contained" color="primary">
-            Back to album
-          </Button>
-        </Container>
+        <div className="mx-auto flex min-h-[70vh] w-full max-w-3xl flex-col items-center justify-center px-4 text-center">
+          <h1 className="font-display text-4xl text-base-900">Fant ikke bildet</h1>
+          <p className="mt-2 text-lg text-base-700">Fant ikke bilde {imageNumber} i dette albumet.</p>
+        <Link
+          to={routes.albumPage(albumName)}
+          className="mt-5 inline-flex items-center rounded-xl bg-base-600 px-5 py-3 text-[22px] font-semibold text-base-50 shadow-soft transition hover:bg-base-700"
+        >
+          Tilbake til album
+        </Link>
+        </div>
         <Footer />
       </>
     );
@@ -117,33 +72,64 @@ const AlbumImageDetailPage = () => {
   return (
     <>
       <Header />
-      <Container className={classes.imageContainer}>
-        <Button component={Link} to={routes.albumPage(albumName)} className={classes.backToAlbumButton}>
-          <KeyboardArrowLeft />
-          Back to album
-        </Button>
-        <img className={classes.image} src={selectedImage.image_url} alt="" />
-        <Grid container justifyContent="space-between">
-          <Button
-            component={previousImageNumber !== null ? Link : 'button'}
-            to={previousImageNumber !== null ? routes.albumImageDetailPage(albumName, previousImageNumber) : undefined}
-            disabled={previousImageNumber === null}
-          >
-            <ArrowBack className={classes.leftIcon} />
-            Previous image
-          </Button>
-          <Button
-            component={nextImageNumber !== null ? Link : 'button'}
-            to={nextImageNumber !== null ? routes.albumImageDetailPage(albumName, nextImageNumber) : undefined}
-            disabled={nextImageNumber === null}
-          >
-            Next image
-            <ArrowForward className={classes.rightIcon} />
-          </Button>
-        </Grid>
-      </Container>
+      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <Link to={routes.albumPage(albumName)} className="inline-flex items-center text-[22px] font-semibold text-base-700 hover:text-base-900">
+          ← Tilbake til album
+        </Link>
+
+        <section className="relative mt-4 overflow-hidden rounded-3xl border border-base-200 bg-black/90 shadow-soft">
+          <img src={selectedImage.image_url} alt={`Bilde ${selectedImage.image_number}`} className="max-h-[82vh] w-full object-contain" />
+
+          <div className="absolute inset-0">
+            <NavigationArrow
+              direction="left"
+              imageNumber={nextImageNumber}
+              albumName={albumName}
+              label="Neste bilde"
+            />
+            <NavigationArrow
+              direction="right"
+              imageNumber={previousImageNumber}
+              albumName={albumName}
+              label="Forrige bilde"
+            />
+          </div>
+        </section>
+      </main>
       <Footer />
     </>
+  );
+};
+
+type NavigationArrowProps = {
+  albumName: string;
+  direction: 'left' | 'right';
+  imageNumber: number | null;
+  label: string;
+};
+
+const NavigationArrow = ({ albumName, direction, imageNumber, label }: NavigationArrowProps) => {
+  const isDisabled = imageNumber === null;
+  const icon = direction === 'left' ? '←' : '→';
+  const zoneClasses = `absolute inset-y-0 ${
+    direction === 'left' ? 'left-0 justify-start pl-2 sm:pl-4' : 'right-0 justify-end pr-2 sm:pr-4'
+  } flex w-1/5 min-w-16 items-center`;
+
+  const classes =
+    'inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-black/35 text-2xl text-white shadow-lg backdrop-blur transition';
+
+  if (isDisabled) {
+    return (
+      <div className={zoneClasses}>
+        <span className={`${classes} cursor-not-allowed opacity-35`}>{icon}</span>
+      </div>
+    );
+  }
+
+  return (
+    <Link to={routes.albumImageDetailPage(albumName, imageNumber)} aria-label={label} className={`${zoneClasses} group`}>
+      <span className={`${classes} group-hover:scale-105 group-hover:bg-black/60`}>{icon}</span>
+    </Link>
   );
 };
 

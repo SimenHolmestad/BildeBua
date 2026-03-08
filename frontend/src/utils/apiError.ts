@@ -15,7 +15,7 @@ export const errorMessageFromValue = (value: unknown): string => {
     }
   }
 
-  return 'Unknown error';
+  return 'Ukjent feil';
 };
 
 export const getApiErrorMessage = (error: unknown): string =>

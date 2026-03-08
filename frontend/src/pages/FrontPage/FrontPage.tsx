@@ -1,61 +1,13 @@
 import React from 'react';
-import Card from '@mui/material/Card';
-import { Link, Navigate } from 'react-router-dom';
-import { makeStyles } from '@mui/styles';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import CircularProgress from '@mui/material/CircularProgress';
-import Grid from '@mui/material/Grid';
-import Header from 'components/Header';
 import Footer from 'components/Footer';
+import Header from 'components/Header';
 import NotFound from 'components/NotFound';
-import NewAlbumDialog from './components/NewAlbumDialog';
-import type { Theme } from '@mui/material/styles';
 import { useAvailableAlbums } from 'hooks/swr';
+import { Link, Navigate } from 'react-router-dom';
 import routes from 'routes';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  heroContent: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(8, 0, 6),
-  },
-  albumCardContainer: {
-    paddingBottom: '20px',
-    minHeight: '50vh',
-  },
-  card: {
-    height: '100%',
-    width: '100%',
-    marginTop: '20px',
-    paddingTop: '10px',
-    cursor: 'pointer',
-    backgroundColor: theme.palette.background.paper,
-    borderRadius: theme.shape.borderRadius * 2 || 8,
-    border: `1px solid ${theme.palette.divider}`,
-    boxShadow: '0 8px 20px rgba(0,0,0,0.08)',
-    backgroundImage: `linear-gradient(145deg, ${theme.palette.grey[50]}, ${theme.palette.grey[100]})`,
-    '&:hover': {
-      backgroundColor: theme.palette.grey[50],
-      boxShadow: '0 12px 28px rgba(0,0,0,0.12)',
-    },
-  },
-  albumLink: {
-    textDecoration: 'inherit',
-    color: 'inherit',
-    textTransform: 'none',
-  },
-  albumLinkText: {
-    fontWeight: '200',
-    color: theme.palette.primary.main,
-  },
-  loadingGrid: {
-    paddingTop: '30px',
-    paddingBottom: '10px',
-  },
-}));
+import NewAlbumDialog from './components/NewAlbumDialog';
 
 const FrontPage = () => {
-  const classes = useStyles();
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const { albumInfo, isLoading } = useAvailableAlbums();
 
@@ -63,9 +15,9 @@ const FrontPage = () => {
     return (
       <>
         <Header />
-        <Grid container className={classes.loadingGrid} spacing={2} justifyContent="center">
-          <CircularProgress />
-        </Grid>
+        <div className="flex min-h-[70vh] items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-base-300 border-t-base-700" />
+        </div>
         <Footer />
       </>
     );
@@ -93,37 +45,66 @@ const FrontPage = () => {
 
   const availableAlbums = albumInfo.available_albums ?? [];
 
-  const albumList = availableAlbums.map((albumName) => (
-    <Link key={albumName} to={routes.albumPage(albumName)} className={classes.albumLink}>
-      <Card className={classes.card}>
-        <Typography variant="h3" align="center" color="textPrimary" className={classes.albumLinkText} paragraph>
-          {albumName}
-        </Typography>
-      </Card>
-    </Link>
-  ));
-
   return (
     <>
       <Header />
-      <div className={classes.heroContent}>
-        <Container maxWidth="sm">
-          <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
-            Welcome to BildeBua!
-          </Typography>
-          <Typography variant="h5" align="center" color="textSecondary" paragraph>
-            You can use BildeBua to capture images or view already captured images. Choose one of the albums below or create a new album to start!
-          </Typography>
-        </Container>
-      </div>
-      <Container maxWidth="md" className={classes.albumCardContainer}>
-        {albumList}
-        <Card className={classes.card} onClick={() => setDialogOpen(true)}>
-          <Typography variant="h3" align="center" color="textPrimary" className={classes.albumLinkText} paragraph>
-            Create new album
-          </Typography>
-        </Card>
-      </Container>
+      <main className="mx-auto w-full max-w-6xl px-4 pb-8 pt-10 sm:px-6 lg:px-8">
+        <section className="animate-fade-in-up rounded-3xl border border-base-200 bg-base-50/70 px-6 py-10 shadow-soft sm:px-10">
+          <h1 className="font-display text-5xl text-base-900 sm:text-6xl">Velkommen til BildeBua</h1>
+          <p className="mt-4 max-w-3xl text-base text-base-700 sm:text-lg">
+            Velg et album nedenfor eller opprett et nytt for å komme igang.
+          </p>
+        </section>
+
+        <section className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <button
+            type="button"
+            onClick={() => setDialogOpen(true)}
+            className="group flex h-full min-h-[14.5rem] flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 bg-base-100/70 p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-base-500 hover:bg-base-100 hover:shadow-soft"
+          >
+            <span className="text-3xl text-base-700">＋</span>
+            <span className="mt-2 font-display text-2xl text-base-900">Opprett nytt album</span>
+            <span className="mt-2 text-sm text-base-600">Lag et nytt sted for de neste bildene dine.</span>
+          </button>
+
+          {availableAlbums.map((album) => (
+            <Link
+              key={album.name}
+              to={routes.albumPage(album.name)}
+              className="group overflow-hidden rounded-2xl border border-base-200 bg-base-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-soft"
+            >
+              <div className="grid h-44 grid-cols-2 grid-rows-2 gap-1 bg-base-200 p-1">
+                {album.last_images_thumbnails.length > 0 ? (
+                  <>
+                    {album.last_images_thumbnails.slice(0, 4).map((thumbnailUrl) => (
+                      <img
+                        key={thumbnailUrl}
+                        src={thumbnailUrl}
+                        alt={album.name}
+                        className="h-full w-full rounded-md object-cover"
+                        loading="lazy"
+                      />
+                    ))}
+                    {Array.from({ length: Math.max(0, 4 - album.last_images_thumbnails.length) }).map((_, idx) => (
+                      <div
+                        key={`placeholder-${album.name}-${idx}`}
+                        className="rounded-md bg-gradient-to-br from-base-200 via-base-100 to-base-300"
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <div className="col-span-2 row-span-2 grid place-items-center rounded-md bg-gradient-to-br from-base-200 via-base-100 to-base-300 text-base-600">
+                    Ingen bilder ennå
+                  </div>
+                )}
+              </div>
+              <div className="px-4 py-4">
+                <p className="font-display text-2xl text-base-900 transition group-hover:text-base-700">{album.name}</p>
+              </div>
+            </Link>
+          ))}
+        </section>
+      </main>
       <NewAlbumDialog open={dialogOpen} handleClose={() => setDialogOpen(false)} />
       <Footer />
     </>

@@ -8,7 +8,7 @@ import { GlobalErrorProvider } from './contexts/GlobalErrorContext';
 
 const container = document.getElementById('root');
 if (!container) {
-  throw new Error('Root container missing in index.html');
+  throw new Error('Rot-container mangler i index.html');
 }
 const root = createRoot(container);
 

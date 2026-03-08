@@ -25,7 +25,7 @@ export const GlobalErrorProvider = ({ children }: GlobalErrorProviderProps) => {
   const showError = React.useCallback((error: unknown, fallbackMessage?: string) => {
     const messageFromError = getApiErrorMessage(error);
     const message =
-      messageFromError === 'Unknown error' && fallbackMessage
+      messageFromError === 'Ukjent feil' && fallbackMessage
         ? fallbackMessage
         : messageFromError;
 
@@ -50,8 +50,7 @@ export const GlobalErrorProvider = ({ children }: GlobalErrorProviderProps) => {
 export const useGlobalError = () => {
   const context = React.useContext(GlobalErrorContext);
   if (!context) {
-    throw new Error('useGlobalError must be used within GlobalErrorProvider');
+    throw new Error('useGlobalError må brukes innenfor GlobalErrorProvider');
   }
   return context;
 };
-

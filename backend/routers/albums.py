@@ -25,10 +25,26 @@ class AlbumCreatedResponse(BaseModel):
     album_url: str = Field(description="Relative URL to the album resource.", examples=["/albums/album1"])
 
 
+class AvailableAlbumResponse(BaseModel):
+    name: str = Field(description="Album name.", examples=["album1"])
+    last_images_thumbnails: List[str] = Field(
+        description="Up to 4 latest thumbnail URLs in the album, newest first."
+    )
+
+
 class AvailableAlbumsResponse(BaseModel):
-    available_albums: List[str] = Field(
-        description="All available album names.",
-        examples=[["album1", "album2"]]
+    available_albums: List[AvailableAlbumResponse] = Field(
+        description="All available albums with card thumbnail previews.",
+        examples=[[{
+            "name": "album1",
+            "last_images_thumbnails": [
+                "/static/albums/album1/thumbnails/image0004.jpg",
+                "/static/albums/album1/thumbnails/image0003.jpg"
+            ]
+        }, {
+            "name": "album2",
+            "last_images_thumbnails": []
+        }]]
     )
     forced_album: Optional[str] = Field(
         default=None,
@@ -92,8 +108,8 @@ def construct_album_api_router(config: Config) -> APIRouter:
         summary="List available albums",
         description="Return all available albums and the active forced album restriction."
     )
-    def available_albums() -> AvailableAlbumsResponse:
-        return get_available_albums()
+    def available_albums(request: Request) -> AvailableAlbumsResponse:
+        return get_available_albums(request)
 
     @album_api_router.post(
         "/",
@@ -242,9 +258,26 @@ def construct_album_api_router(config: Config) -> APIRouter:
             album_url=request.url_for("album_info", album_name=album_name).path
         )
 
-    def get_available_albums() -> AvailableAlbumsResponse:
+    def get_available_albums(request: Request) -> AvailableAlbumsResponse:
         album_names = album_service.get_available_album_names()
-        return AvailableAlbumsResponse(available_albums=album_names, forced_album=forced_album_name)
+        available_albums = [
+            AvailableAlbumResponse(
+                name=album_name,
+                last_images_thumbnails=get_recent_thumbnail_urls(request, album_name)
+            )
+            for album_name in album_names
+        ]
+        return AvailableAlbumsResponse(available_albums=available_albums, forced_album=forced_album_name)
+
+    def get_recent_thumbnail_urls(request: Request, album_name: str, limit: int = 4) -> List[str]:
+        thumbnail_names = album_service.get_thumbnail_names(album_name)[:limit]
+        return [
+            create_static_url(
+                request,
+                _relative_url(albums_url_prefix, album_name, "thumbnails", thumbnail_name)
+            )
+            for thumbnail_name in thumbnail_names
+        ]
 
     def try_capture_image_to_album(
         request: Request,

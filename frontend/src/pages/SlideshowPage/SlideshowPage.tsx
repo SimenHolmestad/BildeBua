@@ -1,21 +1,24 @@
 import React from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
 import AlbumEmptyMessage from 'components/AlbumEmptyMessage';
 import NotFound from 'components/NotFound';
-import Slideshow from './components/Slideshow';
-import { useParams } from 'react-router-dom';
 import { useAlbumInfo } from 'hooks/swr';
+import { useParams } from 'react-router-dom';
+import Slideshow from './components/Slideshow';
 
 const SlideshowPage = () => {
   const { albumName } = useParams<{ albumName: string }>();
   const { albumInfo, isLoading } = useAlbumInfo(30000);
 
   if (!albumName) {
-    return <h1>ERROR: Album name is missing.</h1>;
+    return <h1 className="p-8 text-2xl font-semibold text-red-700">FEIL: Albumnavn mangler.</h1>;
   }
 
   if (isLoading && !albumInfo) {
-    return <CircularProgress />;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-zinc-700 border-t-zinc-100" />
+      </div>
+    );
   }
 
   if (!albumInfo) {
@@ -23,17 +26,13 @@ const SlideshowPage = () => {
   }
 
   const images = albumInfo.images ?? [];
-  const imageUrls = [...images]
-    .reverse()
-    .map((image) => image.image_url);
+  const imageUrls = [...images].reverse().map((image) => image.image_url);
 
   if (imageUrls.length === 0) {
     return <AlbumEmptyMessage />;
   }
 
-  return (
-    <Slideshow imageUrls={imageUrls} />
-  );
+  return <Slideshow imageUrls={imageUrls} />;
 };
 
 export default SlideshowPage;

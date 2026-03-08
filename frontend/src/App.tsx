@@ -1,43 +1,42 @@
 import React from 'react';
-import Alert from '@mui/material/Alert';
-import CssBaseline from '@mui/material/CssBaseline';
-import Slide from '@mui/material/Slide';
-import Snackbar from '@mui/material/Snackbar';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Route, Routes } from 'react-router-dom';
 import { SWRConfig } from 'swr';
-import AlbumPage from './pages/AlbumPage/AlbumPage';
 import AlbumImageDetailPage from './pages/AlbumImageDetailPage/AlbumImageDetailPage';
+import AlbumPage from './pages/AlbumPage/AlbumPage';
 import FrontPage from './pages/FrontPage/FrontPage';
 import LastImagePage from './pages/LastImagePage/LastImagePage';
-import QrCodePage from './pages/QrCodePage/QrCodePage';
 import QrCodeLastImagePage from './pages/QrCodeLastImagePage/QrCodeLastImagePage';
+import QrCodePage from './pages/QrCodePage/QrCodePage';
 import SlideshowLastImagePage from './pages/SlideshowLastImagePage/SlideshowLastImagePage';
 import SlideshowPage from './pages/SlideshowPage/SlideshowPage';
-import routes from './routes';
 import { useGlobalError } from './contexts/GlobalErrorContext';
-
-import { Route, Routes } from 'react-router-dom';
+import routes from './routes';
 
 const App: React.FC = () => {
-  const theme = React.useMemo(() => createTheme(), []);
   const { clearError, currentErrorMessage, showError, snackbarVersion } = useGlobalError();
-  const swrConfig = React.useMemo(() => ({
-    onError: (error: unknown) => {
-      showError(error);
-    },
-  }), [showError]);
+  const swrConfig = React.useMemo(
+    () => ({
+      onError: (error: unknown) => {
+        showError(error);
+      },
+    }),
+    [showError]
+  );
 
-  const handleSnackbarClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
+  React.useEffect(() => {
+    if (!currentErrorMessage) {
       return;
     }
 
-    clearError();
-  };
+    const timeout = setTimeout(() => {
+      clearError();
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [clearError, currentErrorMessage, snackbarVersion]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <>
       <SWRConfig value={swrConfig}>
         <Routes>
           <Route path={routes.frontPage} element={<FrontPage />} />
@@ -52,19 +51,16 @@ const App: React.FC = () => {
           <Route path="*" element={<FrontPage />} />
         </Routes>
       </SWRConfig>
-      <Snackbar
-        key={snackbarVersion}
-        open={Boolean(currentErrorMessage)}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
-        TransitionComponent={Slide}
-        TransitionProps={{ direction: 'up' }}
-      >
-        <Alert severity="error" variant="filled" elevation={6}>
+      {currentErrorMessage ? (
+        <div
+          key={snackbarVersion}
+          className="fixed bottom-6 left-1/2 z-50 w-[min(92vw,560px)] -translate-x-1/2 animate-fade-in-up rounded-xl border border-red-200 bg-red-600/95 px-4 py-3 text-sm font-semibold text-white shadow-soft"
+          role="alert"
+        >
           {currentErrorMessage}
-        </Alert>
-      </Snackbar>
-    </ThemeProvider>
+        </div>
+      ) : null}
+    </>
   );
 };
 

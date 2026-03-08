@@ -1,45 +1,20 @@
 import React from 'react';
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
-import type { Theme } from '@mui/material/styles';
 import routes from 'routes';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  container: {
-    minHeight: '70vh',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: theme.spacing(2),
-  },
-  buttonContainer: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-  },
-}));
-
 const NotFound = () => {
-  const classes = useStyles();
-
   return (
-    <Container className={classes.container}>
-      <Typography variant="h4" align="center">
-        404 Ikke funnet
-      </Typography>
-      <Typography variant="h6" color="textSecondary" align="center">
-        Kunne ikke finne dataen
-      </Typography>
-      <div className={classes.buttonContainer}>
-        <Button component={Link} to={routes.frontPage} variant="contained" color="primary">
-          Gå til forside
-        </Button>
-      </div>
-    </Container>
+    <div className="mx-auto flex min-h-[70vh] w-full max-w-3xl flex-col items-center justify-center px-4 text-center sm:px-6">
+      <p className="font-display text-5xl text-base-900">404</p>
+      <h1 className="mt-3 font-display text-3xl text-base-900">Ikke funnet</h1>
+      <p className="mt-2 text-base text-base-700">Kunne ikke finne dataen.</p>
+      <Link
+        to={routes.frontPage}
+        className="mt-6 inline-flex items-center rounded-xl bg-base-600 px-5 py-3 text-sm font-semibold text-base-50 shadow-soft transition hover:bg-base-700"
+      >
+        Gå til forside
+      </Link>
+    </div>
   );
 };
 

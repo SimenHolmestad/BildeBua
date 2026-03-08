@@ -51,8 +51,9 @@ export const useAlbumInfo = (refreshInterval = 0) => {
   return { albumInfo, isLoading };
 }
 
-export const useAlbumLastImage = (refreshInterval = 0) => {
-  const albumName = useAlbumName();
+export const useAlbumLastImage = (albumNameOverride?: string, refreshInterval = 0) => {
+  const routeAlbumName = useAlbumName();
+  const albumName = albumNameOverride ?? routeAlbumName;
   const { data: albumLastImage, isLoading } = useSWR<LastImageResponse>(
     albumName ? swrKeys.albumLastImage(albumName) : null,
     () =>
@@ -87,7 +88,7 @@ export const createAlbumAndRefresh = async (
       return createdAlbum;
     },
     showError,
-    'Failed to create album',
+    'Kunne ikke opprette album',
   );
 };
 
@@ -109,6 +110,6 @@ export const captureImageToAlbumAndRefresh = async (
       return capturedImage;
     },
     showError,
-    'Failed to capture image',
+    'Kunne ikke ta bilde',
   );
 };
