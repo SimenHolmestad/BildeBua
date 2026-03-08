@@ -34,6 +34,7 @@ def _wait_for_backend(url: str, timeout_seconds: int) -> bool:
     while time.time() < deadline:
         try:
             with request.urlopen(url, timeout=2):
+                time.sleep(1)
                 return True
         except (error.URLError, error.HTTPError):
             time.sleep(1)

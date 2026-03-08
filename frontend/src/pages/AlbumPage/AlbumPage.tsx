@@ -3,6 +3,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { makeStyles } from '@mui/styles';
 import Grid from '@mui/material/Grid';
 import Header from 'components/Header';
+import NotFound from 'components/NotFound';
 import { useParams } from 'react-router-dom';
 import Footer from 'components/Footer';
 import type { Theme } from '@mui/material/styles';
@@ -47,9 +48,7 @@ const AlbumPage = () => {
     return (
       <>
         <Header />
-        <Grid container className={classes.loadingGrid} spacing={2} justifyContent="center">
-          <CircularProgress />
-        </Grid>
+        <NotFound />
         <Footer />
       </>
     );

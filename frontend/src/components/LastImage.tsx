@@ -1,7 +1,7 @@
 import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import FullscreenImage from './FullscreenImage';
-import AlbumEmptyMessage from './AlbumEmptyMessage';
+import NotFound from './NotFound';
 import { useAlbumLastImage } from 'hooks/swr';
 
 type LastImageProps = {
@@ -18,7 +18,7 @@ const LastImage = ({ overlay = false, overlayTime }: LastImageProps) => {
 
   if (!albumLastImage) {
     if (!overlay) {
-      return <AlbumEmptyMessage />;
+      return <NotFound />;
     }
     return null;
   }

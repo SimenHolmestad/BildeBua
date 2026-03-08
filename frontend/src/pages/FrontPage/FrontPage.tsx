@@ -8,6 +8,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
+import NotFound from 'components/NotFound';
 import NewAlbumDialog from './components/NewAlbumDialog';
 import type { Theme } from '@mui/material/styles';
 import { useAvailableAlbums } from 'hooks/swr';
@@ -74,9 +75,7 @@ const FrontPage = () => {
     return (
       <>
         <Header />
-        <Grid container className={classes.loadingGrid} spacing={2} justifyContent="center">
-          <CircularProgress />
-        </Grid>
+        <NotFound />
         <Footer />
       </>
     );

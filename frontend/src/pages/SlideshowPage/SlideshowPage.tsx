@@ -1,6 +1,7 @@
 import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import AlbumEmptyMessage from 'components/AlbumEmptyMessage';
+import NotFound from 'components/NotFound';
 import Slideshow from './components/Slideshow';
 import { useParams } from 'react-router-dom';
 import { useAlbumInfo } from 'hooks/swr';
@@ -17,7 +18,11 @@ const SlideshowPage = () => {
     return <CircularProgress />;
   }
 
-  const images = albumInfo?.images ?? [];
+  if (!albumInfo) {
+    return <NotFound />;
+  }
+
+  const images = albumInfo.images ?? [];
   const imageUrls = [...images]
     .reverse()
     .map((image) => image.image_url);

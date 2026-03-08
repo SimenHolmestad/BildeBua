@@ -12,6 +12,7 @@ import { Link, useParams } from 'react-router-dom';
 import type { Theme } from '@mui/material/styles';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
+import NotFound from 'components/NotFound';
 import { useAlbumInfo } from 'hooks/swr';
 import routes from 'routes';
 
@@ -77,9 +78,7 @@ const AlbumImageDetailPage = () => {
     return (
       <>
         <Header />
-        <Grid container className={classes.loadingGrid} spacing={2} justifyContent="center">
-          <CircularProgress />
-        </Grid>
+        <NotFound />
         <Footer />
       </>
     );

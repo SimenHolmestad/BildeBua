@@ -1,8 +1,10 @@
 import React from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { makeStyles } from '@mui/styles';
 import Header from 'components/Header';
+import NotFound from 'components/NotFound';
 import type { Theme } from '@mui/material/styles';
 import { useQrCodes } from 'hooks/swr';
 
@@ -26,9 +28,31 @@ const useStyles = makeStyles((_theme: Theme) => ({
 
 const QrCodePage = () => {
   const classes = useStyles();
-  const { qrCodes } = useQrCodes();
+  const { qrCodes, isLoading } = useQrCodes();
 
-  const qrCodeData = qrCodes?.qr_codes ?? [];
+  if (isLoading && !qrCodes) {
+    return (
+      <>
+        <Header />
+        <div className={classes.verticallyCenteredDiv}>
+          <Grid container justifyContent="center">
+            <CircularProgress />
+          </Grid>
+        </div>
+      </>
+    );
+  }
+
+  if (!qrCodes) {
+    return (
+      <>
+        <Header />
+        <NotFound />
+      </>
+    );
+  }
+
+  const qrCodeData = qrCodes.qr_codes ?? [];
 
   const qrCodeItems = qrCodeData.map((qrCode, index) => (
     <Grid item key={index} className={classes.qrCodeGridItem}>
