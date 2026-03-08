@@ -9,14 +9,12 @@ import CameraIcon from '@mui/icons-material/PhotoCamera';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import Container from '@mui/material/Container';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
 import { Link } from 'react-router-dom';
 import type { Theme } from '@mui/material/styles';
 import type { AlbumInfoResponse } from 'api';
 import { captureImageToAlbumAndRefresh } from 'hooks/swr';
 import routes from 'routes';
-import { getApiErrorMessage } from 'utils/apiError';
+import { useGlobalError } from 'contexts/GlobalErrorContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   icon: {
@@ -57,27 +55,15 @@ const AlbumOverview = ({ albumData }: AlbumOverviewProps) => {
   const images = albumData.images;
   const albumName = albumData.album_name;
   const albumDescription = albumData.description ?? '';
-  const [errorSnackbarOpen, setErrorSnackbarOpen] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState('');
+  const { showError } = useGlobalError();
   const newestFirstImages = [...images].reverse();
-
-  const handleErrorSnackbarClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setErrorSnackbarOpen(false);
-  };
 
   const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setIsCapturingImage(true);
 
     try {
-      await captureImageToAlbumAndRefresh(albumName);
-    } catch (error) {
-      setErrorMessage(getApiErrorMessage(error));
-      setErrorSnackbarOpen(true);
+      await captureImageToAlbumAndRefresh(albumName, showError);
     } finally {
       setIsCapturingImage(false);
     }
@@ -146,11 +132,6 @@ const AlbumOverview = ({ albumData }: AlbumOverviewProps) => {
           </div>
         </Container>
       </div>
-      <Snackbar open={errorSnackbarOpen} autoHideDuration={5000} onClose={handleErrorSnackbarClose}>
-        <Alert severity="error" variant="filled" elevation={6}>
-          {errorMessage}
-        </Alert>
-      </Snackbar>
       <Container className={classes.cardGrid} maxWidth="md">
         {cardGrid}
       </Container>

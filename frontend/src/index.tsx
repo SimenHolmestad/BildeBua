@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import './utils/apiClient';
 import App from './App';
+import { GlobalErrorProvider } from './contexts/GlobalErrorContext';
 
 const container = document.getElementById('root');
 if (!container) {
@@ -13,8 +14,10 @@ const root = createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <GlobalErrorProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </GlobalErrorProvider>
   </React.StrictMode>
 );

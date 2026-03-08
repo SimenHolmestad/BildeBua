@@ -7,11 +7,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Navigate } from 'react-router-dom';
-import Alert from '@mui/material/Alert';
-import Snackbar from '@mui/material/Snackbar';
 import { createAlbumAndRefresh } from 'hooks/swr';
 import routes from 'routes';
-import { getApiErrorMessage } from 'utils/apiError';
+import { useGlobalError } from 'contexts/GlobalErrorContext';
 
 type NewAlbumDialogProps = {
   open: boolean;
@@ -22,21 +20,19 @@ const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
   const [albumName, setAlbumName] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [redirectAlbum, setRedirectAlbum] = React.useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const { showError } = useGlobalError();
 
   const handleDialogClose = () => {
-    setErrorMessage(null);
     handleClose();
   };
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    try {
-      const response = await createAlbumAndRefresh(albumName, description);
+    const response = await createAlbumAndRefresh(albumName, description, showError);
+
+    if (response) {
       setRedirectAlbum(response.album_name);
-    } catch (error) {
-      setErrorMessage(getApiErrorMessage(error));
     }
   };
 
@@ -78,15 +74,6 @@ const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Snackbar
-        open={Boolean(errorMessage)}
-        autoHideDuration={5000}
-        onClose={() => setErrorMessage(null)}
-      >
-        <Alert severity="error" variant="filled" elevation={6}>
-          {errorMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };

@@ -16,6 +16,7 @@ import type {
   LastImageResponse,
   QrCodesResponse,
 } from 'api';
+import { runWithGlobalApiErrorHandling, type ShowErrorFn } from 'utils/runWithGlobalApiErrorHandling';
 
 export const swrKeys = {
   availableAlbums: (): string => 'availableAlbums',
@@ -73,27 +74,41 @@ export const useQrCodes = () => {
 
 export const createAlbumAndRefresh = async (
   albumName: string,
-  description?: string,
-): Promise<AlbumCreatedResponse> => {
-  const createdAlbum = await createAlbum({
-    body: { album_name: albumName, description },
-  });
+  description: string,
+  showError: ShowErrorFn,
+): Promise<AlbumCreatedResponse | undefined> => {
+  return runWithGlobalApiErrorHandling(
+    async () => {
+      const createdAlbum = await createAlbum({
+        body: { album_name: albumName, description },
+      });
 
-  await mutate(swrKeys.availableAlbums());
-  return createdAlbum;
+      await mutate(swrKeys.availableAlbums());
+      return createdAlbum;
+    },
+    showError,
+    'Failed to create album',
+  );
 };
 
 export const captureImageToAlbumAndRefresh = async (
   albumName: string,
-): Promise<AlbumCaptureResponse> => {
-  const capturedImage = await captureImageToAlbum({
-    path: { album_name: albumName },
-  });
+  showError: ShowErrorFn,
+): Promise<AlbumCaptureResponse | undefined> => {
+  return runWithGlobalApiErrorHandling(
+    async () => {
+      const capturedImage = await captureImageToAlbum({
+        path: { album_name: albumName },
+      });
 
-  await Promise.all([
-    mutate(swrKeys.albumInfo(albumName)),
-    mutate(swrKeys.albumLastImage(albumName)),
-  ]);
+      await Promise.all([
+        mutate(swrKeys.albumInfo(albumName)),
+        mutate(swrKeys.albumLastImage(albumName)),
+      ]);
 
-  return capturedImage;
+      return capturedImage;
+    },
+    showError,
+    'Failed to capture image',
+  );
 };
