@@ -19,7 +19,11 @@ class AlbumService:
 
     def get_available_album_names(self) -> List[str]:
         os.makedirs(self.config.albums_dir, exist_ok=True)
-        return sorted(os.listdir(self.config.albums_dir))
+        return sorted(
+            entry_name
+            for entry_name in os.listdir(self.config.albums_dir)
+            if os.path.isdir(os.path.join(self.config.albums_dir, entry_name))
+        )
 
     def album_exists(self, album_name: str) -> bool:
         return os.path.exists(self._album_path(album_name))

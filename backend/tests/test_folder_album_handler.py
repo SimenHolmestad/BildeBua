@@ -66,6 +66,17 @@ class FolderAlbumHandlerTestCase(unittest.TestCase):
             ["test_album1", "test_album2"]
         )
 
+    def test_non_directory_entries_are_ignored_in_available_album_names(self) -> None:
+        self.create_album_folder("test_album")
+        file_path = os.path.join(self.test_dir_name, ".DS_Store")
+        with open(file_path, "w") as file_handle:
+            file_handle.write("finder metadata")
+
+        self.assertEqual(
+            self.album_service.get_available_album_names(),
+            ["test_album"]
+        )
+
     def test_create_new_album_with_description(self) -> None:
         self.album_service.get_or_create_album("test_album", "This is an album")
         description = self.album_service.get_album_description("test_album")
