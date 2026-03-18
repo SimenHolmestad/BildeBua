@@ -14,8 +14,8 @@ from scripts.shared.utils import (
 )
 
 
-def run_application(config: Config) -> None:
-    if not frontend_is_built(config.static_folder_name):
+def run_application(config: Config, rebuild: bool = False) -> None:
+    if rebuild or not frontend_is_built(config.static_folder_name):
         build_frontend(config.static_folder_name)
 
     host_ip = find_ip_address_for_device()
@@ -40,10 +40,16 @@ def main() -> None:
         default=None,
         help="Path to a .env file."
     )
+    parser.add_argument(
+        "--rebuild",
+        action="store_true",
+        default=False,
+        help="Force a rebuild of the frontend even if it is already built."
+    )
     args = parser.parse_args()
     env_file = args.env_file or os.path.join(".env")
     config = load_config(env_file)
-    run_application(config)
+    run_application(config, rebuild=args.rebuild)
 
 
 if __name__ == '__main__':

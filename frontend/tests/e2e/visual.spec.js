@@ -46,6 +46,16 @@ test.describe("visual regressions", () => {
     await page.route("https://fonts.gstatic.com/**", (route) => route.abort());
   });
 
+  test("qr code page with single qr code is centered", async ({ page }) => {
+    await page.goto("/qr");
+    await expect(page.getByRole("img", { name: "start_page_url" })).toBeVisible();
+
+    await expect(page.locator("main")).toHaveScreenshot("qr-page-single-code.png", {
+      animations: "disabled",
+      caret: "hide",
+    });
+  });
+
   test("front page matches the baseline", async ({ page }) => {
     await page.goto("/");
 
