@@ -7,8 +7,8 @@ from .errors import ImageCaptureError
 from .utils import get_common_ffplay_parameters, show_overlay, stop_process
 
 
-def show_webcam_preview(preview_seconds: int) -> None:
-    process = subprocess.Popen(
+def _start_webcam_preview() -> subprocess.Popen[str]:
+    return subprocess.Popen(
         [
             "ffplay",
             "-f",
@@ -28,13 +28,6 @@ def show_webcam_preview(preview_seconds: int) -> None:
         text=True,
     )
 
-    try:
-        # Det tar rundt 3 sekunder før ffplay er klar til å vise preview, så vi legger til 3
-        time.sleep(preview_seconds + 3)
-        stop_process(process)
-    except Exception as exc:
-        raise ImageCaptureError("Image preview failed") from exc
-
 
 def capture_webcam_still(base_image_path: str) -> None:
     image_path = base_image_path + ".jpg"
@@ -50,13 +43,26 @@ def capture_webcam_still(base_image_path: str) -> None:
 
 
 def capture_webcam_image(camera_config: CameraConfig, base_image_path: str) -> None:
-    try:
-        overlay_process = show_overlay(camera_config.overlay_image)
-    except OSError:
-        overlay_process = None
+    overlay_process = None
+    preview_process = _start_webcam_preview()
 
     try:
-        show_webcam_preview(camera_config.preview_seconds)
+        # Webcam takes ~3s to initialize, then runs for preview_seconds.
+        # Start the overlay 1s before the preview ends so it loads behind the preview
+        # window and is instantly visible when the preview closes.
+        time.sleep(camera_config.preview_seconds + 2)
+
+        try:
+            overlay_process = show_overlay(camera_config.overlay_image)
+        except OSError:
+            pass
+
+        time.sleep(1)
+        stop_process(preview_process)
+
         capture_webcam_still(base_image_path)
+    except Exception:
+        stop_process(preview_process)
+        raise
     finally:
         stop_process(overlay_process)

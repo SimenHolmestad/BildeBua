@@ -1,4 +1,6 @@
 import subprocess
+import threading
+import time
 
 from backend.core.config import CameraConfig
 from .errors import ImageCaptureError
@@ -59,14 +61,25 @@ def capture_dslr_still(base_image_path: str) -> None:
 
 
 def capture_dslr_image(camera_config: CameraConfig, base_image_path: str) -> None:
-    try:
-        overlay_process = show_overlay(camera_config.overlay_image)
-    except OSError:
-        overlay_process = None
+    overlay_process = None
+
+    def start_overlay_near_end() -> None:
+        nonlocal overlay_process
+        # Preview lasts preview_seconds + 1s total. Wait preview_seconds, then start the
+        # overlay so it loads during the last second of the preview and is instantly
+        # visible when the preview closes.
+        time.sleep(camera_config.preview_seconds)
+        try:
+            overlay_process = show_overlay(camera_config.overlay_image)
+        except OSError:
+            pass
 
     try:
         set_dslr_iso(camera_config.dslr_preview_iso)
+        overlay_thread = threading.Thread(target=start_overlay_near_end, daemon=True)
+        overlay_thread.start()
         show_dslr_preview(camera_config.preview_seconds)
+        overlay_thread.join(timeout=2)
         configure_dslr_capture_target()
         set_dslr_iso(camera_config.dslr_capture_iso)
         capture_dslr_still(base_image_path)
