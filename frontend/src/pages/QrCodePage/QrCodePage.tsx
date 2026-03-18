@@ -35,7 +35,7 @@ const QrCodePage = () => {
         <div className={`grid w-full gap-6 ${qrCodeData.length === 1 ? "max-w-lg mx-auto" : "md:grid-cols-2"}`}>
           {qrCodeData.map((qrCode) => (
             <article key={qrCode.name} className="rounded-2xl border border-base-200 bg-base-50 p-6 shadow-soft">
-              <img src={qrCode.url} alt={qrCode.name} className="mx-auto w-full max-w-sm" />
+              <img src={qrCode.url} alt={qrCode.name} className="mx-auto w-full" />
               <p className="mt-4 text-center text-lg font-semibold text-base-900">{qrCode.information}</p>
             </article>
           ))}
