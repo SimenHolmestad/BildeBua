@@ -43,3 +43,17 @@ For å kjøre tester må du ha installert zbar (kan gjøres med `brew install zb
 ```
 export DYLD_LIBRARY_PATH=/opt/homebrew/lib && python3 -m pytest backend/tests
 ```
+
+For å kjøre UI-tester med Playwright:
+```
+cd frontend
+npm install
+npx playwright install chromium
+npm run test:e2e
+```
+
+Playwright-testene starter frontend og en egen backend i dummy-kamera-modus med `.env.e2e`.
+For å oppdatere snapshot-baseliner for visuelle tester:
+```
+npm run test:e2e:update-snapshots
+```

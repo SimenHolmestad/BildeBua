@@ -37,6 +37,7 @@ class DummyCameraConfig(BaseModel):
     number_of_circles: int = 80
     min_circle_radius: int = 30
     max_circle_radius: int = 80
+    seed: Optional[int] = None
     should_fail: bool = False
     error_message: str = "This is a test error message"
 

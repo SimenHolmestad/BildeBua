@@ -1,4 +1,4 @@
-from random import randint
+from random import Random, randint
 from typing import Any
 
 import matplotlib.pyplot as plt
@@ -14,6 +14,7 @@ def create_dummy_image(config: DummyCameraConfig, base_image_path: str) -> None:
 
     image_path = base_image_path + ".png"
     image = np.full((config.height, config.width, 3), 255, dtype=np.uint8)
+    randint_fn = randint if config.seed is None else Random(config.seed).randint
     for _ in range(config.number_of_circles):
         image = _add_random_circle_to_image(
             image,
@@ -21,7 +22,7 @@ def create_dummy_image(config: DummyCameraConfig, base_image_path: str) -> None:
             config.height,
             config.min_circle_radius,
             config.max_circle_radius,
-            randint
+            randint_fn
         )
     plt.imsave(image_path, image)
 

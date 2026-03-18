@@ -50,6 +50,7 @@ class ConfigTestCase(unittest.TestCase):
         self.assertEqual(config.camera.dummy_config.width, 1200)
         self.assertEqual(config.camera.dummy_config.height, 800)
         self.assertEqual(config.camera.dummy_config.number_of_circles, 80)
+        self.assertIsNone(config.camera.dummy_config.seed)
 
     def test_dslr_config_valid_without_raw_transfer_settings(self) -> None:
         config = Config.model_validate({

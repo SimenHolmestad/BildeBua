@@ -20,6 +20,8 @@ backend/static/
 test_albums/
 
 node_modules/
+frontend/playwright-report/
+frontend/test-results/
 
 .dir-locals.el
 
