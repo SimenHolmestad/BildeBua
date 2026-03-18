@@ -32,6 +32,10 @@ test.describe("visual regressions – mobile (iPhone 14)", () => {
     await page.goto(`/album/${albumName}`);
     await page.getByRole("button", { name: /Ta nytt bilde/i }).click();
     await expect(page.getByRole("img", { name: "Bilde 1" })).toBeVisible();
+    await page.getByRole("button", { name: /Ta nytt bilde/i }).click();
+    await expect(page.getByRole("img", { name: "Bilde 2" })).toBeVisible();
+    await page.getByRole("button", { name: /Ta nytt bilde/i }).click();
+    await expect(page.getByRole("img", { name: "Bilde 3" })).toBeVisible();
 
     await expect(page.locator("main")).toHaveScreenshot("album-with-image-main-mobile.png", {
       animations: "disabled",
@@ -73,6 +77,10 @@ test.describe("visual regressions", () => {
     await page.goto(`/album/${albumName}`);
     await page.getByRole("button", { name: /Ta nytt bilde/i }).click();
     await expect(page.getByRole("img", { name: "Bilde 1" })).toBeVisible();
+    await page.getByRole("button", { name: /Ta nytt bilde/i }).click();
+    await expect(page.getByRole("img", { name: "Bilde 2" })).toBeVisible();
+    await page.getByRole("button", { name: /Ta nytt bilde/i }).click();
+    await expect(page.getByRole("img", { name: "Bilde 3" })).toBeVisible();
 
     await expect(page.locator("main")).toHaveScreenshot("album-with-image-main.png", {
       animations: "disabled",

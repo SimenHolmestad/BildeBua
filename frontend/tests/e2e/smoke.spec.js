@@ -36,8 +36,12 @@ test("can capture an image in an album", async ({ page, request }) => {
   await expect(page.getByRole("heading", { name: albumName })).toBeVisible();
   await expect(page.getByText("Ingen bilder ennå")).toBeVisible();
   await page.getByRole("button", { name: /Ta nytt bilde/i }).click();
-
   await expect(page.getByRole("img", { name: "Bilde 1" })).toBeVisible();
+  await page.getByRole("button", { name: /Ta nytt bilde/i }).click();
+  await expect(page.getByRole("img", { name: "Bilde 2" })).toBeVisible();
+  await page.getByRole("button", { name: /Ta nytt bilde/i }).click();
+  await expect(page.getByRole("img", { name: "Bilde 3" })).toBeVisible();
+
   await expect(page.getByText("Ingen bilder ennå")).toHaveCount(0);
 });
 
