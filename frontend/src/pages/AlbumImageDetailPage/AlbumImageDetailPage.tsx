@@ -80,7 +80,7 @@ const AlbumImageDetailPage = () => {
         <section className="relative mt-4 overflow-hidden rounded-3xl border border-base-200 bg-black/90 shadow-soft">
           <img src={selectedImage.image_url} alt={`Bilde ${selectedImage.image_number}`} className="max-h-[82vh] w-full object-contain" />
 
-          <div className="absolute inset-0">
+          <div className="pointer-events-none absolute inset-0">
             <NavigationArrow
               direction="left"
               imageNumber={nextImageNumber}
@@ -111,7 +111,7 @@ type NavigationArrowProps = {
 const NavigationArrow = ({ albumName, direction, imageNumber, label }: NavigationArrowProps) => {
   const isDisabled = imageNumber === null;
   const icon = direction === 'left' ? '←' : '→';
-  const zoneClasses = `absolute inset-y-0 ${
+  const zoneClasses = `pointer-events-auto absolute inset-y-0 ${
     direction === 'left' ? 'left-0 justify-start pl-2 sm:pl-4' : 'right-0 justify-end pr-2 sm:pr-4'
   } flex w-1/5 min-w-16 items-center`;
 
