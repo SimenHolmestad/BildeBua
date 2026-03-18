@@ -11,13 +11,18 @@ type AlbumOverviewProps = {
 
 const tileClassForIndex = (index: number): string => {
   const pattern = index % 10;
+  // Mobile: 6-col grid alternates rows of 2 (col-span-3) and rows of 3 (col-span-2)
+  // Desktop (sm): 4-col grid with variable-size feature tiles
   if (pattern === 0 || pattern === 5) {
-    return 'sm:col-span-2 sm:row-span-2';
+    return 'col-span-3 sm:col-span-2 sm:row-span-2';
+  }
+  if (pattern === 1 || pattern === 6) {
+    return 'col-span-3 sm:col-span-1';
   }
   if (pattern === 2 || pattern === 7) {
-    return 'sm:col-span-2';
+    return 'col-span-2 sm:col-span-2';
   }
-  return '';
+  return 'col-span-2 sm:col-span-1';
 };
 
 const AlbumOverview = ({ albumData }: AlbumOverviewProps) => {
@@ -73,7 +78,7 @@ const AlbumOverview = ({ albumData }: AlbumOverviewProps) => {
         </section>
       ) : (
         <section>
-          <div className="grid grid-cols-1 gap-3 sm:grid-flow-dense sm:grid-cols-4 sm:auto-rows-[140px] lg:auto-rows-[180px]">
+          <div className="grid grid-cols-6 auto-rows-[110px] grid-flow-dense gap-1 sm:gap-3 sm:grid-cols-4 sm:auto-rows-[140px] lg:auto-rows-[180px]">
             {newestFirstImages.map((imageData, index) => (
               <Link
                 key={`${imageData.thumbnail_url}-${imageData.image_number}`}
@@ -83,7 +88,7 @@ const AlbumOverview = ({ albumData }: AlbumOverviewProps) => {
                 <img
                   src={imageData.thumbnail_url}
                   alt={`Bilde ${imageData.image_number}`}
-                  className="h-auto w-full object-contain transition duration-300 group-hover:scale-[1.03] sm:h-full sm:object-cover"
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
                   loading="lazy"
                 />
               </Link>
