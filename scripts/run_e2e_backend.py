@@ -7,8 +7,8 @@ from scripts.shared.utils import create_app_with_config
 
 
 def run_backend(config: Config) -> None:
-    app = create_app_with_config(config, "127.0.0.1", 3000)
-    uvicorn.run(app, host="127.0.0.1", port=3000, log_level="warning")
+    app = create_app_with_config(config, "127.0.0.1", 3100)
+    uvicorn.run(app, host="127.0.0.1", port=3100, log_level="warning")
 
 
 def main() -> None:

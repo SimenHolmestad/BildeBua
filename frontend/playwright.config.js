@@ -14,20 +14,20 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["html"], ["list"]] : "list",
   use: {
-    baseURL: "http://127.0.0.1:5000",
+    baseURL: "http://127.0.0.1:5100",
     trace: "on-first-retry",
   },
   webServer: [
     {
       command: "bash -lc 'source .venv/bin/activate && python3 -m scripts.run_e2e_backend --env-file .env.e2e'",
-      url: "http://127.0.0.1:3000/qr_codes/",
+      url: "http://127.0.0.1:3100/qr_codes/",
       cwd: repoRoot,
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
     },
     {
-      command: "npm run dev -- --host 127.0.0.1 --port 5000",
-      url: "http://127.0.0.1:5000",
+      command: "BACKEND_PORT=3100 npm run dev -- --host 127.0.0.1 --port 5100",
+      url: "http://127.0.0.1:5100",
       cwd: __dirname,
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
