@@ -5,6 +5,7 @@ import time
 from backend.core.config import CameraConfig
 from .errors import ImageCaptureError
 from .utils import get_common_ffplay_parameters, show_overlay, stop_process
+from .utils import get_frontmost_app_on_mac, restore_fullscreen_on_mac
 
 
 def set_dslr_iso(iso: int) -> None:
@@ -62,6 +63,7 @@ def capture_dslr_still(base_image_path: str) -> None:
 
 def capture_dslr_image(camera_config: CameraConfig, base_image_path: str) -> None:
     overlay_process = None
+    frontmost_app_on_mac = get_frontmost_app_on_mac()
 
     def start_overlay_near_end() -> None:
         nonlocal overlay_process
@@ -84,4 +86,5 @@ def capture_dslr_image(camera_config: CameraConfig, base_image_path: str) -> Non
         set_dslr_iso(camera_config.dslr_capture_iso)
         capture_dslr_still(base_image_path)
     finally:
+        restore_fullscreen_on_mac(frontmost_app_on_mac)
         stop_process(overlay_process)

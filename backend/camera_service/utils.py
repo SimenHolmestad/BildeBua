@@ -1,4 +1,5 @@
 from pathlib import Path
+import platform
 import subprocess
 import pyautogui
 
@@ -79,3 +80,42 @@ def stop_process(process: subprocess.Popen[str] | subprocess.Popen[bytes] | None
     except Exception:
         process.kill()
         process.wait(timeout=2)
+
+
+def get_frontmost_app_on_mac() -> str | None:
+    """Return the name of the frontmost application, or None if unavailable."""
+    if platform.system() != "Darwin":
+        return None
+    try:
+        result = subprocess.run(
+            ["osascript", "-e", 'tell application "System Events" to get name of first process whose frontmost is true'],
+            capture_output=True,
+            text=True,
+            timeout=3,
+        )
+        name = result.stdout.strip()
+        return name if name else None
+    except Exception:
+        return None
+
+
+def restore_fullscreen_on_mac(app_name: str | None) -> None:
+    """Re-activate the given app and toggle fullscreen with Ctrl+Cmd+F."""
+    if platform.system() != "Darwin" or not app_name:
+        return
+    try:
+        script = f'''
+tell application "{app_name}" to activate
+delay 0.5
+tell application "System Events"
+    keystroke "f" using {{command down, control down}}
+end tell
+'''
+        subprocess.run(
+            ["osascript", "-e", script],
+            capture_output=True,
+            timeout=5,
+        )
+    except Exception:
+        pass
+

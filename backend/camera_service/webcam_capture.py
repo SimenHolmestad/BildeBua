@@ -5,6 +5,7 @@ import time
 from backend.core.config import CameraConfig
 from .errors import ImageCaptureError
 from .utils import get_common_ffplay_parameters, show_overlay, stop_process
+from .utils import get_frontmost_app_on_mac, restore_fullscreen_on_mac
 
 
 def _start_webcam_preview() -> subprocess.Popen[str]:
@@ -44,6 +45,7 @@ def capture_webcam_still(base_image_path: str) -> None:
 
 def capture_webcam_image(camera_config: CameraConfig, base_image_path: str) -> None:
     overlay_process = None
+    frontmost_app_on_mac = get_frontmost_app_on_mac()
     preview_process = _start_webcam_preview()
 
     try:
@@ -65,4 +67,5 @@ def capture_webcam_image(camera_config: CameraConfig, base_image_path: str) -> N
         stop_process(preview_process)
         raise
     finally:
+        restore_fullscreen_on_mac(frontmost_app_on_mac)
         stop_process(overlay_process)
