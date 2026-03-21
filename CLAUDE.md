@@ -18,7 +18,7 @@ When creating new frontend pages, add screenshot entries for both desktop and mo
 
 To run functional tests, do: `cd frontend && npm run test:e2e`
 To run screenshot tests, do: `cd frontend && npm run test:e2e:screenshots`
-To update screenshot baselines, do: `cd frontend && npm run test:e2e:update-snapshots`
+To update screenshot baselines, do: `cd frontend && npm run test:e2e:update-snapshots`. Make sure to look at the generated images and make sure everything is ok.
 
 ## Frontend Types
 

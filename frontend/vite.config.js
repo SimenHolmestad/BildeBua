@@ -28,9 +28,9 @@ export default defineConfig(({ command }) => ({
     port: 5000,
     open: `http://localhost:5000/`,
     proxy: {
-      "/albums": `http://localhost:3000`,
-      "/qr_codes": `http://localhost:3000`,
-      "/static": `http://localhost:3000`,
+      "/albums": `http://localhost:${process.env.BACKEND_PORT || 3000}`,
+      "/qr_codes": `http://localhost:${process.env.BACKEND_PORT || 3000}`,
+      "/static": `http://localhost:${process.env.BACKEND_PORT || 3000}`,
     },
   },
 }));
