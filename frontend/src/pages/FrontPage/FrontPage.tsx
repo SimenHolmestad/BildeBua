@@ -60,7 +60,7 @@ const FrontPage = () => {
           <button
             type="button"
             onClick={() => setDialogOpen(true)}
-            className="group flex h-full min-h-[14.5rem] flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 bg-base-100/70 p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-base-500 hover:bg-base-100 hover:shadow-soft"
+            className="group flex h-full min-h-[7rem] sm:min-h-[14.5rem] flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 bg-base-100/70 p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-base-500 hover:bg-base-100 hover:shadow-soft"
           >
             <span className="text-3xl text-base-700">＋</span>
             <span className="mt-2 font-display text-2xl text-base-900">Opprett nytt album</span>
