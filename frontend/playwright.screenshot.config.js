@@ -7,10 +7,9 @@ const repoRoot = path.resolve(__dirname, "..");
 
 export default defineConfig({
   testDir: "./tests/e2e",
-  testMatch: "functional.spec.js",
-  globalSetup: "./tests/e2e/global-setup.js",
-  fullyParallel: false,
-  workers: 1,
+  testMatch: "screenshots.spec.js",
+  globalSetup: "./tests/e2e/global-setup-screenshots.js",
+  fullyParallel: true,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["html"], ["list"]] : "list",
   use: {

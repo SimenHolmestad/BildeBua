@@ -26,10 +26,11 @@
     "build": "vite build",
     "preview": "vite preview --host",
     "gen:api": "openapi-ts -f openapi-ts.config.ts",
-    "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:update-snapshots": "playwright test --update-snapshots"
+    "test:e2e": "playwright test -c playwright.config.js",
+    "test:e2e:headed": "playwright test -c playwright.config.js --headed",
+    "test:e2e:ui": "playwright test -c playwright.config.js --ui",
+    "test:e2e:screenshots": "playwright test -c playwright.screenshot.config.js",
+    "test:e2e:update-snapshots": "playwright test -c playwright.screenshot.config.js --update-snapshots"
   },
   "browserslist": {
     "production": [

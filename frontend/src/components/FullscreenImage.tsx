@@ -58,7 +58,7 @@ const FullscreenImage = ({ imageUrl, time, startHided }: FullscreenImageProps) =
       <img
         src={imageUrl ?? undefined}
         alt=""
-        className={`fixed inset-0 m-auto max-h-full max-w-full object-contain transition-opacity duration-1000 ${
+        className={`fixed inset-0 m-auto h-full w-full object-contain transition-opacity duration-1000 ${
           isFadingIn ? 'opacity-100' : 'opacity-0'
         }`}
       />
