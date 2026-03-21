@@ -32,6 +32,7 @@ def run_backend(config: Config) -> None:
     print("Url for qr codes (when frontend is running):", qr_code_url)
 
     app = create_app_with_config(config, host_ip, port)
+    print(f"Swagger docs available at: http://localhost:{port}/docs")
     uvicorn.run(app, host="localhost", port=port, log_level="debug")
 
 
