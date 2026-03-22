@@ -1,6 +1,11 @@
 from pathlib import Path
+import os
 import platform
 import subprocess
+
+# pyautogui requires DISPLAY to be set on Linux even if we only use it for screen size
+if "DISPLAY" not in os.environ:
+    os.environ["DISPLAY"] = ":0"
 import pyautogui
 
 
