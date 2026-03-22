@@ -1,3 +1,4 @@
+import glob
 import os
 import signal
 import subprocess
@@ -26,6 +27,15 @@ def kill_gvfsd_gphoto2_process() -> None:
         if b"gvfsd-gphoto2" in line:
             pid = int(line.split(None, 1)[0])
             os.kill(pid, signal.SIGKILL)
+
+
+def _lowercase_extension(base_image_path: str) -> None:
+    """Rename any file matching base_image_path.* to have a lowercase extension."""
+    for path in glob.glob(glob.escape(base_image_path) + ".*"):
+        root, ext = os.path.splitext(path)
+        lower_ext = ext.lower()
+        if ext != lower_ext:
+            os.rename(path, root + lower_ext)
 
 
 def set_dslr_iso(iso: int) -> None:
@@ -79,6 +89,10 @@ def capture_dslr_still(base_image_path: str) -> None:
 
     if command_result.returncode != 0:
         raise ImageCaptureError("Image was not captured")
+
+    # gphoto2 uses the extension reported by the camera, which may be uppercase
+    # (e.g. .JPG). Rename to lowercase for consistency.
+    _lowercase_extension(base_image_path)
 
 
 def capture_dslr_image(camera_config: CameraConfig, base_image_path: str) -> None:
