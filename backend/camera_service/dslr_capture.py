@@ -1,4 +1,7 @@
+import os
+import signal
 import subprocess
+import sys
 import threading
 import time
 
@@ -6,6 +9,23 @@ from backend.core.config import CameraConfig
 from .errors import ImageCaptureError
 from .utils import get_common_ffplay_parameters, show_overlay, stop_process
 from .utils import get_frontmost_app_on_mac, restore_fullscreen_on_mac
+
+
+def kill_gvfsd_gphoto2_process() -> None:
+    """Kill the gvfsd-gphoto2 process that auto-starts on Linux when a camera
+    is connected. It locks the camera device and prevents gphoto2 from
+    accessing it directly.
+    """
+    if sys.platform != "linux":
+        return
+
+    p = subprocess.Popen(["ps", "-A"], stdout=subprocess.PIPE)
+    out, _ = p.communicate()
+
+    for line in out.splitlines():
+        if b"gvfsd-gphoto2" in line:
+            pid = int(line.split(None, 1)[0])
+            os.kill(pid, signal.SIGKILL)
 
 
 def set_dslr_iso(iso: int) -> None:
@@ -77,6 +97,7 @@ def capture_dslr_image(camera_config: CameraConfig, base_image_path: str) -> Non
             pass
 
     try:
+        kill_gvfsd_gphoto2_process()
         set_dslr_iso(camera_config.dslr_preview_iso)
         overlay_thread = threading.Thread(target=start_overlay_near_end, daemon=True)
         overlay_thread.start()
