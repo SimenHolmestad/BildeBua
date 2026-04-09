@@ -9,6 +9,8 @@ import QrCodeLastImagePage from './pages/QrCodeLastImagePage/QrCodeLastImagePage
 import QrCodePage from './pages/QrCodePage/QrCodePage';
 import SlideshowLastImagePage from './pages/SlideshowLastImagePage/SlideshowLastImagePage';
 import SlideshowPage from './pages/SlideshowPage/SlideshowPage';
+import AdminPage from './pages/AdminPage/AdminPage';
+import AdminAlbumPage from './pages/AdminAlbumPage/AdminAlbumPage';
 import { useGlobalError } from './contexts/GlobalErrorContext';
 import routes from './routes';
 
@@ -47,6 +49,8 @@ const App: React.FC = () => {
           <Route path={routes.qrCodeLastImagePage(':albumName')} element={<QrCodeLastImagePage />} />
           <Route path={routes.slideshowPage(':albumName')} element={<SlideshowPage />} />
           <Route path={routes.slideshowLastImagePage(':albumName')} element={<SlideshowLastImagePage />} />
+          <Route path={routes.adminPage} element={<AdminPage />} />
+          <Route path={routes.adminAlbumPage(':albumName')} element={<AdminAlbumPage />} />
           <Route path={routes.notFoundPage} element={<FrontPage />} />
           <Route path="*" element={<FrontPage />} />
         </Routes>

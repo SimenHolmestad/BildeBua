@@ -2,7 +2,7 @@ import os
 import shutil
 import unittest
 import tempfile
-from backend.album_service.album_service import AlbumService
+from backend.album_service.album_service import AlbumService, AlbumNotFoundError, ImageNotFoundError
 from backend.camera_service import CameraService
 from backend.core.config import AlbumConfig, CameraConfig
 from .camera_modules_for_testing import create_fast_dummy_config
@@ -302,6 +302,43 @@ class FolderAlbumTestCase(unittest.TestCase):
             "image0001.jpg",
         ]
         self.assertEqual(thumbnail_names, expected_thumbnail_names)
+
+    def test_delete_image_removes_image_and_thumbnail(self) -> None:
+        config = create_fast_dummy_config(self.albums_dir)
+        self.configure_camera(config.camera)
+        self.album_service.capture_image_to_album(self.album_name)
+        self.album_service.capture_image_to_album(self.album_name)
+
+        self.album_service.delete_image(self.album_name, 1)
+
+        images = self.album_service.get_image_names(self.album_name)
+        thumbnails = self.album_service.get_thumbnail_names(self.album_name)
+        self.assertEqual(images, ["image0002.png"])
+        self.assertEqual(thumbnails, ["image0002.jpg"])
+
+    def test_delete_image_raises_for_nonexistent(self) -> None:
+        with self.assertRaises(ImageNotFoundError):
+            self.album_service.delete_image(self.album_name, 99)
+
+    def test_delete_album_removes_directory(self) -> None:
+        self.album_service.delete_album(self.album_name)
+        self.assertFalse(self.album_service.album_exists(self.album_name))
+
+    def test_delete_album_raises_for_nonexistent(self) -> None:
+        with self.assertRaises(AlbumNotFoundError):
+            self.album_service.delete_album("nonexistent")
+
+    def test_delete_image_leaves_gaps(self) -> None:
+        config = create_fast_dummy_config(self.albums_dir)
+        self.configure_camera(config.camera)
+        self.album_service.capture_image_to_album(self.album_name)
+        self.album_service.capture_image_to_album(self.album_name)
+        self.album_service.capture_image_to_album(self.album_name)
+
+        self.album_service.delete_image(self.album_name, 2)
+
+        images = sorted(self.album_service.get_image_names(self.album_name))
+        self.assertEqual(images, ["image0001.png", "image0003.png"])
 
     def test_album_empty_after_deleting_all_images(self) -> None:
         config = create_fast_dummy_config(self.albums_dir)

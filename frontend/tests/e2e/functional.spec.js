@@ -45,6 +45,39 @@ test("can capture an image in an album", async ({ page, request }) => {
   await expect(page.getByText("Ingen bilder ennå")).toHaveCount(0);
 });
 
+test("can view admin settings page", async ({ page }) => {
+  await page.goto("/admin");
+
+  await expect(page.getByRole("heading", { name: "Admin" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Kamera" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Albuminnstillinger" })).toBeVisible();
+
+  // Save button hidden until a change is made
+  await expect(page.getByRole("button", { name: /Lagre innstillinger/i })).toHaveCount(0);
+
+  // Change a setting and verify the save button appears
+  await page.getByLabel("Forhåndsvisning (sek)").fill("5");
+  await expect(page.getByRole("button", { name: /Lagre innstillinger/i })).toBeVisible();
+});
+
+test("can delete an image from admin album page", async ({ page, request }) => {
+  const albumName = "e2e-admin-delete-album";
+  await createAlbum(request, albumName, "Album for sletting");
+
+  // Capture two images via API
+  await request.post(`/albums/${albumName}`);
+  await request.post(`/albums/${albumName}`);
+
+  await page.goto(`/admin/album/${albumName}`);
+  await expect(page.getByRole("heading", { name: albumName })).toBeVisible();
+  await expect(page.getByText("2 bilder")).toBeVisible();
+
+  // Click the delete button for the first image (inside the image card, not "Slett album")
+  await page.locator("[data-testid='admin-image']").first().getByRole("button", { name: "Slett" }).click();
+
+  await expect(page.getByText("1 bilder")).toBeVisible();
+});
+
 test("shows QR codes on the qr page", async ({ page }) => {
   await page.goto("/qr");
 

@@ -1,6 +1,5 @@
 from typing import Optional, Literal
 from pydantic import BaseModel, Field, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class WifiConfig(BaseModel):
@@ -54,7 +53,7 @@ class CameraConfig(BaseModel):
 
 class AlbumConfig(BaseModel):
     forced_album: Optional[str] = None
-    albums_dir: str
+    albums_dir: str = "backend/static/albums"
 
     @model_validator(mode="after")
     def _validate_albums_dir(self) -> "AlbumConfig":
@@ -65,12 +64,7 @@ class AlbumConfig(BaseModel):
         return self
 
 
-class Config(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_prefix="BILDEBUA_",
-        env_nested_delimiter="__",
-        extra="ignore",
-    )
+class Config(BaseModel):
     static_folder_name: str = "static"
     albums: AlbumConfig = Field(default_factory=AlbumConfig)
     camera: CameraConfig = Field(default_factory=CameraConfig)

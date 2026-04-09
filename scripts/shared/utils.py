@@ -9,6 +9,7 @@ from scripts.shared import qr_code_utils
 from backend.album_service.album_service import AlbumService
 from backend.app import create_app
 from backend.core.config import Config
+from backend.core.config_manager import ConfigManager
 DEBUG_PORT = 3000
 PRODUCTION_PORT = 5000
 
@@ -86,17 +87,16 @@ def ensure_forced_album_is_created(
 
 
 def create_app_with_config(
-    config: Config,
+    config_manager: ConfigManager,
     host_ip: str,
     port: int
 ) -> Any:
+    config = config_manager.config
     qr_codes = create_qr_codes(config, host_ip, port)
-    service = AlbumService(config.albums, config.camera)
-    ensure_forced_album_is_created(service, config.albums.forced_album)
 
     return create_app(
         static_folder_path(config.static_folder_name),
-        config,
+        config_manager,
         qr_codes
     )
 

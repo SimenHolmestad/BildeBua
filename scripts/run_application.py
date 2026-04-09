@@ -1,8 +1,7 @@
 import argparse
-import os
 import uvicorn
 from backend.core.config_loader import load_config
-from backend.core.config import Config
+from backend.core.config_manager import ConfigManager
 from scripts.shared.utils import (
     PRODUCTION_PORT,
     build_frontend,
@@ -14,7 +13,8 @@ from scripts.shared.utils import (
 )
 
 
-def run_application(config: Config, rebuild: bool = False) -> None:
+def run_application(config_manager: ConfigManager, rebuild: bool = False) -> None:
+    config = config_manager.config
     if rebuild or not frontend_is_built(config.static_folder_name):
         build_frontend(config.static_folder_name)
 
@@ -22,7 +22,7 @@ def run_application(config: Config, rebuild: bool = False) -> None:
     qr_code_url = get_url_for_qr_code_page(host_ip, PRODUCTION_PORT, config.albums.forced_album)
     print("Url for qr codes:", qr_code_url)
 
-    app = create_app_with_config(config, host_ip, PRODUCTION_PORT)
+    app = create_app_with_config(config_manager, host_ip, PRODUCTION_PORT)
 
     browser_process = open_webpage_in_device_browser(qr_code_url)
     uvicorn.run(app, host=host_ip, port=PRODUCTION_PORT)
@@ -35,10 +35,10 @@ def run_application(config: Config, rebuild: bool = False) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run BildeBua application.")
     parser.add_argument(
-        "--env-file",
-        dest="env_file",
-        default=None,
-        help="Path to a .env file."
+        "--config-file",
+        dest="config_file",
+        default="config.json",
+        help="Path to config.json file."
     )
     parser.add_argument(
         "--rebuild",
@@ -47,9 +47,8 @@ def main() -> None:
         help="Force a rebuild of the frontend even if it is already built."
     )
     args = parser.parse_args()
-    env_file = args.env_file or os.path.join(".env")
-    config = load_config(env_file)
-    run_application(config, rebuild=args.rebuild)
+    config_manager = load_config(args.config_file)
+    run_application(config_manager, rebuild=args.rebuild)
 
 
 if __name__ == '__main__':

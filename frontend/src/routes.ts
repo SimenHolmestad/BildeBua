@@ -8,6 +8,8 @@ const routes = {
   qrCodeLastImagePage: (albumName: string): string => `/album/${albumName}/last_image_qr`,
   slideshowPage: (albumName: string): string => `/album/${albumName}/slideshow`,
   slideshowLastImagePage: (albumName: string): string => `/album/${albumName}/slideshow_last_image`,
+  adminPage: '/admin',
+  adminAlbumPage: (albumName: string): string => `/admin/album/${albumName}`,
 };
 
 export default routes;

@@ -1,0 +1,35 @@
+{
+  "static_folder_name": "static",
+  "albums": {
+    "forced_album": null,
+    "albums_dir": "backend/static/e2e-albums"
+  },
+  "camera": {
+    "camera_type": "dummy",
+    "preview_seconds": 3,
+    "overlay_image": "smil",
+    "dslr_preview_iso": 4000,
+    "dslr_capture_iso": 200,
+    "verbose_errors": true,
+    "dummy_config": {
+      "width": 120,
+      "height": 80,
+      "number_of_circles": 5,
+      "min_circle_radius": 5,
+      "max_circle_radius": 15,
+      "seed": 42,
+      "should_fail": false,
+      "error_message": "This is a test error message"
+    }
+  },
+  "qr_codes": {
+    "use_center_images": true
+  },
+  "wifi_qr_code": {
+    "enabled": false,
+    "wifi_name": "",
+    "protocol": "",
+    "password": "",
+    "description": ""
+  }
+}

@@ -3,9 +3,9 @@ from typing import List, Optional
 from fastapi import APIRouter, Path, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from backend.camera_service import CameraService, ImageCaptureError
+from backend.camera_service import ImageCaptureError
 from backend.album_service.album_service import AlbumService
-from backend.core.config import Config
+from backend.core.config_manager import ConfigManager
 
 
 class AlbumCreateRequest(BaseModel):
@@ -93,12 +93,10 @@ class ErrorResponse(BaseModel):
     error: str = Field(description="Human-readable error message.")
 
 
-def construct_album_api_router(config: Config) -> APIRouter:
+def construct_album_api_router(config_manager: ConfigManager, album_service: AlbumService) -> APIRouter:
     """Construct album-related API routes."""
     album_api_router = APIRouter(tags=["albums"])
-    album_service = AlbumService(config.albums, CameraService(config.camera))
-    forced_album_name = config.albums.forced_album
-    albums_dir = config.albums.albums_dir
+    albums_dir = config_manager.config.albums.albums_dir
     albums_url_prefix = _albums_url_prefix_from_dir(albums_dir)
 
     @album_api_router.get(
@@ -152,7 +150,7 @@ def construct_album_api_router(config: Config) -> APIRouter:
         request: Request,
         album_name: str = Path(..., description="Album name.", examples=["album1"])
     ) -> AlbumInfoResponse | JSONResponse:
-        if forced_album_name and album_name != forced_album_name:
+        if config_manager.config.albums.forced_album and album_name != config_manager.config.albums.forced_album:
             return unaccessible_album_error_message()
 
         if not album_service.album_exists(album_name):
@@ -188,7 +186,7 @@ def construct_album_api_router(config: Config) -> APIRouter:
         request: Request,
         album_name: str = Path(..., description="Album name.", examples=["album1"])
     ) -> AlbumCaptureResponse | JSONResponse:
-        if forced_album_name and album_name != forced_album_name:
+        if config_manager.config.albums.forced_album and album_name != config_manager.config.albums.forced_album:
             return unaccessible_album_error_message()
 
         if not album_service.album_exists(album_name):
@@ -220,7 +218,7 @@ def construct_album_api_router(config: Config) -> APIRouter:
         request: Request,
         album_name: str = Path(..., description="Album name.", examples=["album1"])
     ) -> LastImageResponse | JSONResponse:
-        if forced_album_name and album_name != forced_album_name:
+        if config_manager.config.albums.forced_album and album_name != config_manager.config.albums.forced_album:
             return unaccessible_album_error_message()
 
         if not album_service.album_exists(album_name):
@@ -244,7 +242,7 @@ def construct_album_api_router(config: Config) -> APIRouter:
         request_body: AlbumCreateRequest,
         request: Request
     ) -> AlbumCreatedResponse | JSONResponse:
-        if forced_album_name:
+        if config_manager.config.albums.forced_album:
             return unaccessible_album_error_message()
 
         album_name = request_body.album_name
@@ -267,7 +265,7 @@ def construct_album_api_router(config: Config) -> APIRouter:
             )
             for album_name in album_names
         ]
-        return AvailableAlbumsResponse(available_albums=available_albums, forced_album=forced_album_name)
+        return AvailableAlbumsResponse(available_albums=available_albums, forced_album=config_manager.config.albums.forced_album)
 
     def get_recent_thumbnail_urls(request: Request, album_name: str, limit: int = 4) -> List[str]:
         thumbnail_names = album_service.get_thumbnail_names(album_name)[:limit]
@@ -358,7 +356,7 @@ def construct_album_api_router(config: Config) -> APIRouter:
     def unaccessible_album_error_message() -> JSONResponse:
         return error_response(
             status.HTTP_403_FORBIDDEN,
-            f"Illegal operation. The only accessible album is {forced_album_name}."
+            f"Illegal operation. The only accessible album is {config_manager.config.albums.forced_album}."
         )
 
     def error_response(status_code: int, message: str) -> JSONResponse:

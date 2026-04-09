@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from backend.app import create_app
 from scripts.shared import qr_code_utils
 from .camera_modules_for_testing import create_fast_dummy_config
-from .test_utils import temp_dir_relpath
+from .test_utils import temp_dir_relpath, config_manager_from_config
 
 
 class QrCodeApiTestCase(unittest.TestCase):
@@ -16,9 +16,10 @@ class QrCodeApiTestCase(unittest.TestCase):
         config = create_fast_dummy_config(os.path.join(self.static_dir_name, "albums"))
 
         self.qr_code_context = qr_code_utils.create_qr_code_context(self.static_dir_name)
+        cm = config_manager_from_config(config)
         app = create_app(
             self.static_dir_name,
-            config,
+            cm,
             qr_code_utils.get_qr_codes(self.qr_code_context)
         )
         self.test_client = TestClient(app)

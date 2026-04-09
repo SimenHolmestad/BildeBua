@@ -7,7 +7,7 @@ from backend.album_service.album_service import AlbumService
 from backend.camera_service import CameraService
 from scripts.shared import qr_code_utils
 from .camera_modules_for_testing import create_fast_dummy_config, create_faulty_dummy_config
-from .test_utils import temp_dir_relpath
+from .test_utils import temp_dir_relpath, config_manager_from_config
 
 
 class AlbumApiTestCase(unittest.TestCase):
@@ -24,7 +24,8 @@ class AlbumApiTestCase(unittest.TestCase):
         self.config = config
         self.album_service = AlbumService(config.albums, CameraService(config.camera))
         qr_code_context = qr_code_utils.create_qr_code_context(self.static_dir_name)
-        app = create_app(self.static_dir_name, config, qr_code_utils.get_qr_codes(qr_code_context))
+        cm = config_manager_from_config(config)
+        app = create_app(self.static_dir_name, cm, qr_code_utils.get_qr_codes(qr_code_context))
         self.test_client = TestClient(app)
 
     def create_app_and_client_with_forced_album(self, forced_album_name) -> None:
@@ -33,7 +34,8 @@ class AlbumApiTestCase(unittest.TestCase):
         self.config = config
         self.album_service = AlbumService(config.albums, CameraService(config.camera))
         qr_code_context = qr_code_utils.create_qr_code_context(self.static_dir_name)
-        app = create_app(self.static_dir_name, config, qr_code_utils.get_qr_codes(qr_code_context))
+        cm = config_manager_from_config(config)
+        app = create_app(self.static_dir_name, cm, qr_code_utils.get_qr_codes(qr_code_context))
         self.test_client = TestClient(app)
 
     def tearDown(self) -> None:

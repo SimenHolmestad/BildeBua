@@ -2,7 +2,7 @@ import argparse
 import os
 import uvicorn
 from backend.core.config_loader import load_config
-from backend.core.config import Config
+from backend.core.config_manager import ConfigManager
 from scripts.shared.utils import (
     DEBUG_PORT,
     create_app_with_config,
@@ -22,16 +22,17 @@ def get_backend_port() -> int:
         return DEBUG_PORT
 
 
-def run_backend(config: Config) -> None:
+def run_backend(config_manager: ConfigManager) -> None:
     """This should only need to be done when working on or testing the frontend."""
     print("Running the backend in debug mode. Start the frontend in a separate terminal window")
     port = get_backend_port()
 
+    config = config_manager.config
     host_ip = find_ip_address_for_device()
     qr_code_url = get_url_for_qr_code_page(host_ip, port, config.albums.forced_album)
     print("Url for qr codes (when frontend is running):", qr_code_url)
 
-    app = create_app_with_config(config, host_ip, port)
+    app = create_app_with_config(config_manager, host_ip, port)
     print(f"Swagger docs available at: http://localhost:{port}/docs")
     uvicorn.run(app, host="localhost", port=port, log_level="debug")
 
@@ -39,14 +40,14 @@ def run_backend(config: Config) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run BildeBua backend.")
     parser.add_argument(
-        "--env-file",
-        dest="env_file",
-        default=".env",
-        help="Path to a .env file."
+        "--config-file",
+        dest="config_file",
+        default="config.json",
+        help="Path to config.json file."
     )
     args = parser.parse_args()
-    config = load_config(args.env_file)
-    run_backend(config)
+    config_manager = load_config(args.config_file)
+    run_backend(config_manager)
 
 
 if __name__ == "__main__":

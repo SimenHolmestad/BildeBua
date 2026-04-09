@@ -1,4 +1,5 @@
 import os
+import shutil
 from typing import List, Optional
 from .current_image_tracker import CurrentImageTracker
 from .image_name_formatter import change_extension_of_filename
@@ -8,6 +9,10 @@ from backend.core.config import AlbumConfig
 
 
 class AlbumNotFoundError(RuntimeError):
+    pass
+
+
+class ImageNotFoundError(RuntimeError):
     pass
 
 
@@ -33,6 +38,10 @@ class AlbumService:
         if not os.path.exists(album_path):
             raise AlbumNotFoundError()
         return album_path
+
+    def delete_album(self, album_name: str) -> None:
+        album_path = self.get_album_path_or_error(album_name)
+        shutil.rmtree(album_path)
 
     def get_or_create_album(self, album_name: str, description: str = "") -> None:
         self._ensure_album_folders(album_name)
@@ -82,6 +91,30 @@ class AlbumService:
             os.listdir(self._thumbnails_path(album_name)),
             reverse=True
         )
+
+    def delete_image(self, album_name: str, image_number: int) -> None:
+        self.get_album_path_or_error(album_name)
+        images_path = self._images_path(album_name)
+        thumbnails_path = self._thumbnails_path(album_name)
+
+        image_base = f"image{str(image_number).rjust(4, '0')}"
+        image_file = self._find_file_with_base(images_path, image_base)
+        if not image_file:
+            raise ImageNotFoundError(f"Image {image_number} not found in album {album_name}")
+
+        os.remove(os.path.join(images_path, image_file))
+
+        thumbnail_file = self._find_file_with_base(thumbnails_path, image_base)
+        if thumbnail_file:
+            os.remove(os.path.join(thumbnails_path, thumbnail_file))
+
+    def _find_file_with_base(self, directory: str, base_name: str) -> Optional[str]:
+        if not os.path.exists(directory):
+            return None
+        for filename in os.listdir(directory):
+            if filename.split(".")[0] == base_name:
+                return filename
+        return None
 
     def capture_image_to_album(
         self,

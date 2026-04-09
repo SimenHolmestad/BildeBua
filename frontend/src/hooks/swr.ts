@@ -3,12 +3,18 @@ import { useParams } from 'react-router-dom';
 import {
   captureImageToAlbum,
   createAlbum,
+  deleteAdminAlbum,
+  deleteAdminImage,
+  getAdminConfig,
   getAlbumInfo,
   getAlbumLastImage,
   getQrCodes,
   listAlbums,
+  updateAdminConfig,
 } from 'api';
 import type {
+  AdminConfigResponse,
+  AdminConfigUpdateRequest,
   AlbumCaptureResponse,
   AlbumCreatedResponse,
   AlbumInfoResponse,
@@ -23,6 +29,8 @@ export const swrKeys = {
   albumInfo: (albumName: string): string => `albumInfo/${albumName}`,
   albumLastImage: (albumName: string): string => `albumLastImage/${albumName}`,
   qrCodes: (): string => 'qrCodes',
+  adminConfig: (): string => 'adminConfig',
+  adminAlbum: (albumName: string): string => `adminAlbum/${albumName}`,
 };
 
 export const useAlbumName = () => {
@@ -111,5 +119,75 @@ export const captureImageToAlbumAndRefresh = async (
     },
     showError,
     'Kunne ikke ta bilde',
+  );
+};
+
+export const useAdminConfig = () => {
+  const { data: adminConfig, isLoading } = useSWR<AdminConfigResponse>(
+    swrKeys.adminConfig(),
+    () => getAdminConfig()
+  );
+  return { adminConfig, isLoading };
+};
+
+export const useAdminAlbum = () => {
+  const albumName = useAlbumName();
+  const { data: albumInfo, isLoading } = useSWR<AlbumInfoResponse>(
+    albumName ? swrKeys.adminAlbum(albumName) : null,
+    () =>
+      getAlbumInfo({
+        path: { album_name: albumName },
+      }),
+  );
+  return { albumInfo, isLoading };
+};
+
+export const updateAdminConfigAndRefresh = async (
+  updates: AdminConfigUpdateRequest,
+  showError: ShowErrorFn,
+): Promise<AdminConfigResponse | undefined> => {
+  return runWithGlobalApiErrorHandling(
+    async () => {
+      const updatedConfig = await updateAdminConfig({
+        body: updates,
+      });
+      await mutate(swrKeys.adminConfig());
+      return updatedConfig;
+    },
+    showError,
+    'Kunne ikke lagre innstillinger',
+  );
+};
+
+export const deleteAlbumAndRefresh = async (
+  albumName: string,
+  showError: ShowErrorFn,
+): Promise<void> => {
+  await runWithGlobalApiErrorHandling(
+    async () => {
+      await deleteAdminAlbum({
+        path: { album_name: albumName },
+      });
+      await mutate(swrKeys.availableAlbums());
+    },
+    showError,
+    'Kunne ikke slette album',
+  );
+};
+
+export const deleteImageAndRefresh = async (
+  albumName: string,
+  imageNumber: number,
+  showError: ShowErrorFn,
+): Promise<void> => {
+  await runWithGlobalApiErrorHandling(
+    async () => {
+      await deleteAdminImage({
+        path: { album_name: albumName, image_number: imageNumber },
+      });
+      await mutate(swrKeys.adminAlbum(albumName));
+    },
+    showError,
+    'Kunne ikke slette bilde',
   );
 };

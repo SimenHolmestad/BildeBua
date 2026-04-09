@@ -19,7 +19,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "bash -lc 'source .venv/bin/activate && python3 -m scripts.run_e2e_backend --env-file .env.e2e'",
+      command: "bash -lc 'source .venv/bin/activate && python3 -m scripts.run_e2e_backend --config-file config.e2e.json'",
       url: "http://127.0.0.1:3100/qr_codes/",
       cwd: repoRoot,
       reuseExistingServer: !process.env.CI,

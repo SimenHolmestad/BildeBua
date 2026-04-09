@@ -1,13 +1,9 @@
-import os
-from typing import Optional
 from pydantic import ValidationError
-from .config import Config
+from .config_manager import ConfigManager
 
 
-def load_config(env_file: Optional[str] = ".env") -> Config:
-    if env_file and not os.path.exists(env_file):
-        raise FileNotFoundError(f"Env file not found at {env_file}.")
+def load_config(config_json_path: str = "config.json") -> ConfigManager:
     try:
-        return Config(_env_file=env_file)
+        return ConfigManager(config_json_path)
     except ValidationError as exc:
         raise ValueError(f"Invalid config: {exc}") from exc

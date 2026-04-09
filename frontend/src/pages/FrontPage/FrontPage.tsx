@@ -14,7 +14,7 @@ const FrontPage = () => {
   if (isLoading && !albumInfo) {
     return (
       <>
-        <Header />
+        <Header showAdminLink />
         <div className="flex min-h-[70vh] items-center justify-center">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-base-300 border-t-base-700" />
         </div>
@@ -26,7 +26,7 @@ const FrontPage = () => {
   if (!albumInfo) {
     return (
       <>
-        <Header />
+        <Header showAdminLink />
         <NotFound />
         <Footer />
       </>
@@ -36,7 +36,7 @@ const FrontPage = () => {
   if (albumInfo.forced_album) {
     return (
       <>
-        <Header />
+        <Header showAdminLink />
         <Navigate to={routes.albumPage(albumInfo.forced_album)} replace />
         <Footer />
       </>
@@ -47,7 +47,7 @@ const FrontPage = () => {
 
   return (
     <>
-      <Header />
+      <Header showAdminLink />
       <main className="mx-auto w-full max-w-6xl px-4 pb-8 pt-10 sm:px-6 lg:px-8">
         <section className="animate-fade-in-up rounded-3xl border border-base-200 bg-base-50/70 px-6 py-10 shadow-soft sm:px-10">
           <h1 className="font-display text-5xl text-base-900 sm:text-6xl">Velkommen til BildeBua</h1>

@@ -9,6 +9,8 @@ const pages = [
   { name: "image-detail-page", url: `/album/${albumName}/image/1` },
   { name: "last-image-page", url: `/album/${albumName}/last_image` },
   { name: "last-image-qr-page", url: `/album/${albumName}/last_image_qr` },
+  { name: "admin-page", url: "/admin" },
+  { name: "admin-album-page", url: `/admin/album/${albumName}` },
 ];
 
 const viewports = [

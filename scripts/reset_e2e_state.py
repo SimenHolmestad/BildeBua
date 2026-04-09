@@ -5,8 +5,8 @@ from backend.core.config_loader import load_config
 
 
 def main() -> None:
-    config = load_config(".env.e2e")
-    albums_dir = config.albums.albums_dir
+    config_manager = load_config("config.e2e.json")
+    albums_dir = config_manager.config.albums.albums_dir
 
     if os.path.exists(albums_dir):
         shutil.rmtree(albums_dir)
