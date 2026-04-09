@@ -26,7 +26,7 @@ class CurrentImageTracker:
         return format_image_name(self.image_name_prefix, next_image_number)
 
     def increase_image_number(self) -> None:
-        current_number = self._get_current_image_number()
+        current_number = self._read_image_number_file()
         self._write_image_number_file(current_number + 1)
 
     def get_name_of_last_image(self) -> Optional[str]:
@@ -53,14 +53,10 @@ class CurrentImageTracker:
         return self._read_image_number_file()
 
     def _ensure_image_number_file_correct(self) -> None:
-        if not self._image_number_file_correct():
-            self._recreate_image_number_file()
-
-    def _image_number_file_correct(self) -> bool:
-        return self._read_image_number_file() == self._find_last_image_number()
-
-    def _recreate_image_number_file(self) -> None:
-        self._write_image_number_file(self._find_last_image_number())
+        file_number = self._read_image_number_file()
+        last_image_number = self._find_last_image_number()
+        if last_image_number > file_number:
+            self._write_image_number_file(last_image_number)
 
     def _find_last_image_number(self) -> int:
         last_image = self._find_last_image_filename()

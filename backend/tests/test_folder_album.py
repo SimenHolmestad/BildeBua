@@ -170,11 +170,30 @@ class FolderAlbumTestCase(unittest.TestCase):
 
         self.assertTrue(os.path.exists(expected_image_filepath))
 
-    def test_capture_image_with_wrong_image_number_file(self) -> None:
+    def test_capture_image_with_high_image_number_file_keeps_counting(self) -> None:
         self.add_dummy_image_file_to_album("test_album", "image0001.jpg")
         self.add_dummy_image_file_to_album("test_album", "image0002.jpg")
         self.add_dummy_image_file_to_album("test_album", "image0003.jpg")
         self.create_current_image_number_file("test_album", 20)
+
+        config = create_fast_dummy_config(self.albums_dir)
+        self.configure_camera(config.camera)
+        self.album_service.capture_image_to_album(self.album_name)
+
+        expected_image_filepath = os.path.join(
+            self.test_dir_name,
+            "test_album",
+            "images",
+            "image0021.png"
+        )
+
+        self.assertTrue(os.path.exists(expected_image_filepath))
+
+    def test_capture_image_with_low_image_number_file_corrects_upward(self) -> None:
+        self.add_dummy_image_file_to_album("test_album", "image0001.jpg")
+        self.add_dummy_image_file_to_album("test_album", "image0002.jpg")
+        self.add_dummy_image_file_to_album("test_album", "image0003.jpg")
+        self.create_current_image_number_file("test_album", 1)
 
         config = create_fast_dummy_config(self.albums_dir)
         self.configure_camera(config.camera)
