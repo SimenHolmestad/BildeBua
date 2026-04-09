@@ -5,6 +5,7 @@ import {
   createAlbum,
   deleteAdminAlbum,
   deleteAdminImage,
+  getAdminAlbumInfo,
   getAdminConfig,
   getAlbumInfo,
   getAlbumLastImage,
@@ -135,7 +136,7 @@ export const useAdminAlbum = () => {
   const { data: albumInfo, isLoading } = useSWR<AlbumInfoResponse>(
     albumName ? swrKeys.adminAlbum(albumName) : null,
     () =>
-      getAlbumInfo({
+      getAdminAlbumInfo({
         path: { album_name: albumName },
       }),
   );

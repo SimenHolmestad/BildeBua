@@ -655,6 +655,41 @@ export type DeleteAdminAlbumResponses = {
 
 export type DeleteAdminAlbumResponse = DeleteAdminAlbumResponses[keyof DeleteAdminAlbumResponses];
 
+export type GetAdminAlbumInfoData = {
+    body?: never;
+    path: {
+        /**
+         * Album Name
+         * Album name.
+         */
+        album_name: string;
+    };
+    query?: never;
+    url: '/admin/albums/{album_name}';
+};
+
+export type GetAdminAlbumInfoErrors = {
+    /**
+     * Album not found.
+     */
+    404: ErrorResponse;
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetAdminAlbumInfoError = GetAdminAlbumInfoErrors[keyof GetAdminAlbumInfoErrors];
+
+export type GetAdminAlbumInfoResponses = {
+    /**
+     * Successful Response
+     */
+    200: AlbumInfoResponse;
+};
+
+export type GetAdminAlbumInfoResponse = GetAdminAlbumInfoResponses[keyof GetAdminAlbumInfoResponses];
+
 export type ClientOptions = {
     baseUrl: 'http://localhost:5000' | (string & {});
 };

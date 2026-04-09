@@ -142,6 +142,37 @@ class AdminApiTestCase(unittest.TestCase):
         response = self.test_client.delete("/admin/albums/nonexistent")
         self.assertEqual(response.status_code, 404)
 
+    def test_get_album_info_returns_album_details(self) -> None:
+        self.album_service.get_or_create_album("album1")
+        self.album_service.capture_image_to_album("album1")
+
+        response = self.test_client.get("/admin/albums/album1")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["album_name"], "album1")
+        self.assertEqual(len(data["images"]), 1)
+
+    def test_get_album_info_bypasses_forced_album(self) -> None:
+        self.album_service.get_or_create_album("album1")
+        self.album_service.capture_image_to_album("album1")
+        self.album_service.get_or_create_album("album2")
+
+        # Set forced album to album1
+        self.test_client.put("/admin/config", json={"forced_album": "album1"})
+
+        # Regular endpoint should block album2
+        regular_response = self.test_client.get("/albums/album2")
+        self.assertEqual(regular_response.status_code, 403)
+
+        # Admin endpoint should still work for album2
+        admin_response = self.test_client.get("/admin/albums/album2")
+        self.assertEqual(admin_response.status_code, 200)
+        self.assertEqual(admin_response.json()["album_name"], "album2")
+
+    def test_get_album_info_nonexistent_returns_404(self) -> None:
+        response = self.test_client.get("/admin/albums/nonexistent")
+        self.assertEqual(response.status_code, 404)
+
 
 if __name__ == '__main__':
     unittest.main()
