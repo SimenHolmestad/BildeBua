@@ -170,20 +170,33 @@ const AdminPage = () => {
           {/* Album settings */}
           <section className="rounded-2xl border border-base-200 bg-base-50/70 p-6 shadow-soft">
             <h2 className="font-display text-2xl text-base-900">Albuminnstillinger</h2>
-            <div className="mt-4">
-              <label className="block">
-                <span className="text-sm font-medium text-base-700">Tvunget album</span>
+            <div className="mt-4 space-y-3">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={forcedAlbum !== ''}
+                  onChange={(e) => {
+                    if (!e.target.checked) {
+                      setForcedAlbum('');
+                    } else {
+                      setForcedAlbum(availableAlbums[0]?.name ?? '');
+                    }
+                  }}
+                  className="h-4 w-4 rounded border-base-300 text-base-600 focus:ring-base-500"
+                />
+                <span className="text-sm font-medium text-base-700">Tving alle brukere til ett album</span>
+              </label>
+              {forcedAlbum !== '' && (
                 <select
                   value={forcedAlbum}
                   onChange={(e) => setForcedAlbum(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
+                  className="block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
                 >
-                  <option value="">Ingen</option>
                   {availableAlbums.map((album) => (
                     <option key={album.name} value={album.name}>{album.name}</option>
                   ))}
                 </select>
-              </label>
+              )}
             </div>
           </section>
 

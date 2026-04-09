@@ -38,5 +38,15 @@ for (const { name: viewportName, viewport } of viewports) {
         });
       });
     }
+
+    test("admin-page-forced-album", async ({ page }) => {
+      await page.goto("/admin");
+      await page.waitForLoadState("networkidle");
+      await page.getByLabel("Tving alle brukere til ett album").check();
+      await expect(page).toHaveScreenshot(`admin-page-forced-album-${viewportName}.png`, {
+        animations: "disabled",
+        caret: "hide",
+      });
+    });
   });
 }
