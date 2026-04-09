@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import Footer from 'components/Footer';
 import Header from 'components/Header';
 import NotFound from 'components/NotFound';
 import { useAlbumInfo } from 'hooks/swr';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import routes from 'routes';
 
 const AlbumImageDetailPage = () => {
@@ -68,6 +68,24 @@ const AlbumImageDetailPage = () => {
 
   const previousImageNumber = selectedIndex > 0 ? images[selectedIndex - 1].image_number : null;
   const nextImageNumber = selectedIndex < images.length - 1 ? images[selectedIndex + 1].image_number : null;
+
+  const navigate = useNavigate();
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft' && nextImageNumber !== null) {
+        navigate(routes.albumImageDetailPage(albumName, nextImageNumber));
+      } else if (e.key === 'ArrowRight' && previousImageNumber !== null) {
+        navigate(routes.albumImageDetailPage(albumName, previousImageNumber));
+      }
+    },
+    [albumName, nextImageNumber, previousImageNumber, navigate],
+  );
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   return (
     <>
