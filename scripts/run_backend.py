@@ -22,6 +22,18 @@ def get_backend_port() -> int:
         return DEBUG_PORT
 
 
+def _create_app():
+    config_file = os.getenv("BILDEBUA_CONFIG_FILE", "config.json")
+    config_manager = load_config(config_file)
+    port = get_backend_port()
+    host_ip = find_ip_address_for_device()
+    return create_app_with_config(config_manager, host_ip, port)
+
+
+# Module-level app instance so uvicorn can import it for reload
+app = _create_app()
+
+
 def run_backend(config_manager: ConfigManager) -> None:
     """This should only need to be done when working on or testing the frontend."""
     print("Running the backend in debug mode. Start the frontend in a separate terminal window")
@@ -32,9 +44,17 @@ def run_backend(config_manager: ConfigManager) -> None:
     qr_code_url = get_url_for_qr_code_page(host_ip, port, config.albums.forced_album)
     print("Url for qr codes (when frontend is running):", qr_code_url)
 
-    app = create_app_with_config(config_manager, host_ip, port)
     print(f"Swagger docs available at: http://localhost:{port}/docs")
-    uvicorn.run(app, host="localhost", port=port, log_level="debug")
+
+    os.environ["BILDEBUA_CONFIG_FILE"] = config_manager._path
+    uvicorn.run(
+        "scripts.run_backend:app",
+        host="localhost",
+        port=port,
+        log_level="debug",
+        reload=True,
+        reload_dirs=["backend/routers", "backend/core", "backend/album_service", "backend/camera_service"],
+    )
 
 
 def main() -> None:
@@ -46,6 +66,7 @@ def main() -> None:
         help="Path to config.json file."
     )
     args = parser.parse_args()
+    os.environ["BILDEBUA_CONFIG_FILE"] = args.config_file
     config_manager = load_config(args.config_file)
     run_backend(config_manager)
 
