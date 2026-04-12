@@ -1,5 +1,6 @@
+import React from 'react';
 import useSWR, { mutate } from 'swr';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   captureImageToAlbum,
   createAlbum,
@@ -181,4 +182,24 @@ export const deleteImageAndRefresh = async (
     showError,
     'Kunne ikke slette bilde',
   );
+};
+
+export const useRedirectOnForcedAlbumChange = (
+  buildRoute: (albumName: string) => string,
+) => {
+  const { adminConfig } = useAdminConfig(5000);
+  const albumName = useAlbumName();
+  const navigate = useNavigate();
+
+  const isRedirecting = adminConfig != null
+    && adminConfig.forced_album != null
+    && adminConfig.forced_album !== albumName;
+
+  React.useEffect(() => {
+    if (isRedirecting) {
+      navigate(buildRoute(adminConfig!.forced_album!), { replace: true });
+    }
+  }, [isRedirecting, adminConfig, navigate, buildRoute]);
+
+  return { adminConfig, isRedirecting };
 };

@@ -1,13 +1,15 @@
 import React from 'react';
 import AlbumEmptyMessage from 'components/AlbumEmptyMessage';
 import NotFound from 'components/NotFound';
-import { useAlbumInfo } from 'hooks/swr';
+import { useAlbumInfo, useRedirectOnForcedAlbumChange } from 'hooks/swr';
 import { useParams } from 'react-router-dom';
 import Slideshow from './components/Slideshow';
+import routes from 'routes';
 
 const SlideshowPage = () => {
   const { albumName } = useParams<{ albumName: string }>();
   const { albumInfo, isLoading } = useAlbumInfo(30000);
+  useRedirectOnForcedAlbumChange(routes.slideshowPage);
 
   if (!albumName) {
     return <h1 className="p-8 text-2xl font-semibold text-red-700">FEIL: Albumnavn mangler.</h1>;
