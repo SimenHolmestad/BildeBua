@@ -5,6 +5,7 @@
  */
 export type AdminConfigResponse = {
     camera: CameraConfig;
+    display: DisplayConfig;
     /**
      * Forced Album
      */
@@ -18,6 +19,7 @@ export type AdminConfigResponse = {
  */
 export type AdminConfigUpdateRequest = {
     camera?: CameraConfig | null;
+    display?: DisplayConfig | null;
     /**
      * Forced Album
      * Set to empty string to clear forced album.
@@ -186,6 +188,16 @@ export type CameraConfig = {
 };
 
 /**
+ * DisplayConfig
+ */
+export type DisplayConfig = {
+    /**
+     * Overlay Seconds
+     */
+    overlay_seconds?: number;
+};
+
+/**
  * DummyCameraConfig
  */
 export type DummyCameraConfig = {
@@ -263,38 +275,6 @@ export type QrCodeConfig = {
      * Use Center Images
      */
     use_center_images?: boolean;
-};
-
-/**
- * QrCodeResponse
- */
-export type QrCodeResponse = {
-    /**
-     * Name
-     * QR code identifier.
-     */
-    name: string;
-    /**
-     * Information
-     * Text displayed alongside the QR code.
-     */
-    information: string;
-    /**
-     * Url
-     * URL to the QR code image.
-     */
-    url: string;
-};
-
-/**
- * QrCodesResponse
- */
-export type QrCodesResponse = {
-    /**
-     * Qr Codes
-     * All available QR codes.
-     */
-    qr_codes: Array<QrCodeResponse>;
 };
 
 /**
@@ -516,22 +496,6 @@ export type GetAlbumLastImageResponses = {
 };
 
 export type GetAlbumLastImageResponse = GetAlbumLastImageResponses[keyof GetAlbumLastImageResponses];
-
-export type GetQrCodesData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/qr_codes/';
-};
-
-export type GetQrCodesResponses = {
-    /**
-     * Successful Response
-     */
-    200: QrCodesResponse;
-};
-
-export type GetQrCodesResponse = GetQrCodesResponses[keyof GetQrCodesResponses];
 
 export type GetAdminConfigData = {
     body?: never;

@@ -22,7 +22,7 @@ def run_application(config_manager: ConfigManager, rebuild: bool = False) -> Non
     qr_code_url = get_url_for_qr_code_page(host_ip, PRODUCTION_PORT, config.albums.forced_album)
     print("Url for qr codes:", qr_code_url)
 
-    app = create_app_with_config(config_manager, host_ip, PRODUCTION_PORT)
+    app = create_app_with_config(config_manager)
 
     browser_process = open_webpage_in_device_browser(qr_code_url)
     uvicorn.run(app, host=host_ip, port=PRODUCTION_PORT)

@@ -64,9 +64,14 @@ class AlbumConfig(BaseModel):
         return self
 
 
+class DisplayConfig(BaseModel):
+    overlay_seconds: int = Field(default=20, ge=1)
+
+
 class Config(BaseModel):
     static_folder_name: str = "static"
     albums: AlbumConfig = Field(default_factory=AlbumConfig)
     camera: CameraConfig = Field(default_factory=CameraConfig)
+    display: DisplayConfig = Field(default_factory=DisplayConfig)
     qr_codes: QrCodeConfig = Field(default_factory=QrCodeConfig)
     wifi_qr_code: WifiConfig = Field(default_factory=WifiConfig)

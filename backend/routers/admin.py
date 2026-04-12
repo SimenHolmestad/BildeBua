@@ -4,13 +4,14 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, ValidationError
 from backend.album_service.album_service import AlbumService, AlbumNotFoundError, ImageNotFoundError
 from backend.camera_service import CameraService
-from backend.core.config import CameraConfig, QrCodeConfig, WifiConfig
+from backend.core.config import CameraConfig, DisplayConfig, QrCodeConfig, WifiConfig
 from backend.core.config_manager import ConfigManager
 from backend.routers.albums import AlbumInfoResponse, AlbumImageResponse, _albums_url_prefix_from_dir, _relative_url, _image_number_from_filename
 
 
 class AdminConfigResponse(BaseModel):
     camera: CameraConfig
+    display: DisplayConfig
     forced_album: Optional[str]
     qr_codes: QrCodeConfig
     wifi_qr_code: WifiConfig
@@ -18,6 +19,7 @@ class AdminConfigResponse(BaseModel):
 
 class AdminConfigUpdateRequest(BaseModel):
     camera: Optional[CameraConfig] = None
+    display: Optional[DisplayConfig] = None
     forced_album: Optional[str] = Field(default=None, description="Set to empty string to clear forced album.")
     qr_codes: Optional[QrCodeConfig] = None
     wifi_qr_code: Optional[WifiConfig] = None
@@ -44,6 +46,7 @@ def construct_admin_api_router(
         config = config_manager.config
         return AdminConfigResponse(
             camera=config.camera,
+            display=config.display,
             forced_album=config.albums.forced_album,
             qr_codes=config.qr_codes,
             wifi_qr_code=config.wifi_qr_code,
@@ -66,6 +69,9 @@ def construct_admin_api_router(
 
         if request_body.camera is not None:
             overrides["camera"] = request_body.camera.model_dump()
+
+        if request_body.display is not None:
+            overrides["display"] = request_body.display.model_dump()
 
         if request_body.forced_album is not None:
             forced_value = request_body.forced_album if request_body.forced_album != "" else None
@@ -90,6 +96,7 @@ def construct_admin_api_router(
 
         return AdminConfigResponse(
             camera=new_config.camera,
+            display=new_config.display,
             forced_album=new_config.albums.forced_album,
             qr_codes=new_config.qr_codes,
             wifi_qr_code=new_config.wifi_qr_code,

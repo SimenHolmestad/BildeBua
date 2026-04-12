@@ -3,13 +3,11 @@ import React from 'react';
 type FullscreenImageProps = {
   imageUrl?: string | null;
   time?: number;
-  startHided?: boolean;
 };
 
-const FullscreenImage = ({ imageUrl, time, startHided }: FullscreenImageProps) => {
+const FullscreenImage = ({ imageUrl, time }: FullscreenImageProps) => {
   const [isShowing, setIsShowing] = React.useState(false);
   const [isFadingIn, setIsFadingIn] = React.useState(false);
-  const firstImageShowing = React.useRef(true);
   const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
@@ -22,11 +20,6 @@ const FullscreenImage = ({ imageUrl, time, startHided }: FullscreenImageProps) =
 
   React.useEffect(() => {
     if (!imageUrl) {
-      return;
-    }
-
-    if (startHided && firstImageShowing.current) {
-      firstImageShowing.current = false;
       return;
     }
 
@@ -43,7 +36,7 @@ const FullscreenImage = ({ imageUrl, time, startHided }: FullscreenImageProps) =
         timeoutRef.current = setTimeout(() => setIsShowing(false), 1000);
       }, time);
     }
-  }, [imageUrl, startHided, time]);
+  }, [imageUrl, time]);
 
   if (!isShowing) {
     return null;

@@ -9,7 +9,6 @@ import {
   getAdminConfig,
   getAlbumInfo,
   getAlbumLastImage,
-  getQrCodes,
   listAlbums,
   updateAdminConfig,
 } from 'api';
@@ -21,7 +20,6 @@ import type {
   AlbumInfoResponse,
   AvailableAlbumsResponse,
   LastImageResponse,
-  QrCodesResponse,
 } from 'api';
 import { runWithGlobalApiErrorHandling, type ShowErrorFn } from 'utils/runWithGlobalApiErrorHandling';
 
@@ -29,7 +27,6 @@ export const swrKeys = {
   availableAlbums: (): string => 'availableAlbums',
   albumInfo: (albumName: string): string => `albumInfo/${albumName}`,
   albumLastImage: (albumName: string): string => `albumLastImage/${albumName}`,
-  qrCodes: (): string => 'qrCodes',
   adminConfig: (): string => 'adminConfig',
   adminAlbum: (albumName: string): string => `adminAlbum/${albumName}`,
 };
@@ -74,14 +71,6 @@ export const useAlbumLastImage = (albumNameOverride?: string, refreshInterval = 
   return { albumLastImage, isLoading };
 }
 
-export const useQrCodes = () => {
-  const { data: qrCodes, isLoading } = useSWR<QrCodesResponse>(
-    swrKeys.qrCodes(),
-    () => getQrCodes()
-  );
-  return { qrCodes, isLoading };
-}
-
 export const createAlbumAndRefresh = async (
   albumName: string,
   description: string,
@@ -123,10 +112,11 @@ export const captureImageToAlbumAndRefresh = async (
   );
 };
 
-export const useAdminConfig = () => {
+export const useAdminConfig = (refreshInterval = 0) => {
   const { data: adminConfig, isLoading } = useSWR<AdminConfigResponse>(
     swrKeys.adminConfig(),
-    () => getAdminConfig()
+    () => getAdminConfig(),
+    { refreshInterval }
   );
   return { adminConfig, isLoading };
 };

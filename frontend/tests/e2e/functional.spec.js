@@ -81,6 +81,6 @@ test("can delete an image from admin album page", async ({ page, request }) => {
 test("shows QR codes on the qr page", async ({ page }) => {
   await page.goto("/qr");
 
-  await expect(page.getByRole("img", { name: "start_page_url" })).toBeVisible();
   await expect(page.getByText("Scan this qr code to go to BildeBua!")).toBeVisible();
+  await expect(page.getByRole("article").getByRole("img")).toBeVisible();
 });

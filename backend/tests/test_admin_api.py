@@ -7,7 +7,6 @@ from backend.app import create_app
 from backend.album_service.album_service import AlbumService
 from backend.camera_service import CameraService
 from backend.core.config_manager import ConfigManager
-from scripts.shared import qr_code_utils
 from .camera_modules_for_testing import create_fast_dummy_config
 from .test_utils import temp_dir_relpath
 
@@ -31,11 +30,9 @@ class AdminApiTestCase(unittest.TestCase):
         self.camera_service = CameraService(config.camera)
         self.album_service = AlbumService(config.albums, self.camera_service)
 
-        qr_code_context = qr_code_utils.create_qr_code_context(self.static_dir_name)
         app = create_app(
             self.static_dir_name,
             self.config_manager,
-            qr_code_utils.get_qr_codes(qr_code_context)
         )
         self.test_client = TestClient(app)
 

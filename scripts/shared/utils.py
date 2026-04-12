@@ -4,11 +4,8 @@ import socket
 import platform
 import subprocess
 from typing import Any, Optional
-from typing import Mapping
-from scripts.shared import qr_code_utils
 from backend.album_service.album_service import AlbumService
 from backend.app import create_app
-from backend.core.config import Config
 from backend.core.config_manager import ConfigManager
 DEBUG_PORT = 3000
 PRODUCTION_PORT = 5000
@@ -56,22 +53,6 @@ def open_webpage_in_device_browser(url: str) -> Optional[subprocess.Popen]:
     print("Could not open browser automatically or find chromium")
 
 
-def create_qr_codes(
-    config: Config,
-    host_ip: str,
-    port: int
-) -> list[Mapping[str, str]]:
-    context = qr_code_utils.create_qr_codes_with_config(
-        static_folder_path(config.static_folder_name),
-        host_ip,
-        port,
-        use_center_images=config.qr_codes.use_center_images,
-        forced_album_name=config.albums.forced_album,
-        wifi_config=config.wifi_qr_code
-    )
-    return qr_code_utils.get_qr_codes(context)
-
-
 def get_url_for_qr_code_page(host_ip: str, port: int, forced_album: Optional[str]) -> str:
     if forced_album:
         return f"http://{host_ip}:{port}/album/{forced_album}/last_image_qr"
@@ -86,18 +67,11 @@ def ensure_forced_album_is_created(
         service.get_or_create_album(forced_album)
 
 
-def create_app_with_config(
-    config_manager: ConfigManager,
-    host_ip: str,
-    port: int
-) -> Any:
+def create_app_with_config(config_manager: ConfigManager) -> Any:
     config = config_manager.config
-    qr_codes = create_qr_codes(config, host_ip, port)
-
     return create_app(
         static_folder_path(config.static_folder_name),
         config_manager,
-        qr_codes
     )
 
 

@@ -25,9 +25,7 @@ def get_backend_port() -> int:
 def _create_app():
     config_file = os.getenv("BILDEBUA_CONFIG_FILE", "config.json")
     config_manager = load_config(config_file)
-    port = get_backend_port()
-    host_ip = find_ip_address_for_device()
-    return create_app_with_config(config_manager, host_ip, port)
+    return create_app_with_config(config_manager)
 
 
 # Module-level app instance so uvicorn can import it for reload

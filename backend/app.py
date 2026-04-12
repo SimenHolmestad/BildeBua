@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse, Response
 from backend.routers.albums import construct_album_api_router
-from backend.routers.qr_codes import construct_qr_code_api_router
 from backend.routers.admin import construct_admin_api_router
 from backend.album_service.album_service import AlbumService
 from backend.camera_service import CameraService
@@ -14,7 +13,6 @@ from backend.core.config_manager import ConfigManager
 def create_app(
     static_folder_path: str,
     config_manager: ConfigManager,
-    qr_codes: Any
 ) -> FastAPI:
     app = FastAPI(
         title="BildeBua API",
@@ -32,8 +30,6 @@ def create_app(
         construct_album_api_router(config_manager, album_service),
         prefix="/albums"
     )
-
-    app.include_router(construct_qr_code_api_router(qr_codes), prefix="/qr_codes")
 
     app.include_router(
         construct_admin_api_router(config_manager, album_service, camera_service),

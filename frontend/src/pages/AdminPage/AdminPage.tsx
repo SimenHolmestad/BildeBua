@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import routes from 'routes';
 import { useAdminConfig, useAvailableAlbums, updateAdminConfigAndRefresh } from 'hooks/swr';
 import { useGlobalError } from 'contexts/GlobalErrorContext';
-import type { AdminConfigUpdateRequest, CameraConfig, QrCodeConfig, WifiConfig } from 'api';
+import type { AdminConfigUpdateRequest, CameraConfig, DisplayConfig, QrCodeConfig, WifiConfig } from 'api';
 
 const AdminPage = () => {
   const { adminConfig, isLoading: configLoading } = useAdminConfig();
@@ -23,6 +23,7 @@ const AdminPage = () => {
   const [dslrCaptureIso, setDslrCaptureIso] = React.useState(200);
   const [verboseErrors, setVerboseErrors] = React.useState(true);
   const [forcedAlbum, setForcedAlbum] = React.useState('');
+  const [overlaySeconds, setOverlaySeconds] = React.useState(20);
   const [useCenterImages, setUseCenterImages] = React.useState(true);
   const [wifiEnabled, setWifiEnabled] = React.useState(false);
   const [wifiName, setWifiName] = React.useState('');
@@ -39,6 +40,7 @@ const AdminPage = () => {
     setDslrCaptureIso(adminConfig.camera.dslr_capture_iso ?? 200);
     setVerboseErrors(adminConfig.camera.verbose_errors ?? true);
     setForcedAlbum(adminConfig.forced_album ?? '');
+    setOverlaySeconds(adminConfig.display.overlay_seconds ?? 20);
     setUseCenterImages(adminConfig.qr_codes.use_center_images ?? true);
     setWifiEnabled(adminConfig.wifi_qr_code.enabled ?? false);
     setWifiName(adminConfig.wifi_qr_code.wifi_name ?? '');
@@ -55,6 +57,7 @@ const AdminPage = () => {
     dslrCaptureIso !== (adminConfig.camera.dslr_capture_iso ?? 200) ||
     verboseErrors !== (adminConfig.camera.verbose_errors ?? true) ||
     forcedAlbum !== (adminConfig.forced_album ?? '') ||
+    overlaySeconds !== (adminConfig.display.overlay_seconds ?? 20) ||
     useCenterImages !== (adminConfig.qr_codes.use_center_images ?? true) ||
     wifiEnabled !== (adminConfig.wifi_qr_code.enabled ?? false) ||
     wifiName !== (adminConfig.wifi_qr_code.wifi_name ?? '') ||
@@ -76,6 +79,10 @@ const AdminPage = () => {
       verbose_errors: verboseErrors,
     };
 
+    const display: DisplayConfig = {
+      overlay_seconds: overlaySeconds,
+    };
+
     const qr_codes: QrCodeConfig = {
       use_center_images: useCenterImages,
     };
@@ -90,6 +97,7 @@ const AdminPage = () => {
 
     const updates: AdminConfigUpdateRequest = {
       camera,
+      display,
       forced_album: forcedAlbum || '',
       qr_codes,
       wifi_qr_code,
@@ -266,6 +274,24 @@ const AdminPage = () => {
                   className="h-4 w-4 rounded border-base-300"
                 />
                 <span className="text-sm font-medium text-base-700">Detaljerte feilmeldinger</span>
+              </label>
+            </div>
+          </section>
+
+          {/* Display settings */}
+          <section className="rounded-2xl border border-base-200 bg-base-50/70 p-6 shadow-soft">
+            <h2 className="font-display text-2xl text-base-900">Bildevisning etter bildet er tatt</h2>
+            <div className="mt-4">
+              <label className="block">
+                <span className="text-sm font-medium text-base-700">Visningstid for nye bilder (sek)</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={overlaySeconds}
+                  onChange={(e) => setOverlaySeconds(Number(e.target.value))}
+                  className="mt-1 block w-full max-w-xs rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
+                />
+                <span className="mt-1 block text-xs text-base-500">Hvor lenge nye bilder vises over QR-koder og lysbildeshow</span>
               </label>
             </div>
           </section>

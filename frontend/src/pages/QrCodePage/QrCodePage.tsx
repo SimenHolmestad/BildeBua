@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Header from 'components/Header';
 import NotFound from 'components/NotFound';
-import { useQrCodes } from 'hooks/swr';
+import QrCode from 'components/QrCode';
+import { useAdminConfig } from 'hooks/swr';
+import { deriveQrCodes } from 'utils/qrCodeUtils';
+
+const QR_REFRESH_INTERVAL = 5000;
 
 const QrCodePage = () => {
-  const { qrCodes, isLoading } = useQrCodes();
+  const { adminConfig, isLoading } = useAdminConfig(QR_REFRESH_INTERVAL);
 
-  if (isLoading && !qrCodes) {
+  const qrCodeData = useMemo(() => {
+    if (!adminConfig) return null;
+    return deriveQrCodes(adminConfig);
+  }, [adminConfig]);
+
+  if (isLoading && !adminConfig) {
     return (
       <>
         <Header />
@@ -17,7 +26,7 @@ const QrCodePage = () => {
     );
   }
 
-  if (!qrCodes) {
+  if (!qrCodeData || qrCodeData.length === 0) {
     return (
       <>
         <Header />
@@ -26,17 +35,19 @@ const QrCodePage = () => {
     );
   }
 
-  const qrCodeData = qrCodes.qr_codes ?? [];
+  const useCenterImages = adminConfig?.qr_codes.use_center_images ?? true;
 
   return (
     <>
       <Header />
       <main className="mx-auto flex min-h-[90vh] w-full max-w-6xl items-center px-4 py-10 sm:px-6 lg:px-8">
         <div className={`grid w-full gap-6 ${qrCodeData.length === 1 ? "max-w-lg mx-auto" : "md:grid-cols-2"}`}>
-          {qrCodeData.map((qrCode) => (
-            <article key={qrCode.name} className="rounded-2xl border border-base-200 bg-base-50 p-6 shadow-soft">
-              <img src={qrCode.url} alt={qrCode.name} className="mx-auto w-full" />
-              <p className="mt-4 text-center text-lg font-semibold text-base-900">{qrCode.information}</p>
+          {qrCodeData.map((descriptor) => (
+            <article key={descriptor.name} className="rounded-2xl border border-base-200 bg-base-50 p-6 shadow-soft">
+              <div className="mx-auto flex w-full justify-center">
+                <QrCode descriptor={descriptor} size={400} useCenterImage={useCenterImages} />
+              </div>
+              <p className="mt-4 text-center text-lg font-semibold text-base-900">{descriptor.information}</p>
             </article>
           ))}
         </div>
