@@ -28,6 +28,7 @@ class WifiConfig(BaseModel):
 
 class QrCodeConfig(BaseModel):
     use_center_images: bool = True
+    url_qr_code_text: str = "Scan this qr code to go to BildeBua!"
 
 
 class DummyCameraConfig(BaseModel):

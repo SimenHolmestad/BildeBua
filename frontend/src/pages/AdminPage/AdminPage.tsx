@@ -26,6 +26,7 @@ const AdminPage = () => {
   const [forcedAlbum, setForcedAlbum] = React.useState('');
   const [overlaySeconds, setOverlaySeconds] = React.useState(20);
   const [useCenterImages, setUseCenterImages] = React.useState(true);
+  const [urlQrCodeText, setUrlQrCodeText] = React.useState('');
   const [wifiEnabled, setWifiEnabled] = React.useState(false);
   const [wifiName, setWifiName] = React.useState('');
   const [wifiProtocol, setWifiProtocol] = React.useState('');
@@ -43,6 +44,7 @@ const AdminPage = () => {
     setForcedAlbum(adminConfig.forced_album ?? '');
     setOverlaySeconds(adminConfig.display.overlay_seconds ?? 20);
     setUseCenterImages(adminConfig.qr_codes.use_center_images ?? true);
+    setUrlQrCodeText(adminConfig.qr_codes.url_qr_code_text ?? 'Scan this qr code to go to BildeBua!');
     setWifiEnabled(adminConfig.wifi_qr_code.enabled ?? false);
     setWifiName(adminConfig.wifi_qr_code.wifi_name ?? '');
     setWifiProtocol(adminConfig.wifi_qr_code.protocol ?? '');
@@ -60,6 +62,7 @@ const AdminPage = () => {
     forcedAlbum !== (adminConfig.forced_album ?? '') ||
     overlaySeconds !== (adminConfig.display.overlay_seconds ?? 20) ||
     useCenterImages !== (adminConfig.qr_codes.use_center_images ?? true) ||
+    urlQrCodeText !== (adminConfig.qr_codes.url_qr_code_text ?? 'Scan this qr code to go to BildeBua!') ||
     wifiEnabled !== (adminConfig.wifi_qr_code.enabled ?? false) ||
     wifiName !== (adminConfig.wifi_qr_code.wifi_name ?? '') ||
     wifiProtocol !== (adminConfig.wifi_qr_code.protocol ?? '') ||
@@ -97,6 +100,7 @@ const AdminPage = () => {
 
     const qr_codes: QrCodeConfig = {
       use_center_images: useCenterImages,
+      url_qr_code_text: urlQrCodeText,
     };
 
     const wifi_qr_code: WifiConfig = {
@@ -311,7 +315,16 @@ const AdminPage = () => {
           {/* QR code settings */}
           <section className="rounded-2xl border border-base-200 bg-base-50/70 p-6 shadow-soft">
             <h2 className="font-display text-2xl text-base-900">QR-koder</h2>
-            <div className="mt-4">
+            <div className="mt-4 space-y-4">
+              <label className="block">
+                <span className="text-sm font-medium text-base-700">Beskrivelse under hoved-QR-kode</span>
+                <input
+                  type="text"
+                  value={urlQrCodeText}
+                  onChange={(e) => setUrlQrCodeText(e.target.value)}
+                  className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
+                />
+              </label>
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -321,13 +334,6 @@ const AdminPage = () => {
                 />
                 <span className="text-sm font-medium text-base-700">Bruk senterbilder i QR-koder</span>
               </label>
-            </div>
-          </section>
-
-          {/* WiFi QR code settings */}
-          <section className="rounded-2xl border border-base-200 bg-base-50/70 p-6 shadow-soft">
-            <h2 className="font-display text-2xl text-base-900">WiFi QR-kode</h2>
-            <div className="mt-4 space-y-4">
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -335,7 +341,7 @@ const AdminPage = () => {
                   onChange={(e) => setWifiEnabled(e.target.checked)}
                   className="h-4 w-4 rounded border-base-300"
                 />
-                <span className="text-sm font-medium text-base-700">Aktivert</span>
+                <span className="text-sm font-medium text-base-700">Bruke WiFi QR-kode</span>
               </label>
               {wifiEnabled && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -371,7 +377,7 @@ const AdminPage = () => {
                     {wifiErrors.password && <span className="mt-1 block text-xs text-red-600">Påkrevd</span>}
                   </label>
                   <label className="block">
-                    <span className={`text-sm font-medium ${wifiErrors.description ? 'text-red-600' : 'text-base-700'}`}>Beskrivelse under QR-kode</span>
+                    <span className={`text-sm font-medium ${wifiErrors.description ? 'text-red-600' : 'text-base-700'}`}>Beskrivelse under WiFi QR-kode</span>
                     <input
                       type="text"
                       value={wifiDescription}
@@ -384,7 +390,6 @@ const AdminPage = () => {
               )}
             </div>
           </section>
-
         </form>
       </main>
       <Footer />

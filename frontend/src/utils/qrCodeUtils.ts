@@ -26,7 +26,7 @@ export function deriveQrCodes(config: AdminConfigResponse): QrCodeDescriptor[] {
     : `${origin}/`;
   codes.push({
     name: 'start_page_url',
-    information: 'Scan this qr code to go to BildeBua!',
+    information: config.qr_codes.url_qr_code_text || 'Scan this qr code to go to BildeBua!',
     content: url,
     type: 'url',
   });

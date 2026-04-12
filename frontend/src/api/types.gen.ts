@@ -275,6 +275,10 @@ export type QrCodeConfig = {
      * Use Center Images
      */
     use_center_images?: boolean;
+    /**
+     * Url Qr Code Text
+     */
+    url_qr_code_text?: string;
 };
 
 /**
