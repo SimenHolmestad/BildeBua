@@ -15,6 +15,7 @@ const AdminPage = () => {
   const [saving, setSaving] = React.useState(false);
   const [saveSuccess, setSaveSuccess] = React.useState(false);
   const [slidingOut, setSlidingOut] = React.useState(false);
+  const [wifiErrors, setWifiErrors] = React.useState<Record<string, boolean>>({});
 
   const [cameraType, setCameraType] = React.useState('');
   const [previewSeconds, setPreviewSeconds] = React.useState(3);
@@ -67,6 +68,17 @@ const AdminPage = () => {
   );
 
   const handleSave = async () => {
+    if (wifiEnabled) {
+      const errors: Record<string, boolean> = {};
+      if (!wifiName.trim()) errors.wifi_name = true;
+      if (!wifiPassword.trim()) errors.password = true;
+      if (!wifiDescription.trim()) errors.description = true;
+      setWifiErrors(errors);
+      if (Object.keys(errors).length > 0) return;
+    } else {
+      setWifiErrors({});
+    }
+
     setSaving(true);
     setSaveSuccess(false);
 
@@ -90,7 +102,7 @@ const AdminPage = () => {
     const wifi_qr_code: WifiConfig = {
       enabled: wifiEnabled,
       wifi_name: wifiName,
-      protocol: wifiProtocol,
+      protocol: wifiProtocol || 'WPA/WPA2',
       password: wifiPassword,
       description: wifiDescription,
     };
@@ -328,13 +340,14 @@ const AdminPage = () => {
               {wifiEnabled && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label className="block">
-                    <span className="text-sm font-medium text-base-700">WiFi-navn</span>
+                    <span className={`text-sm font-medium ${wifiErrors.wifi_name ? 'text-red-600' : 'text-base-700'}`}>WiFi-navn</span>
                     <input
                       type="text"
                       value={wifiName}
-                      onChange={(e) => setWifiName(e.target.value)}
-                      className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
+                      onChange={(e) => { setWifiName(e.target.value); setWifiErrors((p) => ({ ...p, wifi_name: false })); }}
+                      className={`mt-1 block w-full rounded-lg border bg-white px-3 py-2 text-base-900 shadow-sm focus:outline-none ${wifiErrors.wifi_name ? 'border-red-400 focus:border-red-500' : 'border-base-300 focus:border-base-500'}`}
                     />
+                    {wifiErrors.wifi_name && <span className="mt-1 block text-xs text-red-600">Påkrevd</span>}
                   </label>
                   <label className="block">
                     <span className="text-sm font-medium text-base-700">Protokoll</span>
@@ -345,24 +358,27 @@ const AdminPage = () => {
                       placeholder="WPA/WPA2"
                       className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
                     />
+                    <span className="mt-1 block text-xs text-base-500">Standard: WPA/WPA2</span>
                   </label>
                   <label className="block">
-                    <span className="text-sm font-medium text-base-700">Passord</span>
+                    <span className={`text-sm font-medium ${wifiErrors.password ? 'text-red-600' : 'text-base-700'}`}>Passord</span>
                     <input
                       type="text"
                       value={wifiPassword}
-                      onChange={(e) => setWifiPassword(e.target.value)}
-                      className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
+                      onChange={(e) => { setWifiPassword(e.target.value); setWifiErrors((p) => ({ ...p, password: false })); }}
+                      className={`mt-1 block w-full rounded-lg border bg-white px-3 py-2 text-base-900 shadow-sm focus:outline-none ${wifiErrors.password ? 'border-red-400 focus:border-red-500' : 'border-base-300 focus:border-base-500'}`}
                     />
+                    {wifiErrors.password && <span className="mt-1 block text-xs text-red-600">Påkrevd</span>}
                   </label>
                   <label className="block">
-                    <span className="text-sm font-medium text-base-700">Beskrivelse</span>
+                    <span className={`text-sm font-medium ${wifiErrors.description ? 'text-red-600' : 'text-base-700'}`}>Beskrivelse under QR-kode</span>
                     <input
                       type="text"
                       value={wifiDescription}
-                      onChange={(e) => setWifiDescription(e.target.value)}
-                      className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
+                      onChange={(e) => { setWifiDescription(e.target.value); setWifiErrors((p) => ({ ...p, description: false })); }}
+                      className={`mt-1 block w-full rounded-lg border bg-white px-3 py-2 text-base-900 shadow-sm focus:outline-none ${wifiErrors.description ? 'border-red-400 focus:border-red-500' : 'border-base-300 focus:border-base-500'}`}
                     />
+                    {wifiErrors.description && <span className="mt-1 block text-xs text-red-600">Påkrevd</span>}
                   </label>
                 </div>
               )}
