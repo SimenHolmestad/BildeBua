@@ -167,16 +167,22 @@ const AdminPage = () => {
         <section className="mt-8">
           <h2 className="font-display text-2xl text-base-900">Album</h2>
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {availableAlbums.map((album) => (
-              <Link
-                key={album.name}
-                to={routes.adminAlbumPage(album.name)}
-                className="flex items-center justify-between rounded-xl border border-base-200 bg-base-100 px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-soft"
-              >
-                <span className="font-display text-lg text-base-900">{album.name}</span>
-                <span className="text-sm text-base-500">Administrer &rarr;</span>
-              </Link>
-            ))}
+            {availableAlbums.map((album) => {
+              const isForced = forcedAlbum !== '' && album.name === forcedAlbum;
+              return (
+                <Link
+                  key={album.name}
+                  to={routes.adminAlbumPage(album.name)}
+                  className={`flex items-center justify-between rounded-xl border px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-soft ${isForced ? 'border-base-400 bg-base-200' : 'border-base-200 bg-base-100'}`}
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="font-display text-lg text-base-900">{album.name}</span>
+                    {isForced && <span className="rounded-full bg-base-700 px-2 py-0.5 text-xs font-medium text-white">Tvunget</span>}
+                  </span>
+                  <span className="text-sm text-base-500">Administrer &rarr;</span>
+                </Link>
+              );
+            })}
             {availableAlbums.length === 0 && (
               <p className="text-base-600">Ingen album opprettet ennå.</p>
             )}
