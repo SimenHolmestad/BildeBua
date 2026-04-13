@@ -3,17 +3,17 @@ import os
 import platform
 import subprocess
 
-# pyautogui requires DISPLAY to be set on Linux even if we only use it for screen size
-if "DISPLAY" not in os.environ:
-    os.environ["DISPLAY"] = ":0"
-import pyautogui
-
-
 def get_display_size() -> tuple[int, int]:
     default_width = 1920
     default_height = 1080
 
     try:
+        # Lazy import: pyautogui connects to X11 on import, which fails
+        # when running scripts that don't need display access (e.g. deploy).
+        if "DISPLAY" not in os.environ:
+            os.environ["DISPLAY"] = ":0"
+        import pyautogui
+
         width, height = pyautogui.size()
 
         if width <= 0 or height <= 0:

@@ -66,22 +66,19 @@ def show_dslr_preview(preview_seconds: int) -> None:
     )
 
 
-def configure_dslr_capture_target() -> None:
-    # Save captures to the camera card so the raw file remains on the camera.
+def capture_dslr_still(capture_iso: int, base_image_path: str) -> None:
+    # Combine all config and capture into a single gphoto2 invocation
+    # to avoid repeated USB connect/disconnect overhead.
     command_result = subprocess.run(
-        ["gphoto2", "--set-config", "capturetarget=1"],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-    if command_result.returncode != 0:
-        raise ImageCaptureError("Image was not captured")
-
-
-def capture_dslr_still(base_image_path: str) -> None:
-    # Download the image for the app while keeping the raw file on the camera.
-    command_result = subprocess.run(
-        ["gphoto2", "--capture-image-and-download", "--filename", f"{base_image_path}.%C", "--keep-raw"],
+        [
+            "gphoto2",
+            "--set-config", "capturetarget=1",
+            "--set-config", f"iso={capture_iso}",
+            "--capture-image-and-download",
+            "--filename", f"{base_image_path}.%C",
+            "--keep-raw",
+            "--set-config", "viewfinder=0",
+        ],
         check=False,
         capture_output=True,
         text=True,
@@ -117,9 +114,7 @@ def capture_dslr_image(camera_config: CameraConfig, base_image_path: str) -> Non
         overlay_thread.start()
         show_dslr_preview(camera_config.preview_seconds)
         overlay_thread.join(timeout=2)
-        configure_dslr_capture_target()
-        set_dslr_iso(camera_config.dslr_capture_iso)
-        capture_dslr_still(base_image_path)
+        capture_dslr_still(camera_config.dslr_capture_iso, base_image_path)
     finally:
         restore_fullscreen_on_mac(frontmost_app_on_mac)
         stop_process(overlay_process)

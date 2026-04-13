@@ -28,6 +28,7 @@ def run_deploy(config_file: str) -> None:
         f.write(systemd_file_content)
 
     ensure_static_permissions(static_folder_name)
+    ensure_config_permissions(config_file)
     start_or_restart_systemd_process()
     print("System started")
     print("To get system status, run \"sudo systemctl status bildebua\"")
@@ -82,6 +83,16 @@ def ensure_static_permissions(static_folder_name: str) -> None:
         ["chown", "-R", f"{username}:{username}", static_dir],
         check=True
     )
+
+def ensure_config_permissions(config_file: str) -> None:
+    username = os.environ["SUDO_USER"]
+    resolved = _resolve_config_file_path(os.getcwd(), config_file)
+    if os.path.exists(resolved):
+        subprocess.run(
+            ["chown", f"{username}:{username}", resolved],
+            check=True
+        )
+
 
 def _resolve_config_file_path(working_directory: str, config_file: str) -> str:
     if os.path.isabs(config_file):
