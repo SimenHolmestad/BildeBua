@@ -8,6 +8,36 @@ import { useAdminConfig, useAvailableAlbums, updateAdminConfigAndRefresh } from 
 import { useGlobalError } from 'contexts/GlobalErrorContext';
 import type { AdminConfigUpdateRequest, CameraConfig, DisplayConfig, QrCodeConfig, WifiConfig } from 'api';
 
+const NumberInput = ({ value, onChange, min, ...props }: {
+  value: number;
+  onChange: (n: number) => void;
+  min?: number;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'type' | 'min'>) => {
+  const [raw, setRaw] = React.useState(String(value));
+  React.useEffect(() => { setRaw(String(value)); }, [value]);
+
+  return (
+    <input
+      type="number"
+      min={min}
+      {...props}
+      value={raw}
+      onChange={(e) => {
+        setRaw(e.target.value);
+        const n = Number(e.target.value);
+        if (e.target.value !== '' && !isNaN(n)) onChange(n);
+      }}
+      onBlur={() => {
+        if (raw === '' || isNaN(Number(raw))) {
+          const fallback = min ?? 0;
+          setRaw(String(fallback));
+          onChange(fallback);
+        }
+      }}
+    />
+  );
+};
+
 const AdminPage = () => {
   const { adminConfig, isLoading: configLoading } = useAdminConfig();
   const { albumInfo, isLoading: albumsLoading } = useAvailableAlbums();
@@ -33,7 +63,7 @@ const AdminPage = () => {
   const [wifiPassword, setWifiPassword] = React.useState('');
   const [wifiDescription, setWifiDescription] = React.useState('');
 
-  React.useEffect(() => {
+  const resetToConfig = React.useCallback(() => {
     if (!adminConfig) return;
     setCameraType(adminConfig.camera.camera_type ?? 'dummy');
     setPreviewSeconds(adminConfig.camera.preview_seconds ?? 3);
@@ -50,7 +80,10 @@ const AdminPage = () => {
     setWifiProtocol(adminConfig.wifi_qr_code.protocol ?? '');
     setWifiPassword(adminConfig.wifi_qr_code.password ?? '');
     setWifiDescription(adminConfig.wifi_qr_code.description ?? '');
+    setWifiErrors({});
   }, [adminConfig]);
+
+  React.useEffect(() => { resetToConfig(); }, [resetToConfig]);
 
   const hasChanges = adminConfig != null && (
     cameraType !== (adminConfig.camera.camera_type ?? 'dummy') ||
@@ -249,11 +282,10 @@ const AdminPage = () => {
               </label>
               <label className="block">
                 <span className="text-sm font-medium text-base-700">Forhåndsvisning (sek)</span>
-                <input
-                  type="number"
+                <NumberInput
                   min={0}
                   value={previewSeconds}
-                  onChange={(e) => setPreviewSeconds(Number(e.target.value))}
+                  onChange={setPreviewSeconds}
                   className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
                 />
               </label>
@@ -270,21 +302,19 @@ const AdminPage = () => {
               </label>
               <label className="block">
                 <span className="text-sm font-medium text-base-700">DSLR forhåndsvisning ISO</span>
-                <input
-                  type="number"
+                <NumberInput
                   min={1}
                   value={dslrPreviewIso}
-                  onChange={(e) => setDslrPreviewIso(Number(e.target.value))}
+                  onChange={setDslrPreviewIso}
                   className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
                 />
               </label>
               <label className="block">
                 <span className="text-sm font-medium text-base-700">DSLR opptak ISO</span>
-                <input
-                  type="number"
+                <NumberInput
                   min={1}
                   value={dslrCaptureIso}
-                  onChange={(e) => setDslrCaptureIso(Number(e.target.value))}
+                  onChange={setDslrCaptureIso}
                   className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
                 />
               </label>
@@ -306,11 +336,10 @@ const AdminPage = () => {
             <div className="mt-4">
               <label className="block">
                 <span className="text-sm font-medium text-base-700">Visningstid for nye bilder (sek)</span>
-                <input
-                  type="number"
+                <NumberInput
                   min={1}
                   value={overlaySeconds}
-                  onChange={(e) => setOverlaySeconds(Number(e.target.value))}
+                  onChange={setOverlaySeconds}
                   className="mt-1 block w-full max-w-xs rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
                 />
                 <span className="mt-1 block text-xs text-base-500">Hvor lenge nye bilder vises over QR-koder og lysbildeshow</span>
@@ -410,6 +439,15 @@ const AdminPage = () => {
             >
               {saving ? 'Lagrer...' : 'Lagre innstillinger'}
             </button>
+            {hasChanges && !saving && (
+              <button
+                type="button"
+                onClick={resetToConfig}
+                className="rounded-xl bg-red-600 px-6 py-3 font-display text-lg text-white shadow-sm transition hover:bg-red-700"
+              >
+                Avbryt
+              </button>
+            )}
             {saveSuccess && (
               <span className="text-sm font-medium text-green-600">Innstillinger lagret!</span>
             )}

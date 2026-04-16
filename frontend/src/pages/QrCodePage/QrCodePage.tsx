@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import Header from 'components/Header';
+import LastImage from 'components/LastImage';
 import NotFound from 'components/NotFound';
 import QrCode from 'components/QrCode';
 import { useAdminConfig } from 'hooks/swr';
@@ -7,8 +8,10 @@ import { deriveQrCodes } from 'utils/qrCodeUtils';
 
 const QR_REFRESH_INTERVAL = 5000;
 
-const QrCodePage = () => {
+const QrCodePage = ({ hideOverlay = false }: { hideOverlay?: boolean }) => {
   const { adminConfig, isLoading } = useAdminConfig(QR_REFRESH_INTERVAL);
+  const forcedAlbum = adminConfig?.forced_album ?? null;
+  const overlayTime = (adminConfig?.display.overlay_seconds ?? 20) * 1000;
 
   const qrCodeData = useMemo(() => {
     if (!adminConfig) return null;
@@ -39,6 +42,7 @@ const QrCodePage = () => {
 
   return (
     <>
+      {!hideOverlay && forcedAlbum && <LastImage albumName={forcedAlbum} overlay={true} overlayTime={overlayTime} />}
       <Header />
       <main className="mx-auto flex min-h-[90vh] w-full max-w-6xl items-center px-4 py-10 sm:px-6 lg:px-8">
         <div className={`grid w-full gap-6 ${qrCodeData.length === 1 ? "max-w-lg mx-auto" : "md:grid-cols-2"}`}>

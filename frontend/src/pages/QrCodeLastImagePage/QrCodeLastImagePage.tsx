@@ -11,7 +11,7 @@ const QrCodeLastImagePage = () => {
   return (
     <>
       {!isRedirecting && <LastImage overlay={true} overlayTime={overlayTime} />}
-      <QrCodePage />
+      <QrCodePage hideOverlay />
     </>
   );
 };

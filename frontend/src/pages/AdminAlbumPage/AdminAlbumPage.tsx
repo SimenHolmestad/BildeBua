@@ -3,14 +3,22 @@ import Footer from 'components/Footer';
 import NotFound from 'components/NotFound';
 import { Link, useNavigate } from 'react-router-dom';
 import routes from 'routes';
-import { useAdminAlbum, useAlbumName, deleteAlbumAndRefresh, deleteImageAndRefresh } from 'hooks/swr';
+import { useAdminAlbum, useAdminConfig, useAlbumName, deleteAlbumAndRefresh, deleteImageAndRefresh, updateAdminConfigAndRefresh } from 'hooks/swr';
 import { useGlobalError } from 'contexts/GlobalErrorContext';
 
 const AdminAlbumPage = () => {
   const albumName = useAlbumName();
   const { albumInfo, isLoading } = useAdminAlbum();
+  const { adminConfig } = useAdminConfig();
   const { showError } = useGlobalError();
   const navigate = useNavigate();
+
+  const isForcedAlbum = adminConfig?.forced_album === albumName;
+
+  const handleToggleForcedAlbum = async () => {
+    const forced_album = isForcedAlbum ? '' : albumName;
+    await updateAdminConfigAndRefresh({ forced_album }, showError);
+  };
 
   const handleDeleteAlbum = async () => {
     if (!window.confirm(`Er du sikker på at du vil slette albumet "${albumName}" og alle bildene?`)) return;
@@ -68,6 +76,13 @@ const AdminAlbumPage = () => {
           >
             Gå til album-side
           </a>
+          <button
+            type="button"
+            onClick={handleToggleForcedAlbum}
+            className="rounded-xl border border-base-300 bg-base-100 px-6 py-3 font-display text-lg text-base-900 shadow-sm transition hover:bg-base-200"
+          >
+            {isForcedAlbum ? 'Fjern som tvunget album' : 'Sett som tvunget album'}
+          </button>
           <button
             type="button"
             onClick={handleDeleteAlbum}
