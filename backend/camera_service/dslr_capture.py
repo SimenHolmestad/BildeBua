@@ -54,7 +54,7 @@ def show_dslr_preview(preview_seconds: int) -> None:
     gphoto2_command = f"gphoto2 --capture-movie={preview_seconds + 1}s --stdout"
     common_ffplay_parameters = " ".join(get_common_ffplay_parameters())
     ffplay_command = (
-        "ffplay -fs -fflags nobuffer -flags low_delay -framedrop -vf setpts=0 "
+        "ffplay -fs -fflags nobuffer -flags low_delay -framedrop -vf setpts=0,hflip "
         f"{common_ffplay_parameters} -f mjpeg -i - -autoexit"
     )
 
