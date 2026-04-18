@@ -7,9 +7,10 @@ import routes from 'routes';
 type NewAlbumDialogProps = {
   open: boolean;
   handleClose: () => void;
+  getRedirectPath?: (albumName: string) => string;
 };
 
-const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
+const NewAlbumDialog = ({ open, handleClose, getRedirectPath = routes.albumPage }: NewAlbumDialogProps) => {
   const [albumName, setAlbumName] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [redirectAlbum, setRedirectAlbum] = React.useState<string | null>(null);
@@ -50,7 +51,7 @@ const NewAlbumDialog = ({ open, handleClose }: NewAlbumDialogProps) => {
   };
 
   if (redirectAlbum) {
-    return <Navigate to={routes.albumPage(redirectAlbum)} replace />;
+    return <Navigate to={getRedirectPath(redirectAlbum)} replace />;
   }
 
   if (!open) {

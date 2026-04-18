@@ -360,10 +360,6 @@ export type CreateAlbumData = {
 
 export type CreateAlbumErrors = {
     /**
-     * Write access is blocked because a forced album is configured.
-     */
-    403: ErrorResponse;
-    /**
      * Validation Error
      */
     422: HttpValidationError;

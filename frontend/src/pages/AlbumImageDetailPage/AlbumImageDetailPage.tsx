@@ -58,7 +58,7 @@ const AlbumImageDetailPage = () => {
           to={routes.albumPage(albumName)}
           className="mt-5 inline-flex items-center rounded-xl bg-base-600 px-5 py-3 text-[22px] font-semibold text-base-50 shadow-soft transition hover:bg-base-700"
         >
-          Tilbake
+          Tilbake til oversikt
         </Link>
         </div>
         <Footer />
@@ -92,7 +92,7 @@ const AlbumImageDetailPage = () => {
       <Header />
       <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <Link to={routes.albumPage(albumName)} className="inline-flex items-center text-[22px] font-semibold text-base-700 hover:text-base-900">
-          ← Tilbake
+          ← Tilbake til oversikt
         </Link>
 
         <section className="relative mt-4 overflow-hidden rounded-3xl border border-base-200 bg-black/90 shadow-soft">

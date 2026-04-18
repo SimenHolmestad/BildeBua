@@ -1,9 +1,10 @@
+import React from 'react';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
 import NotFound from 'components/NotFound';
 import { Link, useNavigate } from 'react-router-dom';
 import routes from 'routes';
-import { useAdminAlbum, useAdminConfig, useAlbumName, deleteAlbumAndRefresh, deleteImageAndRefresh, updateAdminConfigAndRefresh } from 'hooks/swr';
+import { useAdminAlbum, useAdminConfig, useAlbumName, deleteAlbumAndRefresh, deleteImageAndRefresh, updateAdminConfigAndRefresh, updateAlbumDescriptionAndRefresh } from 'hooks/swr';
 import { useGlobalError } from 'contexts/GlobalErrorContext';
 
 const AdminAlbumPage = () => {
@@ -13,11 +14,29 @@ const AdminAlbumPage = () => {
   const { showError } = useGlobalError();
   const navigate = useNavigate();
 
+  const [isEditingDescription, setIsEditingDescription] = React.useState(false);
+  const [descriptionDraft, setDescriptionDraft] = React.useState('');
+  const [savingDescription, setSavingDescription] = React.useState(false);
+
   const isForcedAlbum = adminConfig?.forced_album === albumName;
 
   const handleToggleForcedAlbum = async () => {
     const forced_album = isForcedAlbum ? '' : albumName;
     await updateAdminConfigAndRefresh({ forced_album }, showError);
+  };
+
+  const handleStartEditDescription = () => {
+    setDescriptionDraft(albumInfo?.description ?? '');
+    setIsEditingDescription(true);
+  };
+
+  const handleSaveDescription = async () => {
+    setSavingDescription(true);
+    const result = await updateAlbumDescriptionAndRefresh(albumName, descriptionDraft.trim(), showError);
+    setSavingDescription(false);
+    if (result) {
+      setIsEditingDescription(false);
+    }
   };
 
   const handleDeleteAlbum = async () => {
@@ -62,10 +81,49 @@ const AdminAlbumPage = () => {
           &larr; Tilbake til admin
         </Link>
         <h1 className="mt-4 font-display text-4xl text-base-900">{albumName}</h1>
-        {albumInfo.description && (
-          <p className="mt-2 text-base-600">{albumInfo.description}</p>
+        {isEditingDescription ? (
+          <div className="mt-2 space-y-2">
+            <textarea
+              value={descriptionDraft}
+              onChange={(event) => setDescriptionDraft(event.target.value)}
+              rows={3}
+              autoFocus
+              placeholder="Valgfri beskrivelse"
+              className="w-full rounded-xl border border-base-300 bg-white px-3 py-2.5 text-base text-base-900 outline-none ring-base-500 transition placeholder:text-base-400 focus:ring-2"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleSaveDescription}
+                disabled={savingDescription}
+                className="rounded-xl bg-base-600 px-4 py-2 text-sm font-semibold text-base-50 transition hover:bg-base-700 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {savingDescription ? 'Lagrer...' : 'Lagre'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditingDescription(false)}
+                disabled={savingDescription}
+                className="rounded-xl border border-base-300 px-4 py-2 text-sm font-semibold text-base-800 transition hover:bg-base-100 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                Avbryt
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-2 flex items-start gap-3">
+            <p className="text-base-600">
+              {albumInfo.description || <span className="italic text-base-400">Ingen beskrivelse</span>}
+            </p>
+            <button
+              type="button"
+              onClick={handleStartEditDescription}
+              className="text-sm text-base-500 underline-offset-2 hover:text-base-700 hover:underline"
+            >
+              Rediger
+            </button>
+          </div>
         )}
-        <p className="mt-2 text-sm text-base-500">{images.length} bilder</p>
 
         <div className="mt-4 flex flex-wrap gap-3">
           <a
@@ -110,7 +168,9 @@ const AdminAlbumPage = () => {
           </div>
         </div>
 
-        <div className="mt-8 space-y-6">
+        <p className="mt-6 text-sm text-base-500">{images.length} bilder i album</p>
+
+        <div className="mt-4 space-y-6">
           {images.map((image) => (
             <div key={image.image_number} data-testid="admin-image" className="flex flex-col gap-3 rounded-2xl border border-base-200 bg-base-100 p-3 shadow-sm sm:flex-row sm:items-center sm:gap-6 sm:p-4">
               <div className="overflow-hidden rounded-xl sm:w-2/3">

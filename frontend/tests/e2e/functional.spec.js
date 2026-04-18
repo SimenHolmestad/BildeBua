@@ -45,6 +45,21 @@ test("can capture an image in an album", async ({ page, request }) => {
   await expect(page.getByText("Ingen bilder ennå")).toHaveCount(0);
 });
 
+test("can create an album from the admin page", async ({ page }) => {
+  const albumName = "e2e-admin-new-album";
+
+  await page.goto("/admin");
+
+  await expect(page.getByRole("heading", { name: "Admin" })).toBeVisible();
+  await page.getByRole("button", { name: /Lag nytt album/i }).click();
+  await page.getByLabel("Albumnavn").fill(albumName);
+  await page.getByLabel("Beskrivelse", { exact: true }).fill("Laget fra admin");
+  await page.getByRole("button", { name: "Opprett album" }).click();
+
+  await expect(page).toHaveURL(new RegExp(`/admin/album/${albumName}$`));
+  await expect(page.getByRole("heading", { name: albumName })).toBeVisible();
+});
+
 test("can view admin settings page", async ({ page }) => {
   await page.goto("/admin");
 
@@ -58,6 +73,22 @@ test("can view admin settings page", async ({ page }) => {
   // Change a setting and verify the save button appears
   await page.getByLabel("Forhåndsvisning (sek)").fill("5");
   await expect(page.getByRole("button", { name: /Lagre innstillinger/i })).toBeVisible();
+});
+
+test("can edit album description from admin album page", async ({ page, request }) => {
+  const albumName = "e2e-admin-edit-desc";
+  await createAlbum(request, albumName, "Opprinnelig beskrivelse");
+
+  await page.goto(`/admin/album/${albumName}`);
+  await expect(page.getByText("Opprinnelig beskrivelse")).toBeVisible();
+
+  await page.getByRole("button", { name: "Rediger" }).click();
+  const textarea = page.getByRole("textbox");
+  await textarea.fill("Ny beskrivelse");
+  await page.getByRole("button", { name: "Lagre" }).click();
+
+  await expect(page.getByText("Ny beskrivelse")).toBeVisible();
+  await expect(page.getByText("Opprinnelig beskrivelse")).toHaveCount(0);
 });
 
 test("can delete an image from admin album page", async ({ page, request }) => {

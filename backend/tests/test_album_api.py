@@ -114,11 +114,13 @@ class AlbumApiTestCase(unittest.TestCase):
             "description": "A very nice album indeed"
         }
         response = self.test_client.post("/albums/", json=PARAMS)
-        json_response = response.json()
 
-        expected_response = {"error": "Illegal operation. The only accessible album is album2."}
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(json_response, expected_response)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            "album_name": "album1",
+            "album_url": "/albums/album1",
+        })
+        self.assertTrue(self.album_service.album_exists("album1"))
 
     def test_response_from_creating_album(self) -> None:
         PARAMS = {

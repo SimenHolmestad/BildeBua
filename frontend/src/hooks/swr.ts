@@ -91,6 +91,28 @@ export const createAlbumAndRefresh = async (
   );
 };
 
+export const updateAlbumDescriptionAndRefresh = async (
+  albumName: string,
+  description: string,
+  showError: ShowErrorFn,
+): Promise<AlbumCreatedResponse | undefined> => {
+  return runWithGlobalApiErrorHandling(
+    async () => {
+      const updated = await createAlbum({
+        body: { album_name: albumName, description },
+      });
+
+      await Promise.all([
+        mutate(swrKeys.adminAlbum(albumName)),
+        mutate(swrKeys.albumInfo(albumName)),
+      ]);
+      return updated;
+    },
+    showError,
+    'Kunne ikke oppdatere beskrivelse',
+  );
+};
+
 export const captureImageToAlbumAndRefresh = async (
   albumName: string,
   showError: ShowErrorFn,

@@ -2,6 +2,7 @@ import React from 'react';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
 import NotFound from 'components/NotFound';
+import NewAlbumDialog from 'components/NewAlbumDialog';
 import { Link } from 'react-router-dom';
 import routes from 'routes';
 import { useAdminConfig, useAvailableAlbums, updateAdminConfigAndRefresh } from 'hooks/swr';
@@ -46,6 +47,7 @@ const AdminPage = () => {
   const [saveSuccess, setSaveSuccess] = React.useState(false);
   const [slidingOut, setSlidingOut] = React.useState(false);
   const [wifiErrors, setWifiErrors] = React.useState<Record<string, boolean>>({});
+  const [newAlbumDialogOpen, setNewAlbumDialogOpen] = React.useState(false);
 
   const [cameraType, setCameraType] = React.useState('');
   const [previewSeconds, setPreviewSeconds] = React.useState(3);
@@ -216,6 +218,17 @@ const AdminPage = () => {
                 </Link>
               );
             })}
+            <button
+              type="button"
+              onClick={() => setNewAlbumDialogOpen(true)}
+              className="flex items-center justify-between rounded-xl border border-dashed border-base-400 bg-base-50 px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:bg-base-100 hover:shadow-soft"
+            >
+              <span className="flex items-center gap-2">
+                <span className="text-xl leading-none text-base-600">＋</span>
+                <span className="font-display text-lg text-base-900">Lag nytt album</span>
+              </span>
+              <span className="text-sm text-base-600">Opprett &rarr;</span>
+            </button>
             {availableAlbums.length === 0 && (
               <p className="text-base-600">Ingen album opprettet ennå.</p>
             )}
@@ -427,6 +440,11 @@ const AdminPage = () => {
           </section>
         </form>
       </main>
+      <NewAlbumDialog
+        open={newAlbumDialogOpen}
+        handleClose={() => setNewAlbumDialogOpen(false)}
+        getRedirectPath={routes.adminAlbumPage}
+      />
       <Footer />
       {(hasChanges || saving || saveSuccess || slidingOut) && (
         <div className={`sticky bottom-0 z-40 border-t border-base-200 bg-base-50/95 backdrop-blur ${slidingOut ? 'animate-slide-down-out' : 'animate-slide-up-in'}`}>

@@ -5,7 +5,7 @@ import NotFound from 'components/NotFound';
 import { useAvailableAlbums } from 'hooks/swr';
 import { Link, Navigate } from 'react-router-dom';
 import routes from 'routes';
-import NewAlbumDialog from './components/NewAlbumDialog';
+import NewAlbumDialog from 'components/NewAlbumDialog';
 
 const FrontPage = () => {
   const [dialogOpen, setDialogOpen] = React.useState(false);

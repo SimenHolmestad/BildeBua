@@ -118,12 +118,6 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
             "Create the album if it does not exist. "
             "If `description` is provided, update the album description."
         ),
-        responses={
-            status.HTTP_403_FORBIDDEN: {
-                "model": ErrorResponse,
-                "description": "Write access is blocked because a forced album is configured."
-            }
-        }
     )
     def create_album(request_body: AlbumCreateRequest, request: Request) -> AlbumCreatedResponse | JSONResponse:
         return create_or_update_album(request_body, request)
@@ -242,9 +236,6 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
         request_body: AlbumCreateRequest,
         request: Request
     ) -> AlbumCreatedResponse | JSONResponse:
-        if config_manager.config.albums.forced_album:
-            return unaccessible_album_error_message()
-
         album_name = request_body.album_name
         album_service.get_or_create_album(album_name)
 
