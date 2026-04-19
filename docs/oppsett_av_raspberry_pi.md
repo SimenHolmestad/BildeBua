@@ -1,4 +1,4 @@
-[Tilbake til readme](../readme.md)
+[Tilbake til readme](../readme.md#bildebua)
 
 # Oppsett av Raspberry PI
 
@@ -38,13 +38,25 @@ source .venv/bin/activate
 pip3 install -r python-requirements.txt
 ```
 
-Merk at bruk av speilreflekskamera krever [ekstra installasjonssteg](#the-dslr-camera-modules).
-
 ## 5. Installér gphoto2 (til speilrefleks)
 Den enkleste måten å installere gphoto2 på Raspberry PI ser ut til å være følgende kommando:
 ```
 wget https://raw.githubusercontent.com/gonzalo/gphoto2-updater/master/gphoto2-updater.sh && chmod +x gphoto2-updater.sh && sudo ./gphoto2-updater.sh
 ```
 
-# Neste steg
-- [Deploy til Raspberry PI](deploy_til_raspberry_pi.md)
+## 6. Deploy via systemctl
+
+For å kjøre BildeBua via systemctl, bruk hjelpescriptet `rpi_deploy`:
+
+```
+sudo .venv/bin/python -m scripts.rpi_deploy
+```
+
+Dette burde åpne en browser på enheten med applikasjonen kjørende inni. Når dette kjører, gå til `/admin` for å konfigurere BildeBua videre.
+
+## Optional: Deploy med ny kode
+
+For å deploye ny kode (hvis det har kommet nye commits i repoet) kan man bruke hjelpescriptet `rpi_update_and_redeploy`:
+```
+sudo .venv/bin/python -m scripts.rpi_update_and_redeploy
+```

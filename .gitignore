@@ -25,7 +25,4 @@ frontend/test-results/
 
 .dir-locals.el
 
-configs/*
-!configs/example_config.json
-
 config.json

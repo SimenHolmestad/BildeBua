@@ -9,7 +9,7 @@ def run_deploy(config_file: str) -> None:
     """Deploy the application to Systemd."""
     if os.geteuid() != 0:
         print("The deploy script must be run as root.")
-        print("Run script with \"sudo .venv/bin/python scripts/deploy.py\"")
+        print("Run script with \"sudo .venv/bin/python -m scripts.rpi_deploy\"")
         return
 
     config_manager = load_config(config_file)

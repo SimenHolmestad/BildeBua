@@ -2,7 +2,7 @@ import argparse
 import os
 import subprocess
 from backend.core.config_loader import load_config
-from scripts.deploy import (
+from scripts.rpi_deploy import (
     create_systemd_config_file_content,
     ensure_static_permissions,
     get_systemd_file_path,
@@ -14,7 +14,7 @@ from scripts.shared.utils import build_frontend
 def run_update_and_redeploy(config_file: str, skip_frontend_build: bool) -> None:
     if os.geteuid() != 0:
         print("The update and redploy script must be run as root.")
-        print("Run script with \"sudo .venv/bin/python -m scripts.update_and_redeploy")
+        print("Run script with \"sudo .venv/bin/python -m scripts.rpi_update_and_redeploy\"")
         return
 
     subprocess.run("git reset --hard HEAD", shell=True)

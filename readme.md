@@ -1,30 +1,14 @@
 # BildeBua
-BildeBua er en hjemmelaget "Photobooth" til bruk med Raspberry PI.
+BildeBua er en hjemmelaget "Photobooth" der man kan scanne en QR-kode og bruke mobilen til å ta et bilde.
 
 ![BildeBua demo gif](docs/images/demo.gif)
 
-For å sette opp BildeBua trenger du følgende:
+Du kan bruke BildeBua både med webkamera på Mac, Raspberry PI Camera Module eller speilreflekskamera. Ideelt sett kjører man på en Raspberry PI med speilrefleks.
 
-- Raspberry PI
-- Et kamera (Raspberry PI Camera Module eller speilrefleks)
-- En skjerm
-- Kabler for kamera og skjerm
-- Et Wifi-nettverk
+BildeBua er ment å kjøres på lokalt WiFi-nett for enkelheten og sikkerhetens skyld. Hvis det er brukere som ikke har WiFi-passordet fra før kan BildeBua vise en WiFi-QR-kode etter man har lagt inn WiFi-navn og passord.
 
-# Guider
-Oppsett:
-- [Lokal utvikling](docs/lokal_utvikling.md)
-- [Oppsett av Raspberry PI](docs/oppsett_av_raspberry_pi.md)
-- [Deploy til Raspberry PI](docs/deploy_til_raspberry_pi.md)
-- [Utvikling på Raspberry PI](docs/utvkling_paa_raspberry_pi.md)
+Når du først har fått applikasjonen opp og kjøre, er det ganske lett å endre på instillinger fra admin-siden.
 
-Andre nyttige lenker:
-- [Hvordan sette opp bildevisning på andre skjermer](docs/oppsett_ekstra_skjermer.md)
-- [Wifi-setup på hovedskjerm](docs/vis_wifi_qr_kode_pa_hovedskjerm.md)
-- [Nedlasting av bilder fra Raspberry PI](docs/nedlasting_av_bilder_fra_rpi.md)
-- [Generere frontend API-typer](docs/generer_frontend_api_typer.md)
-
-# Kameraoppsett
-`BILDEBUA_CAMERA__CAMERA_TYPE` stotter `dummy`, `rpicam`, `dslr` og `webcam`.
-
-`webcam` bruker `ffplay` for a vise forhåndsvisning i fullskjerm i 3 sekunder og `imagesnap` fra PATH for å ta bildet fra standardkameraet.
+# Docs
+- [Oppsett for lokal utvikling](docs/lokal_utvikling.md#lokal-utvikling)
+- [Oppsett på Raspberry PI fra scratch](docs/oppsett_av_raspberry_pi.md)

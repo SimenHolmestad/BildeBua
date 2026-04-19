@@ -1,4 +1,4 @@
-[Tilbake til readme](../readme.md)
+[Tilbake til readme](../readme.md#bildebua)
 
 # Lokal utvikling
 Under utvikling vil applikasjonen lage bilder som dette når det ikke er noe kamera koblet til:
@@ -6,9 +6,8 @@ Under utvikling vil applikasjonen lage bilder som dette når det ikke er noe kam
 ![Dummy demo circle image](images/dummy_demo_image.png)
 
 # Installering av avhengigheter
-Du trenger `gphoto2` for a kunne bruke applikasjonen med speilreflekskamera. Appen laster ned bildet den skal bruke, mens raw-filen blir liggende igjen pa kameraet. Du trenger ogsa `zbar` for a kunne kjore deler av testene:
+Du trenger `gphoto2` for a kunne bruke applikasjonen med speilreflekskamera.
 ```
-brew install zbar
 brew install gphoto2
 ```
 
@@ -39,9 +38,8 @@ python3 -m scripts.run_application
 ```
 
 # Kjøre tester
-For å kjøre tester må du ha installert zbar (kan gjøres med `brew install zbar`)
 ```
-export DYLD_LIBRARY_PATH=/opt/homebrew/lib && python3 -m pytest backend/tests
+python3 -m pytest backend/tests
 ```
 
 For å kjøre UI-tester med Playwright:
@@ -52,8 +50,14 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Playwright-testene starter frontend og en egen backend i dummy-kamera-modus med `.env.e2e`.
+Playwright-testene starter frontend og en egen backend i dummy-kamera-modus med `config.e2e.json`.
 For å oppdatere snapshot-baseliner for visuelle tester:
 ```
 npm run test:e2e:update-snapshots
+```
+
+# Kjøre med webkamera
+Hvis du vil kjøre applikasjonen med webkameraet på Mac-en, må du ha `ffplay` og `imagesnap` tilgjengelig i PATH. `ffplay` brukes til å vise forhåndsvisning i fullskjerm i 3 sekunder, og `imagesnap` tar selve bildet fra standardkameraet.
+```
+brew install ffmpeg imagesnap
 ```
