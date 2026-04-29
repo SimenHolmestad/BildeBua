@@ -12,6 +12,7 @@ export type AdminConfigResponse = {
     forced_album: string | null;
     qr_codes: QrCodeConfig;
     wifi_qr_code: WifiConfig;
+    banner: BannerConfig;
 };
 
 /**
@@ -27,6 +28,7 @@ export type AdminConfigUpdateRequest = {
     forced_album?: string | null;
     qr_codes?: QrCodeConfig | null;
     wifi_qr_code?: WifiConfig | null;
+    banner?: BannerConfig | null;
 };
 
 /**
@@ -154,6 +156,32 @@ export type AvailableAlbumsResponse = {
      * If set, this is the only album allowed for write/read operations.
      */
     forced_album?: string | null;
+};
+
+/**
+ * BannerConfig
+ */
+export type BannerConfig = {
+    /**
+     * Enabled
+     */
+    enabled?: boolean;
+    /**
+     * Text
+     */
+    text?: string;
+    /**
+     * Height Vh
+     */
+    height_vh?: number;
+    /**
+     * Image Count
+     */
+    image_count?: number;
+    /**
+     * Speed Px Per Sec
+     */
+    speed_px_per_sec?: number;
 };
 
 /**
@@ -655,5 +683,5 @@ export type GetAdminAlbumInfoResponses = {
 export type GetAdminAlbumInfoResponse = GetAdminAlbumInfoResponses[keyof GetAdminAlbumInfoResponses];
 
 export type ClientOptions = {
-    baseUrl: 'http://localhost:5000' | (string & {});
+    baseUrl: 'http://localhost:3000' | (string & {});
 };

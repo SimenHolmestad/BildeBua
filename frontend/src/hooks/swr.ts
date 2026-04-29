@@ -45,8 +45,9 @@ export const useAvailableAlbums = () => {
   return { albumInfo, isLoading };
 }
 
-export const useAlbumInfo = (refreshInterval = 0) => {
-  const albumName = useAlbumName();
+export const useAlbumInfo = (refreshInterval = 0, albumNameOverride?: string) => {
+  const routeAlbumName = useAlbumName();
+  const albumName = albumNameOverride ?? routeAlbumName;
   const { data: albumInfo, isLoading } = useSWR<AlbumInfoResponse>(
     albumName ? swrKeys.albumInfo(albumName) : null,
     () =>

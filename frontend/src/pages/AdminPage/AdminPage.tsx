@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import routes from 'routes';
 import { useAdminConfig, useAvailableAlbums, updateAdminConfigAndRefresh } from 'hooks/swr';
 import { useGlobalError } from 'contexts/GlobalErrorContext';
-import type { AdminConfigUpdateRequest, CameraConfig, DisplayConfig, QrCodeConfig, WifiConfig } from 'api';
+import type { AdminConfigUpdateRequest, BannerConfig, CameraConfig, DisplayConfig, QrCodeConfig, WifiConfig } from 'api';
 
 const NumberInput = ({ value, onChange, min, ...props }: {
   value: number;
@@ -64,6 +64,11 @@ const AdminPage = () => {
   const [wifiProtocol, setWifiProtocol] = React.useState('');
   const [wifiPassword, setWifiPassword] = React.useState('');
   const [wifiDescription, setWifiDescription] = React.useState('');
+  const [bannerEnabled, setBannerEnabled] = React.useState(false);
+  const [bannerText, setBannerText] = React.useState('Ta et bilde selv da vel!');
+  const [bannerHeightVh, setBannerHeightVh] = React.useState(15);
+  const [bannerImageCount, setBannerImageCount] = React.useState(30);
+  const [bannerSpeed, setBannerSpeed] = React.useState(120);
 
   const resetToConfig = React.useCallback(() => {
     if (!adminConfig) return;
@@ -82,6 +87,11 @@ const AdminPage = () => {
     setWifiProtocol(adminConfig.wifi_qr_code.protocol ?? '');
     setWifiPassword(adminConfig.wifi_qr_code.password ?? '');
     setWifiDescription(adminConfig.wifi_qr_code.description ?? '');
+    setBannerEnabled(adminConfig.banner.enabled ?? false);
+    setBannerText(adminConfig.banner.text ?? 'Ta et bilde selv da vel!');
+    setBannerHeightVh(adminConfig.banner.height_vh ?? 15);
+    setBannerImageCount(adminConfig.banner.image_count ?? 30);
+    setBannerSpeed(adminConfig.banner.speed_px_per_sec ?? 120);
     setWifiErrors({});
   }, [adminConfig]);
 
@@ -102,7 +112,12 @@ const AdminPage = () => {
     wifiName !== (adminConfig.wifi_qr_code.wifi_name ?? '') ||
     wifiProtocol !== (adminConfig.wifi_qr_code.protocol ?? '') ||
     wifiPassword !== (adminConfig.wifi_qr_code.password ?? '') ||
-    wifiDescription !== (adminConfig.wifi_qr_code.description ?? '')
+    wifiDescription !== (adminConfig.wifi_qr_code.description ?? '') ||
+    bannerEnabled !== (adminConfig.banner.enabled ?? false) ||
+    bannerText !== (adminConfig.banner.text ?? 'Ta et bilde selv da vel!') ||
+    bannerHeightVh !== (adminConfig.banner.height_vh ?? 15) ||
+    bannerImageCount !== (adminConfig.banner.image_count ?? 30) ||
+    bannerSpeed !== (adminConfig.banner.speed_px_per_sec ?? 120)
   );
 
   const handleSave = async () => {
@@ -146,12 +161,21 @@ const AdminPage = () => {
       description: wifiDescription,
     };
 
+    const banner: BannerConfig = {
+      enabled: bannerEnabled,
+      text: bannerText,
+      height_vh: bannerHeightVh,
+      image_count: bannerImageCount,
+      speed_px_per_sec: bannerSpeed,
+    };
+
     const updates: AdminConfigUpdateRequest = {
       camera,
       display,
       forced_album: forcedAlbum || '',
       qr_codes,
       wifi_qr_code,
+      banner,
     };
 
     const result = await updateAdminConfigAndRefresh(updates, showError);
@@ -433,6 +457,62 @@ const AdminPage = () => {
                       className={`mt-1 block w-full rounded-lg border bg-white px-3 py-2 text-base-900 shadow-sm focus:outline-none ${wifiErrors.description ? 'border-red-400 focus:border-red-500' : 'border-base-300 focus:border-base-500'}`}
                     />
                     {wifiErrors.description && <span className="mt-1 block text-xs text-red-600">Påkrevd</span>}
+                  </label>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Banner settings */}
+          <section className="rounded-2xl border border-base-200 bg-base-50/70 p-6 shadow-soft">
+            <h2 className="font-display text-2xl text-base-900">Banner på QR-kode-siden</h2>
+            <div className="mt-4 space-y-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={bannerEnabled}
+                  onChange={(e) => setBannerEnabled(e.target.checked)}
+                  className="h-4 w-4 rounded border-base-300"
+                />
+                <span className="text-sm font-medium text-base-700">Vis banner nederst på QR-kode-siden</span>
+              </label>
+              {bannerEnabled && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label className="block sm:col-span-2">
+                    <span className="text-sm font-medium text-base-700">Tekst i banneret</span>
+                    <input
+                      type="text"
+                      value={bannerText}
+                      onChange={(e) => setBannerText(e.target.value)}
+                      className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-base-700">Høyde (% av skjermhøyde)</span>
+                    <NumberInput
+                      min={5}
+                      value={bannerHeightVh}
+                      onChange={setBannerHeightVh}
+                      className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-base-700">Antall bilder per syklus</span>
+                    <NumberInput
+                      min={0}
+                      value={bannerImageCount}
+                      onChange={setBannerImageCount}
+                      className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-base-700">Hastighet (piksler per sekund)</span>
+                    <NumberInput
+                      min={10}
+                      value={bannerSpeed}
+                      onChange={setBannerSpeed}
+                      className="mt-1 block w-full rounded-lg border border-base-300 bg-white px-3 py-2 text-base-900 shadow-sm focus:border-base-500 focus:outline-none"
+                    />
                   </label>
                 </div>
               )}

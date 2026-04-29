@@ -31,6 +31,14 @@ class QrCodeConfig(BaseModel):
     url_qr_code_text: str = "Scan this qr code to go to BildeBua!"
 
 
+class BannerConfig(BaseModel):
+    enabled: bool = False
+    text: str = "Ta et bilde selv da vel!"
+    height_vh: int = Field(default=15, ge=5, le=50)
+    image_count: int = Field(default=30, ge=0)
+    speed_px_per_sec: int = Field(default=120, ge=10)
+
+
 class DummyCameraConfig(BaseModel):
     width: int = 1200
     height: int = 800
@@ -76,3 +84,4 @@ class Config(BaseModel):
     display: DisplayConfig = Field(default_factory=DisplayConfig)
     qr_codes: QrCodeConfig = Field(default_factory=QrCodeConfig)
     wifi_qr_code: WifiConfig = Field(default_factory=WifiConfig)
+    banner: BannerConfig = Field(default_factory=BannerConfig)

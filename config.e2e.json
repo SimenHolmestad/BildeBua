@@ -12,24 +12,35 @@
     "dslr_capture_iso": 200,
     "verbose_errors": true,
     "dummy_config": {
-      "width": 120,
-      "height": 80,
-      "number_of_circles": 5,
-      "min_circle_radius": 5,
-      "max_circle_radius": 15,
-      "seed": 42,
+      "width": 1200,
+      "height": 800,
+      "number_of_circles": 80,
+      "min_circle_radius": 30,
+      "max_circle_radius": 80,
+      "seed": null,
       "should_fail": false,
       "error_message": "This is a test error message"
     }
   },
   "qr_codes": {
-    "use_center_images": true
+    "use_center_images": true,
+    "url_qr_code_text": "Scan this qr code to go to BildeBua!"
   },
   "wifi_qr_code": {
     "enabled": false,
     "wifi_name": "",
-    "protocol": "",
+    "protocol": "WPA/WPA2",
     "password": "",
     "description": ""
+  },
+  "display": {
+    "overlay_seconds": 20
+  },
+  "banner": {
+    "enabled": false,
+    "text": "Ta et bilde selv da vel!",
+    "height_vh": 15,
+    "image_count": 8,
+    "speed_px_per_sec": 80
   }
 }

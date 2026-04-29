@@ -115,3 +115,37 @@ test("shows QR codes on the qr page", async ({ page }) => {
   await expect(page.getByText("Scan this qr code to go to BildeBua!")).toBeVisible();
   await expect(page.getByRole("article").getByRole("img")).toBeVisible();
 });
+
+test("can toggle banner on the qr page from admin", async ({ page, request }) => {
+  const albumName = "e2e-banner-album";
+  await createAlbum(request, albumName, "Album for banner-test");
+
+  // Banner is hidden by default
+  await page.goto("/qr");
+  await expect(page.locator('[data-testid="qr-code-banner"]')).toHaveCount(0);
+
+  // Enable banner + forced album from admin
+  await page.goto("/admin");
+  await page.getByLabel("Tving alle brukere til ett album").check();
+  await page.locator("select").first().selectOption(albumName);
+  await page.getByLabel("Vis banner nederst på QR-kode-siden").check();
+  await page.getByLabel("Tekst i banneret").fill("Bli med på moroa!");
+  await page.getByRole("button", { name: /Lagre innstillinger/i }).click();
+  await expect(page.getByText("Innstillinger lagret!")).toBeVisible();
+
+  // Banner now visible on /qr
+  await page.goto("/qr");
+  await expect(page.locator('[data-testid="qr-code-banner"]')).toBeVisible();
+  await expect(page.getByText("Bli med på moroa!")).toBeVisible();
+
+  // Disable banner and clear forced album to restore state
+  await page.goto("/admin");
+  await page.getByLabel("Vis banner nederst på QR-kode-siden").uncheck();
+  await page.getByLabel("Tving alle brukere til ett album").uncheck();
+  await page.getByRole("button", { name: /Lagre innstillinger/i }).click();
+  await expect(page.getByText("Innstillinger lagret!")).toBeVisible();
+
+  // Banner gone again
+  await page.goto("/qr");
+  await expect(page.locator('[data-testid="qr-code-banner"]')).toHaveCount(0);
+});

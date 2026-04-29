@@ -48,7 +48,56 @@ class AdminApiTestCase(unittest.TestCase):
         self.assertIn("forced_album", data)
         self.assertIn("qr_codes", data)
         self.assertIn("wifi_qr_code", data)
+        self.assertIn("banner", data)
         self.assertEqual(data["camera"]["camera_type"], "dummy")
+
+    def test_get_config_returns_banner_defaults(self) -> None:
+        response = self.test_client.get("/admin/config")
+        banner = response.json()["banner"]
+        self.assertEqual(banner["enabled"], False)
+        self.assertEqual(banner["text"], "Ta et bilde selv da vel!")
+        self.assertEqual(banner["height_vh"], 15)
+        self.assertEqual(banner["image_count"], 30)
+        self.assertEqual(banner["speed_px_per_sec"], 120)
+
+    def test_update_config_persists_banner_settings(self) -> None:
+        response = self.test_client.put("/admin/config", json={
+            "banner": {
+                "enabled": True,
+                "text": "Bli med på moroa!",
+                "height_vh": 20,
+                "image_count": 12,
+                "speed_px_per_sec": 120,
+            }
+        })
+        self.assertEqual(response.status_code, 200)
+        banner = response.json()["banner"]
+        self.assertEqual(banner["enabled"], True)
+        self.assertEqual(banner["text"], "Bli med på moroa!")
+        self.assertEqual(banner["height_vh"], 20)
+        self.assertEqual(banner["image_count"], 12)
+        self.assertEqual(banner["speed_px_per_sec"], 120)
+
+        get_response = self.test_client.get("/admin/config")
+        self.assertEqual(get_response.json()["banner"]["text"], "Bli med på moroa!")
+
+    def test_update_config_rejects_banner_height_below_minimum(self) -> None:
+        response = self.test_client.put("/admin/config", json={
+            "banner": {"height_vh": 1}
+        })
+        self.assertEqual(response.status_code, 422)
+
+    def test_update_config_rejects_banner_height_above_maximum(self) -> None:
+        response = self.test_client.put("/admin/config", json={
+            "banner": {"height_vh": 99}
+        })
+        self.assertEqual(response.status_code, 422)
+
+    def test_update_config_rejects_banner_speed_below_minimum(self) -> None:
+        response = self.test_client.put("/admin/config", json={
+            "banner": {"speed_px_per_sec": 1}
+        })
+        self.assertEqual(response.status_code, 422)
 
     def test_update_config_changes_camera_type(self) -> None:
         response = self.test_client.put("/admin/config", json={

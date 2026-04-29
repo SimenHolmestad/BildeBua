@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, ValidationError
 from backend.album_service.album_service import AlbumService, AlbumNotFoundError, ImageNotFoundError
 from backend.camera_service import CameraService
-from backend.core.config import CameraConfig, DisplayConfig, QrCodeConfig, WifiConfig
+from backend.core.config import BannerConfig, CameraConfig, DisplayConfig, QrCodeConfig, WifiConfig
 from backend.core.config_manager import ConfigManager
 from backend.routers.albums import AlbumInfoResponse, AlbumImageResponse, _albums_url_prefix_from_dir, _relative_url, _image_number_from_filename
 
@@ -15,6 +15,7 @@ class AdminConfigResponse(BaseModel):
     forced_album: Optional[str]
     qr_codes: QrCodeConfig
     wifi_qr_code: WifiConfig
+    banner: BannerConfig
 
 
 class AdminConfigUpdateRequest(BaseModel):
@@ -23,6 +24,7 @@ class AdminConfigUpdateRequest(BaseModel):
     forced_album: Optional[str] = Field(default=None, description="Set to empty string to clear forced album.")
     qr_codes: Optional[QrCodeConfig] = None
     wifi_qr_code: Optional[WifiConfig] = None
+    banner: Optional[BannerConfig] = None
 
 
 class ErrorResponse(BaseModel):
@@ -50,6 +52,7 @@ def construct_admin_api_router(
             forced_album=config.albums.forced_album,
             qr_codes=config.qr_codes,
             wifi_qr_code=config.wifi_qr_code,
+            banner=config.banner,
         )
 
     @admin_router.put(
@@ -83,6 +86,9 @@ def construct_admin_api_router(
         if request_body.wifi_qr_code is not None:
             overrides["wifi_qr_code"] = request_body.wifi_qr_code.model_dump()
 
+        if request_body.banner is not None:
+            overrides["banner"] = request_body.banner.model_dump()
+
         try:
             new_config = config_manager.save_and_reload(overrides)
         except (ValidationError, ValueError) as exc:
@@ -100,6 +106,7 @@ def construct_admin_api_router(
             forced_album=new_config.albums.forced_album,
             qr_codes=new_config.qr_codes,
             wifi_qr_code=new_config.wifi_qr_code,
+            banner=new_config.banner,
         )
 
     @admin_router.delete(

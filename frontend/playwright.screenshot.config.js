@@ -9,7 +9,8 @@ export default defineConfig({
   testDir: "./tests/e2e",
   testMatch: "screenshots.spec.js",
   globalSetup: "./tests/e2e/global-setup-screenshots.js",
-  fullyParallel: true,
+  fullyParallel: false,
+  workers: 1,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["html"], ["list"]] : "list",
   use: {
