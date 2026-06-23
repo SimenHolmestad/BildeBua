@@ -107,7 +107,16 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
         description="Return all available albums and the active forced album restriction."
     )
     def available_albums(request: Request) -> AvailableAlbumsResponse:
-        return get_available_albums(request)
+        return AvailableAlbumsResponse(
+            available_albums=[
+                AvailableAlbumResponse(
+                    name=album_name,
+                    last_images_thumbnails=get_recent_thumbnail_urls(request, album_name)
+                )
+                for album_name in album_service.get_available_album_names()
+            ],
+            forced_album=config_manager.config.albums.forced_album,
+        )
 
     @album_api_router.post(
         "/",
@@ -119,8 +128,15 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
             "If `description` is provided, update the album description."
         ),
     )
-    def create_album(request_body: AlbumCreateRequest, request: Request) -> AlbumCreatedResponse | JSONResponse:
-        return create_or_update_album(request_body, request)
+    def create_album(request_body: AlbumCreateRequest, request: Request) -> AlbumCreatedResponse:
+        album_name = request_body.album_name
+        album_service.get_or_create_album(album_name)
+        if request_body.description is not None:
+            album_service.set_album_description(album_name, request_body.description)
+        return AlbumCreatedResponse(
+            album_name=album_name,
+            album_url=request.url_for("album_info", album_name=album_name).path
+        )
 
     @album_api_router.get(
         "/{album_name}",
@@ -153,7 +169,7 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
                 f"No album with the name \"{album_name}\" exists"
             )
 
-        return get_album_information(request, album_name)
+        return build_album_info_response(request, album_service, albums_url_prefix, album_name)
 
     @album_api_router.post(
         "/{album_name}",
@@ -189,7 +205,24 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
                 f"No album with the name \"{album_name}\" exists"
             )
 
-        return try_capture_image_to_album(request, album_name)
+        try:
+            album_service.capture_image_to_album(album_name)
+        except ImageCaptureError as e:
+            return error_response(status.HTTP_500_INTERNAL_SERVER_ERROR, str(e))
+
+        image_name = album_service.get_last_image_name(album_name) or ""
+        thumbnail_name = album_service.get_last_thumbnail_name(album_name) or ""
+        return AlbumCaptureResponse(
+            success="Image successfully captured",
+            image_url=create_static_url(
+                request,
+                _relative_url(albums_url_prefix, album_name, "images", image_name)
+            ),
+            thumbnail_url=create_static_url(
+                request,
+                _relative_url(albums_url_prefix, album_name, "thumbnails", thumbnail_name)
+            )
+        )
 
     @album_api_router.get(
         "/{album_name}/last_image",
@@ -232,32 +265,6 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
             )
         )
 
-    def create_or_update_album(
-        request_body: AlbumCreateRequest,
-        request: Request
-    ) -> AlbumCreatedResponse | JSONResponse:
-        album_name = request_body.album_name
-        album_service.get_or_create_album(album_name)
-
-        if request_body.description is not None:
-            album_service.set_album_description(album_name, request_body.description)
-
-        return AlbumCreatedResponse(
-            album_name=album_name,
-            album_url=request.url_for("album_info", album_name=album_name).path
-        )
-
-    def get_available_albums(request: Request) -> AvailableAlbumsResponse:
-        album_names = album_service.get_available_album_names()
-        available_albums = [
-            AvailableAlbumResponse(
-                name=album_name,
-                last_images_thumbnails=get_recent_thumbnail_urls(request, album_name)
-            )
-            for album_name in album_names
-        ]
-        return AvailableAlbumsResponse(available_albums=available_albums, forced_album=config_manager.config.albums.forced_album)
-
     def get_recent_thumbnail_urls(request: Request, album_name: str, limit: int = 4) -> List[str]:
         thumbnail_names = album_service.get_thumbnail_names(album_name)[:limit]
         return [
@@ -267,79 +274,6 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
             )
             for thumbnail_name in thumbnail_names
         ]
-
-    def try_capture_image_to_album(
-        request: Request,
-        album_name: str
-    ) -> AlbumCaptureResponse | JSONResponse:
-        try:
-            return capture_image_to_album(request, album_name)
-        except ImageCaptureError as e:
-            return error_response(status.HTTP_500_INTERNAL_SERVER_ERROR, str(e))
-
-    def capture_image_to_album(request: Request, album_name: str) -> AlbumCaptureResponse:
-        album_service.capture_image_to_album(album_name)
-        image_name = album_service.get_last_image_name(album_name) or ""
-        thumbnail_name = album_service.get_last_thumbnail_name(album_name) or ""
-
-        return AlbumCaptureResponse(
-            success="Image successfully captured",
-            image_url=create_static_url(
-                request,
-                _relative_url(albums_url_prefix, album_name, "images", image_name)
-            ),
-            thumbnail_url=create_static_url(
-                request,
-                _relative_url(albums_url_prefix, album_name, "thumbnails", thumbnail_name)
-            )
-        )
-
-    def get_album_information(request: Request, album_name: str) -> AlbumInfoResponse:
-        description = album_service.get_album_description(album_name)
-        image_names = album_service.get_image_names(album_name)
-        thumbnail_names = album_service.get_thumbnail_names(album_name)
-        image_names_by_number = {
-            image_number: image_name
-            for image_name in image_names
-            for image_number in [_image_number_from_filename(image_name)]
-            if image_number is not None
-        }
-        thumbnail_names_by_number = {
-            image_number: thumbnail_name
-            for thumbnail_name in thumbnail_names
-            for image_number in [_image_number_from_filename(thumbnail_name)]
-            if image_number is not None
-        }
-        available_numbers = sorted(set(image_names_by_number).intersection(thumbnail_names_by_number))
-
-        return AlbumInfoResponse(
-            album_name=album_name,
-            images=[
-                AlbumImageResponse(
-                    image_number=image_number,
-                    image_url=create_static_url(
-                        request,
-                        _relative_url(
-                            albums_url_prefix,
-                            album_name,
-                            "images",
-                            image_names_by_number[image_number]
-                        )
-                    ),
-                    thumbnail_url=create_static_url(
-                        request,
-                        _relative_url(
-                            albums_url_prefix,
-                            album_name,
-                            "thumbnails",
-                            thumbnail_names_by_number[image_number]
-                        )
-                    )
-                )
-                for image_number in available_numbers
-            ],
-            description=description,
-        )
 
     def create_static_url(request: Request, relative_url: str) -> str:
         return request.url_for("static", path=relative_url).path
@@ -354,6 +288,40 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
         return JSONResponse(status_code=status_code, content={"error": message})
 
     return album_api_router
+
+
+def build_album_info_response(
+    request: Request,
+    album_service: AlbumService,
+    albums_url_prefix: str,
+    album_name: str,
+) -> AlbumInfoResponse:
+    description = album_service.get_album_description(album_name)
+    image_names_by_number = {
+        num: name for name in album_service.get_image_names(album_name)
+        for num in [_image_number_from_filename(name)] if num is not None
+    }
+    thumbnail_names_by_number = {
+        num: name for name in album_service.get_thumbnail_names(album_name)
+        for num in [_image_number_from_filename(name)] if num is not None
+    }
+    available_numbers = sorted(set(image_names_by_number) & set(thumbnail_names_by_number))
+
+    def static_url(relative: str) -> str:
+        return request.url_for("static", path=relative).path
+
+    return AlbumInfoResponse(
+        album_name=album_name,
+        description=description,
+        images=[
+            AlbumImageResponse(
+                image_number=n,
+                image_url=static_url(_relative_url(albums_url_prefix, album_name, "images", image_names_by_number[n])),
+                thumbnail_url=static_url(_relative_url(albums_url_prefix, album_name, "thumbnails", thumbnail_names_by_number[n])),
+            )
+            for n in available_numbers
+        ],
+    )
 
 
 def _albums_url_prefix_from_dir(albums_dir: str) -> str:

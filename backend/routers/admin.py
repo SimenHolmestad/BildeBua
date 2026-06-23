@@ -6,7 +6,7 @@ from backend.album_service.album_service import AlbumService, AlbumNotFoundError
 from backend.camera_service import CameraService
 from backend.core.config import BannerConfig, CameraConfig, DisplayConfig, QrCodeConfig, WifiConfig
 from backend.core.config_manager import ConfigManager
-from backend.routers.albums import AlbumInfoResponse, AlbumImageResponse, _albums_url_prefix_from_dir, _relative_url, _image_number_from_filename
+from backend.routers.albums import AlbumInfoResponse, _albums_url_prefix_from_dir, build_album_info_response
 
 
 class AdminConfigResponse(BaseModel):
@@ -186,33 +186,6 @@ def construct_admin_api_router(
             )
 
         albums_url_prefix = _albums_url_prefix_from_dir(config_manager.config.albums.albums_dir)
-        description = album_service.get_album_description(album_name)
-        image_names = album_service.get_image_names(album_name)
-        thumbnail_names = album_service.get_thumbnail_names(album_name)
-        image_names_by_number = {
-            num: name for name in image_names
-            for num in [_image_number_from_filename(name)] if num is not None
-        }
-        thumbnail_names_by_number = {
-            num: name for name in thumbnail_names
-            for num in [_image_number_from_filename(name)] if num is not None
-        }
-        available_numbers = sorted(set(image_names_by_number) & set(thumbnail_names_by_number))
-
-        def static_url(relative: str) -> str:
-            return request.url_for("static", path=relative).path
-
-        return AlbumInfoResponse(
-            album_name=album_name,
-            description=description,
-            images=[
-                AlbumImageResponse(
-                    image_number=n,
-                    image_url=static_url(_relative_url(albums_url_prefix, album_name, "images", image_names_by_number[n])),
-                    thumbnail_url=static_url(_relative_url(albums_url_prefix, album_name, "thumbnails", thumbnail_names_by_number[n])),
-                )
-                for n in available_numbers
-            ],
-        )
+        return build_album_info_response(request, album_service, albums_url_prefix, album_name)
 
     return admin_router

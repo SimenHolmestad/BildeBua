@@ -99,6 +99,22 @@ class AdminApiTestCase(unittest.TestCase):
         })
         self.assertEqual(response.status_code, 422)
 
+    def test_update_config_persists_display_qr_and_wifi(self) -> None:
+        response = self.test_client.put("/admin/config", json={
+            "display": {"overlay_seconds": 42},
+            "qr_codes": {"use_center_images": False, "url_qr_code_text": "Scan me"},
+            "wifi_qr_code": {"enabled": False},
+        })
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["display"]["overlay_seconds"], 42)
+        self.assertEqual(data["qr_codes"]["use_center_images"], False)
+        self.assertEqual(data["qr_codes"]["url_qr_code_text"], "Scan me")
+        self.assertEqual(data["wifi_qr_code"]["enabled"], False)
+
+        get_response = self.test_client.get("/admin/config")
+        self.assertEqual(get_response.json()["display"]["overlay_seconds"], 42)
+
     def test_update_config_changes_camera_type(self) -> None:
         response = self.test_client.put("/admin/config", json={
             "camera": {

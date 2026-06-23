@@ -251,6 +251,11 @@ class AlbumApiTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(json_response, {"error": "Illegal operation. The only accessible album is album2."})
 
+    def test_capture_image_to_nonexistent_album(self) -> None:
+        response = self.test_client.post("/albums/album1")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {"error": "No album with the name \"album1\" exists"})
+
     def test_successful_image_capture_response(self) -> None:
         self.create_temp_album("album1")
         json_response = self.test_client.post("/albums/album1").json()
@@ -290,6 +295,11 @@ class AlbumApiTestCase(unittest.TestCase):
 
         json_response = self.test_client.post("/albums/album1").json()
         self.assertNotIn("error", json_response)
+
+    def test_get_last_image_for_nonexistent_album(self) -> None:
+        response = self.test_client.get("/albums/album1/last_image")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {"error": "No album with the name \"album1\" exists"})
 
     def test_get_last_image_for_album_on_empty_album(self) -> None:
         self.create_temp_album("album1")
