@@ -7,6 +7,40 @@ import routes from 'routes';
 import { useAdminAlbum, useAdminConfig, useAlbumName, deleteAlbumAndRefresh, deleteImageAndRefresh, updateAdminConfigAndRefresh, updateAlbumDescriptionAndRefresh } from 'hooks/swr';
 import { useGlobalError } from 'contexts/GlobalErrorContext';
 
+const linkClass = 'rounded-xl border border-base-300 bg-base-100 px-6 py-3 font-display text-lg text-base-900 shadow-sm transition hover:bg-base-200';
+const disabledLinkClass = 'rounded-xl border border-base-300 bg-base-100 px-6 py-3 font-display text-lg text-base-400 shadow-sm opacity-60 cursor-not-allowed';
+
+type AlbumLinkProps = {
+  to: string;
+  external?: boolean;
+  disabled?: boolean;
+  children: React.ReactNode;
+};
+
+// Links to this album's user-facing views are dead while another album is forced
+// (those pages redirect to the forced album or 403), so render them disabled.
+const AlbumLink = ({ to, external, disabled, children }: AlbumLinkProps) => {
+  if (disabled) {
+    return (
+      <span className={disabledLinkClass} title="Ikke tilgjengelig mens et annet album er tvunget" aria-disabled="true">
+        {children}
+      </span>
+    );
+  }
+  if (external) {
+    return (
+      <a href={to} target="_blank" rel="noopener noreferrer" className={linkClass}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link to={to} className={linkClass}>
+      {children}
+    </Link>
+  );
+};
+
 const AdminAlbumPage = () => {
   const albumName = useAlbumName();
   const { albumInfo, isLoading } = useAdminAlbum();
@@ -19,6 +53,7 @@ const AdminAlbumPage = () => {
   const [savingDescription, setSavingDescription] = React.useState(false);
 
   const isForcedAlbum = adminConfig?.forced_album === albumName;
+  const anotherAlbumForced = !!adminConfig?.forced_album && adminConfig.forced_album !== albumName;
 
   const handleToggleForcedAlbum = async () => {
     const forced_album = isForcedAlbum ? '' : albumName;
@@ -126,14 +161,9 @@ const AdminAlbumPage = () => {
         )}
 
         <div className="mt-4 flex flex-wrap gap-3">
-          <a
-            href={routes.albumPage(albumName)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-xl border border-base-300 bg-base-100 px-6 py-3 font-display text-lg text-base-900 shadow-sm transition hover:bg-base-200"
-          >
+          <AlbumLink to={routes.albumPage(albumName)} external disabled={anotherAlbumForced}>
             Gå til album-side
-          </a>
+          </AlbumLink>
           <button
             type="button"
             onClick={handleToggleForcedAlbum}
@@ -152,19 +182,22 @@ const AdminAlbumPage = () => {
 
         <div className="mt-6">
           <h2 className="text-sm font-medium text-base-500">Andre lenker:</h2>
+          {anotherAlbumForced && (
+            <p className="mt-1 text-sm text-base-500">Ikke tilgjengelig mens et annet album er tvunget.</p>
+          )}
           <div className="mt-2 flex flex-wrap gap-3">
-            <Link to={routes.lastImagePage(albumName)} className="rounded-xl border border-base-300 bg-base-100 px-6 py-3 font-display text-lg text-base-900 shadow-sm transition hover:bg-base-200">
+            <AlbumLink to={routes.lastImagePage(albumName)} disabled={anotherAlbumForced}>
               Siste bilde
-            </Link>
-            <Link to={routes.qrCodeLastImagePage(albumName)} className="rounded-xl border border-base-300 bg-base-100 px-6 py-3 font-display text-lg text-base-900 shadow-sm transition hover:bg-base-200">
+            </AlbumLink>
+            <AlbumLink to={routes.qrCodeLastImagePage(albumName)} disabled={anotherAlbumForced}>
               QR siste bilde
-            </Link>
-            <Link to={routes.slideshowPage(albumName)} className="rounded-xl border border-base-300 bg-base-100 px-6 py-3 font-display text-lg text-base-900 shadow-sm transition hover:bg-base-200">
+            </AlbumLink>
+            <AlbumLink to={routes.slideshowPage(albumName)} disabled={anotherAlbumForced}>
               Lysbildeshow
-            </Link>
-            <Link to={routes.slideshowLastImagePage(albumName)} className="rounded-xl border border-base-300 bg-base-100 px-6 py-3 font-display text-lg text-base-900 shadow-sm transition hover:bg-base-200">
+            </AlbumLink>
+            <AlbumLink to={routes.slideshowLastImagePage(albumName)} disabled={anotherAlbumForced}>
               Lysbildeshow siste bilde
-            </Link>
+            </AlbumLink>
           </div>
         </div>
 

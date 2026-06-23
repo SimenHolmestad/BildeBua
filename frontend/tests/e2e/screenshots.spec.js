@@ -61,6 +61,35 @@ for (const { name: viewportName, viewport } of viewports) {
   });
 }
 
+test.describe("admin-album-forced-other", () => {
+  test.describe.configure({ mode: "serial" });
+
+  for (const { name: viewportName, viewport } of viewports) {
+    test(`admin-album-page-forced-other-${viewportName}`, async ({ page, request }) => {
+      await page.setViewportSize(viewport);
+      await page.route("https://fonts.googleapis.com/**", (route) => route.abort());
+      await page.route("https://fonts.gstatic.com/**", (route) => route.abort());
+
+      // Force a different album than the one we view, so its links render disabled
+      const enableResponse = await request.put("/admin/config", { data: { forced_album: "Sommerfest" } });
+      expect(enableResponse.ok()).toBeTruthy();
+
+      try {
+        await page.goto(`/admin/album/${albumName}`);
+        await page.waitForLoadState("networkidle");
+        await page.getByText("Ikke tilgjengelig mens et annet album er tvunget.").waitFor();
+
+        await expect(page).toHaveScreenshot(`admin-album-page-forced-other-${viewportName}.png`, {
+          animations: "disabled",
+          caret: "hide",
+        });
+      } finally {
+        await request.put("/admin/config", { data: { forced_album: "" } });
+      }
+    });
+  }
+});
+
 test.describe("qr-page-banner", () => {
   test.describe.configure({ mode: "serial" });
 

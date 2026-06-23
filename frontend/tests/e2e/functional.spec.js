@@ -109,6 +109,34 @@ test("can delete an image from admin album page", async ({ page, request }) => {
   await expect(page.getByText("1 bilder")).toBeVisible();
 });
 
+test("disables album view links when another album is forced", async ({ page, request }) => {
+  const albumName = "e2e-admin-forced-other";
+  const forcedAlbum = "e2e-admin-forced-target";
+  await createAlbum(request, albumName, "Album som vises");
+  await createAlbum(request, forcedAlbum, "Tvunget album");
+
+  // Force a different album
+  let response = await request.put("/admin/config", { data: { forced_album: forcedAlbum } });
+  expect(response.ok()).toBeTruthy();
+
+  await page.goto(`/admin/album/${albumName}`);
+  await expect(page.getByRole("heading", { name: albumName })).toBeVisible();
+
+  // Links to this album's user-facing views are disabled (rendered as aria-disabled spans, not links)
+  await expect(page.getByText("Ikke tilgjengelig mens et annet album er tvunget.")).toBeVisible();
+  await expect(page.getByText("Gå til album-side")).toHaveAttribute("aria-disabled", "true");
+  await expect(page.getByText("Siste bilde", { exact: true })).toHaveAttribute("aria-disabled", "true");
+  await expect(page.getByRole("link", { name: "Siste bilde", exact: true })).toHaveCount(0);
+
+  // Clear forced album: links become real links again
+  response = await request.put("/admin/config", { data: { forced_album: "" } });
+  expect(response.ok()).toBeTruthy();
+
+  await page.goto(`/admin/album/${albumName}`);
+  await expect(page.getByRole("link", { name: "Siste bilde", exact: true })).toBeVisible();
+  await expect(page.getByText("Ikke tilgjengelig mens et annet album er tvunget.")).toHaveCount(0);
+});
+
 test("shows QR codes on the qr page", async ({ page }) => {
   await page.goto("/qr");
 
