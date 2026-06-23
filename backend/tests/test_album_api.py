@@ -305,8 +305,8 @@ class AlbumApiTestCase(unittest.TestCase):
         self.create_temp_album("album1")
         response = self.test_client.get("/albums/album1/last_image")
         json_response = response.json()
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(json_response, {'error': 'album is empty'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json_response, {'last_image_url': None})
 
     def test_get_last_image_for_not_forced_album(self) -> None:
         self.create_temp_album("album1")

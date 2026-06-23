@@ -83,8 +83,9 @@ class AlbumCaptureResponse(BaseModel):
 
 
 class LastImageResponse(BaseModel):
-    last_image_url: str = Field(
-        description="URL of the latest image in the album.",
+    last_image_url: Optional[str] = Field(
+        default=None,
+        description="URL of the latest image in the album, or null if the album is empty.",
         examples=["/static/albums/album1/images/image0001.png"]
     )
 
@@ -237,7 +238,7 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
             },
             status.HTTP_404_NOT_FOUND: {
                 "model": ErrorResponse,
-                "description": "Album does not exist or has no images yet."
+                "description": "Album does not exist."
             }
         }
     )
@@ -256,7 +257,7 @@ def construct_album_api_router(config_manager: ConfigManager, album_service: Alb
 
         image_name = album_service.get_last_image_name(album_name)
         if not image_name:
-            return error_response(status.HTTP_404_NOT_FOUND, "album is empty")
+            return LastImageResponse(last_image_url=None)
 
         return LastImageResponse(
             last_image_url=create_static_url(

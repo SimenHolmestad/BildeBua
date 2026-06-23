@@ -290,9 +290,9 @@ export type HttpValidationError = {
 export type LastImageResponse = {
     /**
      * Last Image Url
-     * URL of the latest image in the album.
+     * URL of the latest image in the album, or null if the album is empty.
      */
-    last_image_url: string;
+    last_image_url?: string | null;
 };
 
 /**
@@ -505,7 +505,7 @@ export type GetAlbumLastImageErrors = {
      */
     403: ErrorResponse;
     /**
-     * Album does not exist or has no images yet.
+     * Album does not exist.
      */
     404: ErrorResponse;
     /**

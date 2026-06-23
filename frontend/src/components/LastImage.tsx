@@ -42,11 +42,11 @@ const LastImage = ({ albumName, overlay = false, overlayTime }: LastImageProps) 
     );
   }
 
-  if (!albumLastImage) {
+  if (!currentUrl) {
     return <NotFound />;
   }
 
-  return <FullscreenImage imageUrl={albumLastImage.last_image_url} time={overlayTime} />;
+  return <FullscreenImage imageUrl={currentUrl} time={overlayTime} />;
 };
 
 export default LastImage;
